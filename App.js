@@ -9,7 +9,6 @@ YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTIm
 import welcomePage from './src/welcomePage';//登陆主页
 import main from './src/main'//第一个Tab
 
-
 export default App = createStackNavigator({
   welcome: {
     screen: welcomePage, 
