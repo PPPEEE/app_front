@@ -12,7 +12,7 @@ const RootStack = createStackNavigator({
   Login: login,
 //Registry: registry
 },{
-	initialRouteName: 'Main'
+	initialRouteName: 'Login'
 });
 
 export default class Router extends Component {
