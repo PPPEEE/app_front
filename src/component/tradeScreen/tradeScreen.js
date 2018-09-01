@@ -12,11 +12,11 @@ import {
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 
-export default class scanCode extends Component {
+export default class tradeScreen extends Component {
   render() {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>scanCodeScreen!</Text>
+        <Text>tradeScreen!</Text>
       </View>
     );
   }
