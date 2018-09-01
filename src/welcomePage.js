@@ -6,8 +6,6 @@ import {
   StyleSheet,
   View,
   Button,
-  Text,
-  Image,
   ImageBackground,
 } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
@@ -15,7 +13,7 @@ import { SafeAreaView } from 'react-navigation';
 export default class MainPage extends Component {
 
   componentDidMount() {
-    setTimeout(() => this.props.navigation.replace('main'), 3000);
+    setTimeout(() => this.props.navigation.replace('main'), 1000);
   }
   render() {
     return (

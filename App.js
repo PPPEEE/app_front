@@ -26,6 +26,9 @@ export default App = createStackNavigator({
   // regiter: {screen: ImageDemo,},
   main: {
     screen: main,
+    navigationOptions: ({navigation}) => ({
+      header: null,
+    }),
   },
 },
   {
