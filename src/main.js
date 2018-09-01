@@ -31,10 +31,10 @@ export default Home = createBottomTabNavigator(
     },
     trade: {
       screen: tradeScreen,
-      navigationOptions: {
+      navigationOptions: ({ navigation }) => ({
         tabBarLabel: '交易',
         tabBarIcon: ({ tintColor }) => <Icon name="credit-card" size={26} color={tintColor} />,
-      },
+      }),
     },
     scanCode: {
       screen: scanCode,

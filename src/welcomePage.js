@@ -5,10 +5,10 @@ import React, { Component } from 'react';
 import {
   StyleSheet,
   View,
-  Button,
   ImageBackground,
 } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
+import Button from 'react-native-button';
 
 export default class MainPage extends Component {
 
@@ -21,10 +21,12 @@ export default class MainPage extends Component {
         <ImageBackground source={require('./images/backgroundImg.jpg')} style={{width: '100%', height: '100%'}} >
           <View style={styles.content}>
             <Button
-              title="欢迎进入DCCB"
-              color="#FFFFFF"
+              containerStyle={{padding:10, height:45, width:'90%', margin:'5%', overflow:'hidden', borderRadius:4, backgroundColor: '#441272'}}
+              disabledContainerStyle={{backgroundColor: '#441272'}}
+              style={{fontSize: 20, color: '#FFFFFF'}}>
               onPress={() => this.props.navigation.replace('main')}
-            />
+              欢迎进入DCCB
+          </Button>
           </View>
         </ImageBackground>
       </SafeAreaView>
