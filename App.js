@@ -63,7 +63,6 @@ export default App = createStackNavigator({
     // },
     // headerMode:'screen',
   }
-);
     // backTitle: 'Back',
     // style:styles.header,
     // right: <Button title="Info" />,
@@ -76,6 +75,5 @@ export default App = createStackNavigator({
     // },
     // },
     // headerMode:'screen',
-  }
 );
 

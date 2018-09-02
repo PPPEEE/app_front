@@ -11,7 +11,7 @@ export default class MainPage extends Component {
   componentDidMount() {
     AsyncStorage.getItem('token').then((result, error) => {
       setTimeout(() => {
-        if (typeof result !== 'undefined') {
+        if ( result !== null ) {
           this.props.navigation.replace('main');
         } else {
           this.props.navigation.replace('login');
