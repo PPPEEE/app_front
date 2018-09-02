@@ -9,16 +9,20 @@ import {
   Text,
   Image,
   ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Feather';
 import EIcons from 'react-native-vector-icons/Entypo';
 import MIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FIcons from 'react-native-vector-icons/FontAwesome';
 import Button from 'react-native-button';
+import { SafeAreaView, createStackNavigator } from 'react-navigation';
 
-import { SafeAreaView } from 'react-navigation';
 
 export default class userScreen extends Component {
+  onPress = (where) => {
+    this.props.navigation.navigate(where);
+  }
   render() {
     return (
       <SafeAreaView style={styles.container}>
@@ -46,10 +50,13 @@ export default class userScreen extends Component {
                 <FIcons name={'language'} style={styles.fontIcon}></FIcons>
                 <Text style={styles.font}>多语言</Text>
               </View>
-              <View style={styles.one}>
-                <FIcons name={'group'} style={styles.fontIcon}></FIcons>
-                <Text style={styles.font}>我的团队</Text>
-              </View>
+                <TouchableOpacity style={styles.one}
+                  onPress={()=>this.onPress('myTeam')}>
+                  <View style={{flex:1}}>
+                    <FIcons name={'group'} style={styles.fontIcon}></FIcons>
+                    <Text style={styles.font}>我的团队</Text>
+                  </View>
+                </TouchableOpacity>
             </View>
             <View style={styles.listone}>
               <View style={styles.one}>
@@ -61,7 +68,7 @@ export default class userScreen extends Component {
                 <Text style={styles.font}>我的资产</Text>
               </View>
               <View style={styles.one}>
-                <FIcons name={'log-in'} style={styles.fontIcon}></FIcons>
+                <Ionicons name={'log-in'} style={styles.fontIcon}></Ionicons>
                 <Text style={styles.font}>转入与提现</Text>
               </View>
             </View>
@@ -94,10 +101,13 @@ export default class userScreen extends Component {
               </View>
             </View>
             <View style={styles.listone}>
-              <View style={styles.one}>
-                <MIcons name={'file-document-box-outline'} style={styles.fontIcon}></MIcons>
-                <Text style={styles.font}>我的订单</Text>
-              </View>
+              <TouchableOpacity style={styles.one}
+                  onPress={()=>this.onPress('allTrade')}>
+                  <View style={{flex:1}}>
+                    <MIcons name={'file-document-box-outline'} style={styles.fontIcon}></MIcons>
+                    <Text style={styles.font}>我的订单</Text>
+                  </View>
+                </TouchableOpacity>
               <View style={styles.one}>
                 <EIcons name={'location'} style={styles.fontIcon}></EIcons>
                 <Text style={styles.font}>地址管理</Text>
@@ -134,6 +144,7 @@ export default class userScreen extends Component {
   }
 }
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -149,7 +160,7 @@ const styles = StyleSheet.create({
   },
   topInfo: {
     justifyContent: 'center',
-    width: '32%',
+    width: '33%',
     alignItems: 'stretch',
   },
   middle: {
@@ -158,8 +169,8 @@ const styles = StyleSheet.create({
   listone: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
-    borderBottomWidth: 1,
-    borderBottomColor: '#391563',
+    borderBottomWidth: 2,
+    borderBottomColor: '#381363',
   },
   one: {
     justifyContent: 'center',
@@ -180,7 +191,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   buttonstyle: {
-    textAlign: 'center',
     flex: 1 , height: 45, width: '90%', margin: '5%'
   }
 });

@@ -9,6 +9,7 @@ YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTIm
 import welcomePage from './src/welcomePage'; //登陆主页
 import main from './src/main' //第一个Tab
 import Login from './src/component/loginScreen/login';
+import myTeam from './src/component/userScreen/myTeam';
 
 export default App = createStackNavigator({
   welcome: {
@@ -30,6 +31,19 @@ export default App = createStackNavigator({
       header: null,
     }),
   },
+  myTeam: {
+    screen: myTeam,
+    navigationOptions: ({navigation}) => ({
+      title: '我的团队',
+      headerTitleStyle: {
+        color: '#FFFFFF',
+},
+      headerStyle: {
+        backgroundColor: '#551670',
+      },
+      headerTintColor: '#FFFFFF',
+    }),
+  },
 },
   {
     initialRouteName: 'login', // 默认显示界面
@@ -49,3 +63,18 @@ export default App = createStackNavigator({
     // headerMode:'screen',
   }
 );
+    // backTitle: 'Back',
+    // style:styles.header,
+    // right: <Button title="Info" />,
+    // left:<Button title="left" />,
+    // titleStyle:styles.title,
+    // visible:true,
+    // title: 'ProfileScreen',
+    // tintColor:'yellow',
+    // gesturesEnabled:true,
+    // },
+    // },
+    // headerMode:'screen',
+  }
+);
+

@@ -9,7 +9,7 @@ import {
   Text,
   Image,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Sicon from 'react-native-vector-icons/SimpleLineIcons';
 import { createMaterialTopTabNavigator } from 'react-navigation';
 import allTrade from './allTrade';
 import buyList from './buyList';
@@ -23,35 +23,35 @@ export default tradeScreen = createMaterialTopTabNavigator({
     screen: allTrade,
     navigationOptions: {
       tabBarLabel: '全部',
-      tabBarIcon: ({ tintColor }) => <Ionicons name="home" size={24} color={tintColor} />,
+      tabBarIcon: ({ tintColor }) => <Sicon name="list" size={22} color={tintColor} />,
     },
   },
   buy: {
     screen: buyList,
     navigationOptions: {
       tabBarLabel: '我买的',
-      tabBarIcon: ({ tintColor }) => <Ionicons name="home" size={24} color={tintColor} />,
+      tabBarIcon: ({ tintColor }) => <Sicon name="plus" size={22} color={tintColor} />,
     },
   },
   trade: {
     screen: soldList,
     navigationOptions: {
       tabBarLabel: '我卖的',
-      tabBarIcon: ({ tintColor }) => <Ionicons name="credit-card" size={26} color={tintColor} />,
+      tabBarIcon: ({ tintColor }) => <Sicon name="minus" size={22} color={tintColor} />,
     },
   },
   comlete: {
     screen: completeList,
     navigationOptions: {
       tabBarLabel: '已完成',
-      tabBarIcon: ({ tintColor }) => <Ionicons name="credit-card" size={26} color={tintColor} />,
+      tabBarIcon: ({ tintColor }) => <Sicon name="paper-clip" size={22} color={tintColor} />,
     },
   },
   shensu: {
     screen: shensu,
     navigationOptions: {
       tabBarLabel: '申诉',
-      tabBarIcon: ({ tintColor }) => <Ionicons name="credit-card" size={26} color={tintColor} />,
+      tabBarIcon: ({ tintColor }) => <Sicon name="info" size={22} color={tintColor} />,
     },
   },
 },
