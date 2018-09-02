@@ -1,5 +1,5 @@
 /**
- * 全部订单
+ * 已完成订单
  */
 import React, { Component } from 'react';
 import {
@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-navigation';
 
 var ITEM_HEIGHT = 150;
 
-export default class allTrade extends Component {
+export default class completeList extends Component {
 
   _flatList;
   //每一个列表渲染的方法
@@ -105,9 +105,9 @@ export default class allTrade extends Component {
 const styles = StyleSheet.create({
   txt: {
     textAlign: 'center',
-    textAlignVertical: 'center',
+    // textAlignVertical: 'center',
     color: 'white',
-    fontSize: 18,
+    fontSize: 30,
   },
   text: {
     color: 'black',

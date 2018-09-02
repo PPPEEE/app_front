@@ -12,6 +12,10 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import { createMaterialTopTabNavigator } from 'react-navigation';
 import allTrade from './allTrade';
+import buyList from './buyList';
+import soldList from './soldList';
+import completeList from './completeList';
+import shensu from './shensu';
 
 
 export default tradeScreen = createMaterialTopTabNavigator({  
@@ -23,28 +27,28 @@ export default tradeScreen = createMaterialTopTabNavigator({
     },
   },
   buy: {
-    screen: allTrade,
+    screen: buyList,
     navigationOptions: {
       tabBarLabel: '我买的',
       tabBarIcon: ({ tintColor }) => <Ionicons name="home" size={24} color={tintColor} />,
     },
   },
   trade: {
-    screen: allTrade,
+    screen: soldList,
     navigationOptions: {
       tabBarLabel: '我卖的',
       tabBarIcon: ({ tintColor }) => <Ionicons name="credit-card" size={26} color={tintColor} />,
     },
   },
   comlete: {
-    screen: allTrade,
+    screen: completeList,
     navigationOptions: {
       tabBarLabel: '已完成',
       tabBarIcon: ({ tintColor }) => <Ionicons name="credit-card" size={26} color={tintColor} />,
     },
   },
   shensu: {
-    screen: allTrade,
+    screen: shensu,
     navigationOptions: {
       tabBarLabel: '申诉',
       tabBarIcon: ({ tintColor }) => <Ionicons name="credit-card" size={26} color={tintColor} />,

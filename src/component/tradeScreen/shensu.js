@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-navigation';
 
 var ITEM_HEIGHT = 150;
 
-export default class allTrade extends Component {
+export default class shensu extends Component {
 
   _flatList;
   //每一个列表渲染的方法
@@ -27,23 +27,6 @@ export default class allTrade extends Component {
     var orderStateColor = item.item.orderState == '0' ? 'green' : '#fb9c27';
     return (
       <View style={{flex: 1, height: ITEM_HEIGHT, backgroundColor: bgColor}}>
-        <View style={styles.listViewTop}>
-          <View>
-            <Text style={{color: '#c33915'}}>{orderType + item.item.orderMoney+' PE'}</Text>
-            <View style={{flexDirection: 'row',justifyContent: 'flex-start'}}>
-              <Text style={styles.text}>{buySeller+item.item.buySellerNum}</Text>
-              <Image
-                style={{width: 15, height: 15, borderRadius: 15, margin:5}}
-                source={require('../../images/WeChat.png')}
-              />
-            </View>
-            <Text style={styles.text}>{'卖家手机: '+item.item.phone}</Text>
-          </View>
-          <View>
-            <Text style={styles.text}>{item.item.orderMoney+' CNY'}</Text>
-            <Text style={styles.text}>{'实付: '+item.item.payMoney+' CNY'}</Text>
-          </View>  
-        </View>
         <View style={styles.listViewBottom}>
           <Text style={{color: orderStateColor}}>状态: {orderState}</Text>
           <Text style={styles.text}>编号: {item.item.orderNum}</Text>
@@ -63,7 +46,7 @@ export default class allTrade extends Component {
 
   render() {
     var data = [];
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < 0; i++) {
       data.push({ 
         key: i,
         title: i + '',
@@ -77,7 +60,6 @@ export default class allTrade extends Component {
         orderNum: '7689123',
       });
     }
-    console.log(data);
 
     return (
       <View style={{ flex: 1 }}>
@@ -105,9 +87,9 @@ export default class allTrade extends Component {
 const styles = StyleSheet.create({
   txt: {
     textAlign: 'center',
-    textAlignVertical: 'center',
+    // textAlignVertical: 'center',
     color: 'white',
-    fontSize: 18,
+    fontSize: 30,
   },
   text: {
     color: 'black',
