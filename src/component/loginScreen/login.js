@@ -1,31 +1,43 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View, TextInput, TouchableOpacity , Alert} from 'react-native';
-import Icon from 'react-native-vector-icons/EvilIcons';
-import Resolutions from '../resolutions';
+import { Platform, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, AsyncStorage} from 'react-native';
+import Icon from 'react-native-vector-icons/FontAwesome';
+import Resolutions from '../../utils/resolutions';
 
 export default class Login extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      username: '',
+      mobile: '',
       password: ''
     };
 
     this.login = () => {
-      fetch('https://www.baidu.com/', {
+    	// if(!this.state.mobile){
+     //       this.refs.mobile.focus();
+     //       return;
+    	// }
+    	// if(!this.state.password){
+    	// 	this.refs.password.focus();
+    	// 	return;
+    	// }
+      fetch('http://120.78.205.55:8081/user/login', {
         method: "POST",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          firstParam: this.state.username,
-          secondParam: this.state.password
+          mobile: this.state.mobile || '15013669204',
+          password: this.state.password || '123456'
         })
       }).then((res) => {
-      	console.log(res);
-        Alert.alert('','登录成功');
+      	return  res.json();
+      }).then((jsonData) =>{
+        if(jsonData.code === 200){
+          AsyncStorage.setItem('token',jsonData.data);
+          this.props.navigation.replace('main');
+        }
       });
     }
   }
@@ -45,11 +57,15 @@ export default class Login extends Component {
                     style={ styles.icon } />
             </Text>
             <TextInput
+                       ref="mobile"
                        placeholder="请填写用户名/手机号码/UID"
                        style={ styles.input }
                        placeholderTextColor="#969696"
                        underlineColorAndroid="transparent"
-                       value={ this.state.username } />
+                       onChangeText={ (text) => this.setState({
+                                        mobile: text
+                                      }) }
+                       value={ this.state.mobile } />
           </View>
           <View style={ [styles.formElement, { borderBottomWidth: 4, borderColor: '#203E86' }] }>
             <Text style={ styles.iconWrapper }>
@@ -58,11 +74,15 @@ export default class Login extends Component {
                     style={ styles.icon } />
             </Text>
             <TextInput
+                       ref="password"
                        placeholder="请填写登录密码"
                        style={ styles.input }
                        placeholderTextColor="#969696"
                        underlineColorAndroid="transparent"
-                       secureTextEntry={ true } />
+                       secureTextEntry={ true }
+                       onChangeText={ (text) => this.setState({
+                                        password: text
+                                      }) } />
           </View>
           <View style={ [styles.formElement, { marginTop: 100, backgroundColor: 'transparent' }] }>
             <TouchableOpacity
@@ -74,7 +94,11 @@ export default class Login extends Component {
             </TouchableOpacity>
           </View>
           <View style={ [styles.formElement, { margin: 25, backgroundColor: 'transparent', justifyContent: 'space-between' }] }>
-            <Text style={ { color: '#969696', fontSize: 40 } }>
+            <Text
+                  style={ { color: '#969696', fontSize: 40 } }
+                  onPress={ () => {
+                              this.props.navigation.push('register')
+                            } }>
               免费注册
             </Text>
             <Text style={ { color: '#969696', fontSize: 40 } }>
@@ -101,19 +125,19 @@ const styles = StyleSheet.create({
   },
   formElement: {
     width: 810,
-    height: 110,
+    height: 130,
     flexDirection: 'row',
-    backgroundColor: 'black',
-    margin: 40
+    margin: 30
   },
   iconWrapper: {
-    width: 110,
-    padding: 15,
-    margin: 15
+    width: 90,
+    padding: 5,
+    marginLeft: 30,
+    marginTop: 25
   },
   icon: {
     color: '#3A9AF5',
-    fontSize: 60
+    fontSize: 70
   },
   input: {
     width: 720,
@@ -129,5 +153,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderRadius: 55
   }
+
 
 })

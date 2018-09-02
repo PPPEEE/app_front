@@ -58,6 +58,12 @@ export default class Resolution {
       scaleY: fh_scale,
       navHeight
     }
+
+    return {
+      fw: props.fw,
+      fh: props.fh,
+      fs: props.fs
+    };
   }
 
   static FixWidthView = (p) => {

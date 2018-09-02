@@ -10,6 +10,7 @@ import welcomePage from './src/welcomePage'; //登陆主页
 import main from './src/main' //第一个Tab
 import Login from './src/component/loginScreen/login';
 import myTeam from './src/component/userScreen/myTeam';
+import Register from './src/component/loginScreen/register';
 
 export default App = createStackNavigator({
   welcome: {
@@ -24,11 +25,11 @@ export default App = createStackNavigator({
       header: null,
     })
   },
-  // regiter: {screen: ImageDemo,},
+  register: {screen: Register},
   main: {
     screen: main,
     navigationOptions: ({navigation}) => ({
-      header: null,
+      header: null
     }),
   },
   myTeam: {
@@ -46,7 +47,7 @@ export default App = createStackNavigator({
   },
 },
   {
-    initialRouteName: 'login', // 默认显示界面
+    initialRouteName: 'welcome', // 默认显示界面
     // navigationOptions: {
     //     header: {
     // backTitle: 'Back',
