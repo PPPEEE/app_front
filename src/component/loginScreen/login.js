@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, AsyncStorage} from 'react-native';
+import { Platform, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, AsyncStorage, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Resolutions from '../../utils/resolutions';
 
@@ -13,14 +13,14 @@ export default class Login extends Component {
     };
 
     this.login = () => {
-    	// if(!this.state.mobile){
-     //       this.refs.mobile.focus();
-     //       return;
-    	// }
-    	// if(!this.state.password){
-    	// 	this.refs.password.focus();
-    	// 	return;
-    	// }
+      if (!this.state.mobile) {
+        this.refs.mobile.focus();
+        return;
+      }
+      if (!this.state.password) {
+        this.refs.password.focus();
+        return;
+      }
       fetch('http://120.78.205.55:8081/user/login', {
         method: "POST",
         headers: {
@@ -32,12 +32,16 @@ export default class Login extends Component {
           password: this.state.password || '123456'
         })
       }).then((res) => {
-      	return  res.json();
-      }).then((jsonData) =>{
-        if(jsonData.code === 200){
-          AsyncStorage.setItem('token',jsonData.data);
+        return res.json();
+      }).then((jsonData) => {
+        if (jsonData.code === 200) {
+          AsyncStorage.setItem('token', jsonData.data);
           this.props.navigation.replace('main');
+        }else{
+          Alert.alert('提示', jsonData.message);
         }
+      }).catch(()=>{
+
       });
     }
   }
@@ -46,9 +50,10 @@ export default class Login extends Component {
       <Resolutions.FixFullView>
         <View style={ styles.container }>
           <View style={ styles.logon }>
-            <Text style={ { fontSize: 44, color: 'white' } }>
-              { '登录页图标' }
-            </Text>
+            <Image
+                   style={ { width: 650, height: 150 } }
+                   source={ require('../../images/LOGO.png') }
+                   resizeMode='contain' />
           </View>
           <View style={ [styles.formElement, { borderBottomWidth: 4, borderColor: '#203E86' }] }>
             <Text style={ styles.iconWrapper }>

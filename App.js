@@ -77,17 +77,5 @@ export default App = createStackNavigator({
     // },
     // headerMode:'screen',
   }
-  // backTitle: 'Back',
-  // style:styles.header,
-  // right: <Button title="Info" />,
-  // left:<Button title="left" />,
-  // titleStyle:styles.title,
-  // visible:true,
-  // title: 'ProfileScreen',
-  // tintColor:'yellow',
-  // gesturesEnabled:true,
-  // },
-  // },
-  // headerMode:'screen',
 );
 

@@ -1,42 +1,60 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Picker, KeyboardAvoidingView } from 'react-native';
+import { Platform, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Picker, KeyboardAvoidingView, AsyncStorage } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Resolutions from '../../utils/resolutions';
-
+var token;
 export default class Register extends Component {
   constructor(props) {
     super(props);
-
+    AsyncStorage.getItem('token', (error, value) => {
+      token = value;
+    });
     this.state = {
-      userName: '',
-      pwd: '',
       checked: true,
       areaCode: '86',
-      seconds: 60
+      seconds: 60,
+      type: '1'
     };
+
     this.register = this.register.bind(this);
     this.sendVerifiCode = this.sendVerifiCode.bind(this);
+    this.checkUserName = this.checkUserName.bind(this);
   }
-  sendVerifiCode() {
-    var formData = new FormData();
-    formData.append('areaCode', '86');
-    formData.append('mobile', this.state.mobile);
-    formData.append('type', '1');
-
-    fetch('http://120.78.205.55:8081/user/sendCode', {
+  checkUserName() {
+    fetch('http://120.78.205.55:8081/user/userNameExists', {
       method: "POST",
       headers: {
-        "Accept": "application/json;",
-        "Content-Type": "multipart/form-data"
+        "Accept": "application/json",
+        "token":'2e43c15ede4a8be9ad39975ff5054f49',
+        "Content-Type": "application/json"
       },
-      body: formData
+      body: JSON.stringify({
+        'userName ': this.state.userName
+      })
     }).then((res) => {
       return res.json();
     }).then((jsonData) => {
-      Alert.alert('error', JSON.stringify(jsonData).concat(JSON.stringify(formData)));
+      Alert.alert('提示', JSON.stringify(jsonData),);
+    }).catch((error) => {
+      Alert.error('error', JSON.stringify(error));
+    })
+  }
+  sendVerifiCode() {
+    fetch('http://120.78.205.55:8081/user/sendCode', {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        'areaCode': this.state.areaCode,
+        'mobile': this.state.mobile,
+        'type': this.state.type
+      })
+    }).then((res) => {
+      return res.json();
     }).catch(error => {
 
-      // Alert.alert('error',JSON.stringify(error));
     });
     this.setState({
       isSendCode: true
@@ -62,18 +80,25 @@ export default class Register extends Component {
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        userName: this.state.userName || 'shenjia',
-        pwd: this.state.pwd || 'shenjia',
-        telephone: this.state.telephone || '15013669204',
-        refereeId: this.state.refereeId || 'shenjia',
-        code: this.state.code || '000000'
+        code: this.state.verificode,
+        user: {
+          userName: this.state.userName,
+          pwd: this.state.password,
+          telephone: this.state.mobile,
+          refereeId: this.state.refereeId,
+        }
       })
     }).then((res) => {
       return res.json();
     }).then((jsonData) => {
-      Alert.alert('error',JSON.stringify(jsonData));
+      if (jsonData.code === 200) {
+        Alert.alert('提示', '注册成功');
+        this.props.navigation.replace('login');
+      } else {
+        Alert.alert('提示', '注册失败');
+      }
     }).catch(error => {
-      Alert.alert(JSON.stringify(error.error));
+
     });
   }
 
@@ -96,7 +121,8 @@ export default class Register extends Component {
                          underlineColorAndroid="transparent"
                          onChangeText={ (text) => this.setState({
                                           userName: text
-                                        }) } />
+                                        }) }
+                         onBlur={ this.checkUserName } />
             </View>
             <View style={ [styles.formElement, { borderBottomWidth: 4, borderColor: '#203E86' }] }>
               <Text style={ styles.iconWrapper }>
@@ -126,9 +152,14 @@ export default class Register extends Component {
                          placeholderTextColor="#969696"
                          underlineColorAndroid="transparent"
                          secureTextEntry={ true }
-                         onChangeText={ (text) => this.setState({
-                                          passwordConfirm: text
-                                        }) } />
+                         onChangeText={ (text) => {
+                                          if (text !== this.state.password) {
+                                             this.setState
+                                          }
+                                          return this.setState({
+                                            passwordConfirm: text
+                                          });
+                                        } } />
             </View>
             <View style={ [styles.formElement, { borderBottomWidth: 4, borderColor: '#203E86' }] }>
               <Text style={ [styles.iconWrapper, { paddingLeft: 10, paddingBottom: 10, paddingTop: 5 }] }>
@@ -170,7 +201,7 @@ export default class Register extends Component {
                                 onPress={ this.sendVerifiCode }
                                 disabled={ this.state.isSendCode }>
                 <Text style={ { fontSize: 40, color: '#0C2956' } }>
-                  {this.state.isSendCode ? ('重新发送('+this.state.seconds+')'):'获取验证码'}
+                  { this.state.isSendCode ? ('重新发送(' + this.state.seconds + ')') : '获取验证码' }
                 </Text>
               </TouchableOpacity>
             </View>
@@ -186,13 +217,14 @@ export default class Register extends Component {
                          placeholderTextColor="#969696"
                          underlineColorAndroid="transparent"
                          onChangeText={ (text) => this.setState({
-                                          referee: text
+                                          refereeId: text
                                         }) } />
             </View>
             <View style={ [styles.formElement, { marginTop: 60, backgroundColor: 'transparent' }] }>
               <TouchableOpacity
                                 style={ styles.loginButton }
-                                onPress={ this.register }>
+                                onPress={ this.register }
+                                disabled={ this.state.invalidPwd || this.state.invalidUsername }>
                 <Text style={ { fontSize: 40, color: '#0C2956' } }>
                   注册
                 </Text>
