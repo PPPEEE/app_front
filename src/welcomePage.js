@@ -41,11 +41,11 @@ export default class MainPage extends Component {
                          style={ { width: '100%', height: '100%' } }>
           <View style={ styles.content }>
             <Button
-                    containerStyle={ { padding: 10, height: 45, width: '90%', margin: '5%', overflow: 'hidden', borderRadius: 4, backgroundColor: '#441272' } }
-                    disabledContainerStyle={ { backgroundColor: '#441272' } }
-                    style={ { fontSize: 20, color: '#FFFFFF' } }>
-              onPress=
-              { () => this.props.navigation.replace('main') } 欢迎进入DCCB
+              containerStyle={ { padding: 10, height: 45, width: '90%', margin: '5%', overflow: 'hidden', borderRadius: 4, backgroundColor: '#441272' } }
+              disabledContainerStyle={ { backgroundColor: '#441272' } }
+              style={{ fontSize: 20, color: '#FFFFFF' }}
+              onPress={ () => this.props.navigation.replace('main') } 
+              >欢迎进入DCCB
             </Button>
             <CheckUpdate newVersionState={this.newVersionState}/>
           </View>

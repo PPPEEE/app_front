@@ -11,34 +11,48 @@ import main from './src/main' //第一个Tab
 import Login from './src/component/loginScreen/login';
 import myTeam from './src/component/userScreen/myTeam';
 import Register from './src/component/loginScreen/register';
+import tradeScreen from './src/component/tradeScreen/tradeScreen';
 
 export default App = createStackNavigator({
   welcome: {
     screen: welcomePage,
-    navigationOptions: ({navigation}) => ({
+    navigationOptions: ({ navigation }) => ({
       header: null,
     }),
   },
   login: {
     screen: Login,
-    navigationOptions: ({navigation}) => ({
+    navigationOptions: ({ navigation }) => ({
       header: null,
     })
   },
-  register: {screen: Register},
+  register: { screen: Register },
   main: {
     screen: main,
-    navigationOptions: ({navigation}) => ({
+    navigationOptions: ({ navigation }) => ({
       header: null
     }),
   },
   myTeam: {
     screen: myTeam,
-    navigationOptions: ({navigation}) => ({
+    navigationOptions: ({ navigation }) => ({
       title: '我的团队',
       headerTitleStyle: {
         color: '#FFFFFF',
-},
+      },
+      headerStyle: {
+        backgroundColor: '#551670',
+      },
+      headerTintColor: '#FFFFFF',
+    }),
+  },
+  tradeScreen: {
+    screen: tradeScreen,
+    navigationOptions: ({ navigation }) => ({
+      title: '我的交易',
+      headerTitleStyle: {
+        color: '#FFFFFF',
+      },
       headerStyle: {
         backgroundColor: '#551670',
       },
@@ -63,17 +77,17 @@ export default App = createStackNavigator({
     // },
     // headerMode:'screen',
   }
-    // backTitle: 'Back',
-    // style:styles.header,
-    // right: <Button title="Info" />,
-    // left:<Button title="left" />,
-    // titleStyle:styles.title,
-    // visible:true,
-    // title: 'ProfileScreen',
-    // tintColor:'yellow',
-    // gesturesEnabled:true,
-    // },
-    // },
-    // headerMode:'screen',
+  // backTitle: 'Back',
+  // style:styles.header,
+  // right: <Button title="Info" />,
+  // left:<Button title="left" />,
+  // titleStyle:styles.title,
+  // visible:true,
+  // title: 'ProfileScreen',
+  // tintColor:'yellow',
+  // gesturesEnabled:true,
+  // },
+  // },
+  // headerMode:'screen',
 );
 

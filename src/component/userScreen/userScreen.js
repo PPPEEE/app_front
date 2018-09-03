@@ -21,7 +21,7 @@ import { SafeAreaView, createStackNavigator } from 'react-navigation';
 
 export default class userScreen extends Component {
   onPress = (where) => {
-    this.props.navigation.navigate(where);
+    this.props.navigation.push(where);
   }
   render() {
     return (
@@ -102,7 +102,7 @@ export default class userScreen extends Component {
             </View>
             <View style={styles.listone}>
               <TouchableOpacity style={styles.one}
-                  onPress={()=>this.onPress('allTrade')}>
+                  onPress={()=>this.onPress('tradeScreen')}>
                   <View style={{flex:1}}>
                     <MIcons name={'file-document-box-outline'} style={styles.fontIcon}></MIcons>
                     <Text style={styles.font}>我的订单</Text>

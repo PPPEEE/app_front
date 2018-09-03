@@ -1,5 +1,5 @@
 /**
- * 已完成订单
+ * 卖单
  */
 import React, { Component } from 'react';
 import {
@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-navigation';
 
 var ITEM_HEIGHT = 150;
 
-export default class completeList extends Component {
+export default class soldList extends Component {
 
   _flatList;
   //每一个列表渲染的方法
@@ -34,7 +34,7 @@ export default class completeList extends Component {
               <Text style={styles.text}>{buySeller+item.item.buySellerNum}</Text>
               <Image
                 style={{width: 15, height: 15, borderRadius: 15, margin:5}}
-                source={require('../../images/WeChat.png')}
+                source={require('../../../images/WeChat.png')}
               />
             </View>
             <Text style={styles.text}>{'卖家手机: '+item.item.phone}</Text>

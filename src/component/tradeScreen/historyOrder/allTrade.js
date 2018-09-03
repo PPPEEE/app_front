@@ -34,7 +34,7 @@ export default class allTrade extends Component {
               <Text style={styles.text}>{buySeller+item.item.buySellerNum}</Text>
               <Image
                 style={{width: 15, height: 15, borderRadius: 15, margin:5}}
-                source={require('../../images/WeChat.png')}
+                source={require('../../../images/WeChat.png')}
               />
             </View>
             <Text style={styles.text}>{'卖家手机: '+item.item.phone}</Text>

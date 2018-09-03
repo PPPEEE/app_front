@@ -11,11 +11,11 @@ import {
 } from 'react-native';
 import Sicon from 'react-native-vector-icons/SimpleLineIcons';
 import { createMaterialTopTabNavigator } from 'react-navigation';
-import allTrade from './allTrade';
-import buyList from './buyList';
-import soldList from './soldList';
-import completeList from './completeList';
-import shensu from './shensu';
+import allTrade from './historyOrder/allTrade';
+import buyList from './historyOrder/buyList';
+import soldList from './historyOrder/soldList';
+import completeList from './historyOrder/completeList';
+import shensu from './historyOrder/shensu';
 
 
 export default tradeScreen = createMaterialTopTabNavigator({  
