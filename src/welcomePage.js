@@ -5,8 +5,22 @@ import React, { Component } from 'react';
 import { StyleSheet, View, ImageBackground, AsyncStorage } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import Button from 'react-native-button';
+import CheckUpdate from './component/CheckUpdate';
 
 export default class MainPage extends Component {
+
+  //弹出升级modal
+  setNewVersion = (e) => {
+    this.childFN.setModalVisible(false)
+  }
+  //绑定检测version的Modal方法
+  newVersionState = (ref)=> {
+    this.childFN = ref
+  }
+  //检查版本请求
+  fetchVersion = () => {
+
+  }
 
   componentDidMount() {
     AsyncStorage.getItem('token').then((result, error) => {
@@ -17,7 +31,6 @@ export default class MainPage extends Component {
           this.props.navigation.replace('login');
         }
       }, 2000)
-
     });
   }
   render() {
@@ -34,6 +47,7 @@ export default class MainPage extends Component {
               onPress=
               { () => this.props.navigation.replace('main') } 欢迎进入DCCB
             </Button>
+            <CheckUpdate newVersionState={this.newVersionState}/>
           </View>
         </ImageBackground>
       </SafeAreaView>
@@ -51,3 +65,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   }
 });
+
