@@ -10,6 +10,7 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
+  AsyncStorage,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Feather';
 import EIcons from 'react-native-vector-icons/Entypo';
@@ -17,15 +18,55 @@ import MIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FIcons from 'react-native-vector-icons/FontAwesome';
 import Button from 'react-native-button';
 import { SafeAreaView, createStackNavigator } from 'react-navigation';
+import { ModifyInfo } from './modifyInfo'
 
 
 export default class userScreen extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      UID: null,
+      userLevel: null
+    };
+  }
+  logout() {
+    AsyncStorage.removeItem('token');
+    this.props.navigation.replace('login');
+  }
+  fetchUserList() {
+    const url = 'http://120.78.205.55:8081/user/findUserBy';
+    const opts = {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json;charset=UTF-8',
+        'token': global.userToken
+      },
+    }
+    fetch(url, opts)
+      .then((response) => response.json())
+      .then(
+        (responseJson) => {
+          var users = responseJson.data;
+          this.setState({
+            UID: users.id,
+            userLevel: users.userLevel
+          })
+        }
+      )
+      .catch((error) => console.error(error))
+  }
+  //页面渲染完成后会主动回调该方法
+  componentDidMount() {
+    this.fetchUserList();
+  }
   onPress = (where) => {
     this.props.navigation.push(where);
   }
   render() {
     return (
       <SafeAreaView style={styles.container}>
+        <ModifyInfo />
         <ImageBackground source={require('../../images/user_bg.jpg')} style={{ flex: 1 }} >
           <View style={styles.top}>
             <Image
@@ -33,30 +74,34 @@ export default class userScreen extends Component {
               source={require('../../images/nohead.jpg')}
             />
             <View style={styles.topInfo}>
-              <Text style={styles.font}>UID:12123</Text>
-              <Text style={styles.font}>会员等级</Text>
+              <Text style={styles.font}>{'UID: ' + this.state.UID}</Text>
+              <Text style={styles.font}>{'会员等级: ' + this.state.userLevel}</Text>
             </View>
-            <View style={styles.topInfo}>
+            <TouchableOpacity style={styles.topInfo}
+              onPress={() => this.logout()}>
               <Ionicons name={'log-out'} style={styles.font}>退出登录</Ionicons>
-            </View>
+            </TouchableOpacity>
           </View>
           <ScrollView style={styles.middle}>
             <View style={styles.listone}>
-              <View style={styles.one}>
-                <Ionicons name={'user'} style={styles.fontIcon}></Ionicons>
-                <Text style={styles.font}>昵称</Text>
-              </View>
+              <TouchableOpacity style={styles.one}
+                onPress={() => this.fetchUserList('modifyNiki')}>
+                <View style={{ flex: 1 }}>
+                  <Ionicons name={'user'} style={styles.fontIcon}></Ionicons>
+                  <Text style={styles.font}>昵称</Text>
+                </View>
+              </TouchableOpacity>
               <View style={styles.one}>
                 <FIcons name={'language'} style={styles.fontIcon}></FIcons>
                 <Text style={styles.font}>多语言</Text>
               </View>
-                <TouchableOpacity style={styles.one}
-                  onPress={()=>this.onPress('myTeam')}>
-                  <View style={{flex:1}}>
-                    <FIcons name={'group'} style={styles.fontIcon}></FIcons>
-                    <Text style={styles.font}>我的团队</Text>
-                  </View>
-                </TouchableOpacity>
+              <TouchableOpacity style={styles.one}
+                onPress={() => this.onPress('myTeam')}>
+                <View style={{ flex: 1 }}>
+                  <FIcons name={'group'} style={styles.fontIcon}></FIcons>
+                  <Text style={styles.font}>我的团队</Text>
+                </View>
+              </TouchableOpacity>
             </View>
             <View style={styles.listone}>
               <View style={styles.one}>
@@ -102,12 +147,12 @@ export default class userScreen extends Component {
             </View>
             <View style={styles.listone}>
               <TouchableOpacity style={styles.one}
-                  onPress={()=>this.onPress('tradeScreen')}>
-                  <View style={{flex:1}}>
-                    <MIcons name={'file-document-box-outline'} style={styles.fontIcon}></MIcons>
-                    <Text style={styles.font}>我的订单</Text>
-                  </View>
-                </TouchableOpacity>
+                onPress={() => this.onPress('tradeScreen')}>
+                <View style={{ flex: 1 }}>
+                  <MIcons name={'file-document-box-outline'} style={styles.fontIcon}></MIcons>
+                  <Text style={styles.font}>我的订单</Text>
+                </View>
+              </TouchableOpacity>
               <View style={styles.one}>
                 <EIcons name={'location'} style={styles.fontIcon}></EIcons>
                 <Text style={styles.font}>地址管理</Text>
@@ -132,6 +177,7 @@ export default class userScreen extends Component {
                 <Button
                   containerStyle={{ padding: 10, height: 45, overflow: 'hidden', borderRadius: 4 }}
                   disabledContainerStyle={{ backgroundColor: '#441272' }}
+                  onPress={() => this.logout()}
                   style={{ fontSize: 20, color: '#FFFFFF' }}>
                   退出登录
                 </Button>
@@ -191,6 +237,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
   },
   buttonstyle: {
-    flex: 1 , height: 45, width: '90%', margin: '5%'
+    flex: 1, height: 45, width: '90%', margin: '5%'
   }
 });

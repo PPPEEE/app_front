@@ -24,6 +24,7 @@ export default class MainPage extends Component {
 
   componentDidMount() {
     AsyncStorage.getItem('token').then((result, error) => {
+      global.userToken = result;
       setTimeout(() => {
         if ( result !== null ) {
           this.props.navigation.replace('main');

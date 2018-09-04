@@ -10,6 +10,7 @@ import welcomePage from './src/welcomePage'; //登陆主页
 import main from './src/main' //第一个Tab
 import Login from './src/component/loginScreen/login';
 import myTeam from './src/component/userScreen/myTeam';
+import modifyNiki from './src/component/userScreen/userMenu/modifyNiki';
 import Register from './src/component/loginScreen/register';
 import tradeScreen from './src/component/tradeScreen/tradeScreen';
 
@@ -37,6 +38,19 @@ export default App = createStackNavigator({
     screen: myTeam,
     navigationOptions: ({ navigation }) => ({
       title: '我的团队',
+      headerTitleStyle: {
+        color: '#FFFFFF',
+      },
+      headerStyle: {
+        backgroundColor: '#551670',
+      },
+      headerTintColor: '#FFFFFF',
+    }),
+  },
+  modifyNiki: {
+    screen: modifyNiki,
+    navigationOptions: ({ navigation }) => ({
+      title: '修改昵称',
       headerTitleStyle: {
         color: '#FFFFFF',
       },
