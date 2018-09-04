@@ -123,7 +123,11 @@ var storage = new Storage({
   
 // 对于react native
 global.storage = storage;
-
+global.Config = {
+  'FetchURL': 'http://120.78.205.55:8081',
+  'Accept': 'application/json',
+  'ContentType': 'application/json;charset=UTF-8'
+};
 // 这样，在此**之后**的任意位置即可以直接调用storage
 // 注意：全局变量一定是先声明，后使用
 // 如果你在某处调用storage报错未定义

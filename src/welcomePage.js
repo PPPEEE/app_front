@@ -52,12 +52,12 @@ export default class MainPage extends Component {
     storage.load({
       key: 'loginState'
     }).then(ret => {
-      const url = 'http://120.78.205.55:8081/user/findUserBy';
+      const url = global.Config.FetchURL + '/user/findUserBy';
       const opts = {
         method: 'POST',
         headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json;charset=UTF-8',
+          'Accept': global.Config.Accept,
+          'Content-Type': global.Config.ContentType,
           'token': ret.token
         },
       }
