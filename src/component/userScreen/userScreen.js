@@ -76,7 +76,7 @@ export default class userScreen extends Component {
           <ScrollView style={styles.middle}>
             <View style={styles.listone}>
               <TouchableOpacity style={styles.one}
-                onPress={() => this.fetchUserList('modifyNiki')}>
+                onPress={() => this.onPress('modifyNick')}>
                 <View style={{ flex: 1 }}>
                   <Ionicons name={'user'} style={styles.fontIcon}></Ionicons>
                   <Text style={styles.font}>昵称</Text>
