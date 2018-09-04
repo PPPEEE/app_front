@@ -7,15 +7,48 @@ import {
   View,
   FlatList,
   Text,
-  Button,
   Image,
 } from 'react-native';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import Button from 'react-native-button';
 import { SafeAreaView } from 'react-navigation';
 
 var ITEM_HEIGHT = 90;
 
 export default class myTeam extends Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      users: []
+    };
+  }
+  componentDidMount() {
+    this.fetchTeam();
+    //level  0 临时 1普通  2VIP
+  }
+
+  fetchTeam() {
+    storage.load({
+      key: 'loginState'
+    }).then(ret => {
+      const url = global.Config.FetchURL + '/user/myTeam';
+      const opts = {
+        method: 'POST',
+        headers: {
+          'Accept': global.Config.Accept,
+          'Content-Type': global.Config.ContentType,
+          'token': ret.token
+        },
+      }
+      fetch(url, opts)
+        .then((res) => res.json())
+        .then((resJson) => { 
+          console.log(resJson)
+          this.setState({ users: resJson.data });
+        })
+    })
+
+  }
 
   _flatList;
   //每一个列表渲染的方法
@@ -23,21 +56,26 @@ export default class myTeam extends Component {
     var bgColor = item.index % 2 == 0 ? '#f6edfe' : '#ebe5f0';
     //头像，   名字，UID，电话，  会员等级
     return (
-      <View style={[{ height: ITEM_HEIGHT },styles.listViewContainer]}>
+      <View style={[{ height: ITEM_HEIGHT }, styles.listViewContainer]}>
         <View style={styles.listViewLeft}>
           <Image
-            style={{width: 50, height: 50, borderRadius: 60, marginRight: 10}}
+            style={{ width: 50, height: 50, borderRadius: 60, marginRight: 10 }}
             source={require('../../../images/user.png')}
           />
           <View style={styles.listViewMiddle}>
             <Text style={styles.textN}>昵称: {item.item.name}</Text>
-            <Text style={styles.textU}>UID: {item.item.uid}</Text>
+            <Text style={styles.textU}>UID: {item.item.UID}</Text>
             <Text style={styles.textP}>电话: {item.item.phone}</Text>
           </View>
         </View>
         <View style={styles.listViewRight}>
           <View>
-            <Text>合格会员</Text>
+            <Button
+              containerStyle={{ padding: 4, width: 80, height: 25, overflow: 'hidden', borderRadius: 10 ,backgroundColor:'#fb9c27' }}
+              disabledContainerStyle={{ backgroundColor: '#441272' }}
+              style={{ fontSize: 12, color: '#FFFFFF' }}>
+              {item.item.level}
+            </Button>
           </View>
         </View>
       </View>
@@ -51,19 +89,25 @@ export default class myTeam extends Component {
   _separator = () => {
     return <View style={{ height: 1, backgroundColor: '#d6bfe4' }} />;
   }
-  _keyExtractor = (item, index) => item.id;
+  _keyExtractor = (item, index) => item.key;
 
   render() {
     var data = [];
-    for (var i = 0; i < 4; i++) {
-      data.push({ 
-        key: i,
-        title: i + '',
-        id: i,
-        level: '7000',
-        name: '5000',
-        uid: '19276371872',
-        phone: '15013559203',
+    var tempLevel;
+    for (var i = 0; i < this.state.users.length; i++) {
+      if(this.state.users[i].userLevel == 0){
+        tempLevel = '临时会员';
+      }else if(this.state.users[i].userLevel == 1){
+        tempLevel = '普通会员';
+      }else if(this.state.users[i].userLevel == 2){
+        tempLevel = 'VIP会员';
+      }
+      data.push({
+        key: this.state.users[i].id,
+        level: tempLevel,
+        name: this.state.users[i].userName,
+        UID: this.state.users[i].id,
+        phone: this.state.users[i].telephone,
       });
     }
     console.log(data);
@@ -79,7 +123,6 @@ export default class myTeam extends Component {
             keyExtractor={this._keyExtractor}
             //numColumns ={3}
             //columnWrapperStyle={{borderWidth:2,borderColor:'black',paddingLeft:20}}
-
             //getItemLayout={(data,index)=>( //可选的优化
             //{length: ITEM_HEIGHT, offset: (ITEM_HEIGHT+2) * index, index}
             //)}
@@ -96,7 +139,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     // textAlignVertical: 'center',
     color: 'white',
-    fontSize: 30,
+    fontSize: 16,
   },
   textN: {
     color: 'black',
@@ -131,5 +174,5 @@ const styles = StyleSheet.create({
   },
   listViewRight: {
     flex: 0.2,
-  }
+  },
 });
