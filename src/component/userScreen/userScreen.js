@@ -18,7 +18,6 @@ import MIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import FIcons from 'react-native-vector-icons/FontAwesome';
 import Button from 'react-native-button';
 import { SafeAreaView, createStackNavigator } from 'react-navigation';
-import { ModifyInfo } from './modifyInfo'
 
 
 export default class userScreen extends Component {
@@ -48,10 +47,14 @@ export default class userScreen extends Component {
       .then(
         (responseJson) => {
           var users = responseJson.data;
-          this.setState({
-            UID: users.id,
-            userLevel: users.userLevel
-          })
+          if(!users){
+            console.log('获取用户数据失败');
+          }else{
+            this.setState({
+              UID: users.id,
+              userLevel: users.userLevel
+            })
+          }
         }
       )
       .catch((error) => console.error(error))
@@ -66,7 +69,6 @@ export default class userScreen extends Component {
   render() {
     return (
       <SafeAreaView style={styles.container}>
-        <ModifyInfo />
         <ImageBackground source={require('../../images/user_bg.jpg')} style={{ flex: 1 }} >
           <View style={styles.top}>
             <Image
