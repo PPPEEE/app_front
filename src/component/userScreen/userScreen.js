@@ -95,10 +95,13 @@ export default class userScreen extends Component {
               </TouchableOpacity>
             </View>
             <View style={styles.listone}>
-              <View style={styles.one}>
+              <TouchableOpacity style={styles.one}
+                onPress={() => this.onPress('ReceiptCode')}>
+                <View style={{ flex: 1 }}>
                 <FIcons name={'id-card-o'} style={styles.fontIcon}></FIcons>
                 <Text style={styles.font}>我的收款账户</Text>
-              </View>
+                </View>
+              </TouchableOpacity>
               <View style={styles.one}>
                 <FIcons name={'bitcoin'} style={styles.fontIcon}></FIcons>
                 <Text style={styles.font}>我的资产</Text>

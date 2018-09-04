@@ -14,6 +14,10 @@ import myTeam from './src/component/userScreen/userMenu/myTeam';
 import modifyNiki from './src/component/userScreen/userMenu/modifyNiki';
 import Register from './src/component/loginScreen/register';
 import tradeScreen from './src/component/tradeScreen/tradeScreen';
+import ReceiptCode from './src/component/userScreen/userMenu/ReceiptCode';
+import ReceiptCode1 from './src/component/userScreen/userMenu/ReceiptCode1';
+import ReceiptCode2 from './src/component/userScreen/userMenu/ReceiptCode2';
+import ReceiptCode3 from './src/component/userScreen/userMenu/ReceiptCode3';
 
 export default App = createStackNavigator({
   welcome: {
@@ -52,12 +56,44 @@ export default App = createStackNavigator({
     screen: modifyNiki,
     navigationOptions: ({ navigation }) => ({
       title: '修改昵称',
-      headerTitleStyle: {
-        color: '#FFFFFF',
-      },
-      headerStyle: {
-        backgroundColor: '#551670',
-      },
+      headerTitleStyle: {color: '#FFFFFF',},
+      headerStyle: {backgroundColor: '#551670',},
+      headerTintColor: '#FFFFFF',
+    }),
+  },
+  ReceiptCode: {
+    screen: ReceiptCode,
+    navigationOptions: ({ navigation }) => ({
+      title: '收款方式',
+      headerTitleStyle: {color: '#FFFFFF',},
+      headerStyle: {backgroundColor: '#551670',},
+      headerTintColor: '#FFFFFF',
+    }),
+  },
+  ReceiptCode1: {
+    screen: ReceiptCode1,
+    navigationOptions: ({ navigation }) => ({
+      title: '绑定微信支付',
+      headerTitleStyle: {color: '#FFFFFF',},
+      headerStyle: {backgroundColor: '#551670',},
+      headerTintColor: '#FFFFFF',
+    }),
+  },
+  ReceiptCode2: {
+    screen: ReceiptCode2,
+    navigationOptions: ({ navigation }) => ({
+      title: '绑定支付宝',
+      headerTitleStyle: {color: '#FFFFFF',},
+      headerStyle: {backgroundColor: '#551670',},
+      headerTintColor: '#FFFFFF',
+    }),
+  },
+  ReceiptCode3: {
+    screen: ReceiptCode3,
+    navigationOptions: ({ navigation }) => ({
+      title: '绑定银行卡',
+      headerTitleStyle: {color: '#FFFFFF',},
+      headerStyle: {backgroundColor: '#551670',},
       headerTintColor: '#FFFFFF',
     }),
   },
@@ -136,7 +172,6 @@ storage.sync = {
       fetch(url, opts).then(response => {
         return response.json();
       }).then(json => {
-        console.log(json);
         if (json && json.data) {
           var newData = {
             UID: json.data.id,
