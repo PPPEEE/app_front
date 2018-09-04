@@ -52,7 +52,7 @@ export default class Login extends Component {
           <View style={ styles.logon }>
             <Image
                    style={ { width: 650, height: 150 } }
-                   source={ require('../../images/LOGO.png') }
+                   source={ require('../../images/logoWhite.png') }
                    resizeMode='contain' />
           </View>
           <View style={ [styles.formElement, { borderBottomWidth: 4, borderColor: '#203E86' }] }>
