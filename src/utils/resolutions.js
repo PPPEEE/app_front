@@ -20,8 +20,6 @@ export default class Resolution {
     let navHeight = Platform.OS === 'android' ? StatusBar.currentHeight : 64;
     let pxRatio = PixelRatio.get(dim);
     let {width, height} = Dimensions.get(dim);
-    if (dim != "screen")
-      height -= navHeight;
     let w = PixelRatio.getPixelSizeForLayoutSize(width);
     let h = PixelRatio.getPixelSizeForLayoutSize(height);
 
@@ -62,7 +60,9 @@ export default class Resolution {
     return {
       fw: props.fw,
       fh: props.fh,
-      fs: props.fs
+      fs: props.fs,
+      scaleX: fw_scale,
+      scaleY: fh_scale
     };
   }
 

@@ -2,7 +2,7 @@
  * 
  */
 import React, { Component } from 'react';
-import { StyleSheet, View, Button, Text, Image, ImageBackground, ScrollView, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Button, Text, Image, ImageBackground, ScrollView, TouchableOpacity, StatusBar} from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import Resolutions from '../../utils/resolutions';
 import Icon from 'react-native-vector-icons/EvilIcons';
@@ -20,13 +20,15 @@ var menus = [, {
   key: '2'
 }, {
   label: '买入',
-  route: '',
+  route: 'publish',
   icon: 'cart',
+  param: { whichState: 'buy'},
   key: '3'
 }, {
   label: '卖出',
-  route: '',
+  route: 'publish',
   icon: 'cart-outline',
+  param: { whichState: 'sale'},
   key: '4'
 }, {
   label: '数字资产',
@@ -50,6 +52,8 @@ var menus = [, {
   key: '8'
 }];
 
+var initOpacity = 0;
+
 export default class homeScreen extends Component {
   constructor(props) {
     super();
@@ -58,24 +62,31 @@ export default class homeScreen extends Component {
       pv: 13444.24115,
       pe: 55.75885555
     }
+    this.goPage = (item) => {
+      this.props.navigation.navigate(item.route, item.param);
+    }
     this.scrollToView = (e) => {
       this.setState({
         opacity: 1 - e.nativeEvent.contentOffset.y / 700
       })
 
     }
+    setTimeout(() => {
+      initOpacity = 1;
+    }, 0)
   }
 
   render() {
     return (
       <Resolutions.FixFullView>
         <SafeAreaView style={ styles.container }>
+          <StatusBar translucent={ true }  backgroundColor='rgba(0,0,0,0)'/>
           <ScrollView
                       onScroll={ this.scrollToView }
                       style={ { backgroundColor: 'rgb(51,11,84)' } }>
             <ImageBackground
                              source={ require('../../images/home2_bg.jpg') }
-                             style={ { width: 1080, height: 1920, marginTop: 700 } }>
+                             style={ { width: 1080, height: 1920, marginTop: 700, opacity: initOpacity } }>
               <View style={ { flexDirection: 'row', alignItems: 'center', height: 450 } }>
                 <Image
                        source={ require('../../images/nohead.jpg') }
@@ -96,7 +107,7 @@ export default class homeScreen extends Component {
                   </View>
                 </View>
               </View>
-              <View style={ { marginTop: 85, height: 410, borderRadius: 200, paddingTop: 100 } }>
+              <View style={ { marginTop: 85, height: 410, borderRadius: 200, paddingTop: 120 } }>
                 <Text style={ { color: 'white', fontSize: 65, textAlign: 'center', fontWeight: 'bold', marginBottom: 10 } }>
                   区块链既服务
                 </Text>
@@ -117,10 +128,12 @@ export default class homeScreen extends Component {
                       return (<TouchableOpacity
                                                 key={ 'homeButton' + index }
                                                 style={ styles.homeButton }
-                                                onPress={ this.login }>
+                                                onPress={ () => {
+                                                            item.route && this.goPage(item)
+                                                          } }>
                                 <MaterialCommunityIcons
-                                      name={ item.icon }
-                                      style={ styles.icon } />
+                                                        name={ item.icon }
+                                                        style={ styles.icon } />
                                 <Text style={ { fontSize: 40, color: 'white', margin: 5 } }>
                                   { item.label }
                                 </Text>

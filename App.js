@@ -2,7 +2,7 @@
  * 
  */
 import React, { Component } from 'react';
-import { YellowBox, AsyncStorage } from 'react-native';
+import { YellowBox, AsyncStorage, StatusBar, Platform} from 'react-native';
 import { createStackNavigator } from 'react-navigation';
 import Storage from 'react-native-storage';
 YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
@@ -18,30 +18,35 @@ import ReceiptCode from './src/component/userScreen/userMenu/ReceiptCode';
 import ReceiptCode1 from './src/component/userScreen/userMenu/ReceiptCode1';
 import ReceiptCode2 from './src/component/userScreen/userMenu/ReceiptCode2';
 import ReceiptCode3 from './src/component/userScreen/userMenu/ReceiptCode3';
+import publishScreen from './src/component/tradeScreen/payOrder/publish';
+
+var navHeight = Platform.OS === 'android' ? StatusBar.currentHeight : 64;
 
 export default App = createStackNavigator({
   welcome: {
     screen: welcomePage,
-    navigationOptions: ({ navigation }) => ({
+    navigationOptions: ({navigation}) => ({
       header: null,
     }),
   },
   login: {
     screen: Login,
-    navigationOptions: ({ navigation }) => ({
+    navigationOptions: ({navigation}) => ({
       header: null,
     })
   },
-  register: { screen: Register },
+  register: {
+    screen: Register
+  },
   main: {
     screen: main,
-    navigationOptions: ({ navigation }) => ({
+    navigationOptions: ({navigation}) => ({
       header: null
     }),
   },
   myTeam: {
     screen: myTeam,
-    navigationOptions: ({ navigation }) => ({
+    navigationOptions: ({navigation}) => ({
       title: '我的团队',
       headerTitleStyle: {
         color: '#FFFFFF',
@@ -99,7 +104,7 @@ export default App = createStackNavigator({
   },
   tradeScreen: {
     screen: tradeScreen,
-    navigationOptions: ({ navigation }) => ({
+    navigationOptions: ({navigation}) => ({
       title: '我的交易',
       headerTitleStyle: {
         color: '#FFFFFF',
@@ -110,23 +115,39 @@ export default App = createStackNavigator({
       headerTintColor: '#FFFFFF',
     }),
   },
+  publish: {
+    screen: publishScreen,
+    navigationOptions: ({navigation}) => ({
+      title: '发布DK交易委托',
+      headerTitleStyle: {
+        color: '#FFFFFF',
+        fontSize: 14
+      },
+      headerStyle: {
+        // backgroundColor: 'rgba(0,0,0,0)',
+        paddingTop: navHeight
+      },
+      headerTintColor: '#FFFFFF',
+      headerTransparent: true
+    }),
+  }
 },
   {
     initialRouteName: 'welcome', // 默认显示界面
-    // navigationOptions: {
-    //     header: {
-    // backTitle: 'Back',
-    // style:styles.header,
-    // right: <Button title="Info" />,
-    // left:<Button title="left" />,
-    // titleStyle:styles.title,
-    // visible:true,
-    // title: 'ProfileScreen',
-    // tintColor:'yellow',
-    // gesturesEnabled:true,
-    // },
-    // },
-    // headerMode:'screen',
+  // navigationOptions: {
+  //     header: {
+  // backTitle: 'Back',
+  // style:styles.header,
+  // right: <Button title="Info" />,
+  // left:<Button title="left" />,
+  // titleStyle:styles.title,
+  // visible:true,
+  // title: 'ProfileScreen',
+  // tintColor:'yellow',
+  // gesturesEnabled:true,
+  // },
+  // },
+  // headerMode:'screen',
   }
 );
 
@@ -199,6 +220,7 @@ storage.sync = {
   }
 
 }
+
 
 // 最好在全局范围内创建一个（且只有一个）storage实例，方便直接调用
 

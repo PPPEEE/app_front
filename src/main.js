@@ -95,5 +95,6 @@ const styles = StyleSheet.create({
     borderTopWidth: .5,
     borderTopColor: '#A028EA',
     height: '8%'
+    
   }
 })

@@ -37,14 +37,14 @@ export default payScreen = createMaterialTopTabNavigator({
   wantEntrust: {
     screen: wantEntrust,
     navigationOptions: {
-      tabBarLabel: '发布',
+      tabBarLabel: '委托',
       tabBarIcon: ({ tintColor }) => <MIcons name="alarm-plus" size={22} color={tintColor} />,
     },
   },
   wantPublish: {
     screen: wantPublish,
     navigationOptions: {
-      tabBarLabel: '委托',
+      tabBarLabel: '发布',
       tabBarIcon: ({ tintColor }) => <MIcons name="table-edit" size={22} color={tintColor} />,
     },
   },

@@ -2,7 +2,7 @@
  * Created by mengqingdong on 2017/4/19.
  */
 import React, { Component } from 'react';
-import { StyleSheet, View, ImageBackground } from 'react-native';
+import { StyleSheet, View, ImageBackground, StatusBar} from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import Button from 'react-native-button';
 import CheckUpdate from './component/CheckUpdate';
@@ -104,6 +104,7 @@ export default class MainPage extends Component {
   render() {
     return (
       <SafeAreaView style={styles.container}>
+        <StatusBar translucent={ true }  backgroundColor='rgba(0,0,0,0)'/>
         <ImageBackground
           source={require('./images/backgroundImg.jpg')}
           style={{ width: '100%', height: '100%' }}>
