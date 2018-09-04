@@ -2,7 +2,7 @@
  * Created by mengqingdong on 2017/4/19.
  */
 import React, { Component } from 'react';
-import { StyleSheet, View, ImageBackground, AsyncStorage } from 'react-native';
+import { StyleSheet, View, ImageBackground } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import Button from 'react-native-button';
 

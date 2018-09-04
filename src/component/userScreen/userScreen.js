@@ -10,7 +10,6 @@ import {
   Image,
   ScrollView,
   TouchableOpacity,
-  AsyncStorage,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Feather';
 import EIcons from 'react-native-vector-icons/Entypo';
@@ -25,43 +24,33 @@ export default class userScreen extends Component {
     super(props);
     this.state = {
       UID: null,
-      userLevel: null
+      level: null
     };
   }
   logout() {
-    AsyncStorage.removeItem('token');
+    // storage.clearMapForKey('loginState');
+    storage.remove({
+      key: 'loginState'
+    });
+    storage.remove({
+      key: 'userBasicInfo'
+    });
     this.props.navigation.replace('login');
   }
-  fetchUserList() {
-    const url = 'http://120.78.205.55:8081/user/findUserBy';
-    const opts = {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json;charset=UTF-8',
-        'token': global.userToken
-      },
-    }
-    fetch(url, opts)
-      .then((response) => response.json())
-      .then(
-        (responseJson) => {
-          var users = responseJson.data;
-          if(!users){
-            console.log('获取用户数据失败');
-          }else{
-            this.setState({
-              UID: users.id,
-              userLevel: users.userLevel
-            })
-          }
-        }
-      )
-      .catch((error) => console.error(error))
+  getUserInfo() {
+    storage.load({
+      key: 'userBasicInfo'
+    }).then(ret => {
+      this.setState({
+        UID: ret.UID,
+        level: ret.level
+      })
+    })
   }
+
   //页面渲染完成后会主动回调该方法
   componentDidMount() {
-    this.fetchUserList();
+    this.getUserInfo();
   }
   onPress = (where) => {
     this.props.navigation.push(where);
@@ -77,7 +66,7 @@ export default class userScreen extends Component {
             />
             <View style={styles.topInfo}>
               <Text style={styles.font}>{'UID: ' + this.state.UID}</Text>
-              <Text style={styles.font}>{'会员等级: ' + this.state.userLevel}</Text>
+              <Text style={styles.font}>{'会员等级: ' + this.state.level}</Text>
             </View>
             <TouchableOpacity style={styles.topInfo}
               onPress={() => this.logout()}>

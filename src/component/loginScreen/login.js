@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, AsyncStorage, Image } from 'react-native';
+import { Platform, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Resolutions from '../../utils/resolutions';
 
@@ -35,7 +35,12 @@ export default class Login extends Component {
         return res.json();
       }).then((jsonData) => {
         if (jsonData.code === 200) {
-          AsyncStorage.setItem('token', jsonData.data);
+          storage.save({
+            key: 'loginState',  // 注意:请不要在key中使用_下划线符号!
+            data: {
+              token: jsonData.data
+            },
+          });
           this.props.navigation.replace('main');
         }else{
           Alert.alert('提示', jsonData.message);

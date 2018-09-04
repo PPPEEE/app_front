@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Picker, KeyboardAvoidingView, AsyncStorage } from 'react-native';
+import { Platform, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Picker, KeyboardAvoidingView } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Resolutions from '../../utils/resolutions';
 var token;
 export default class Register extends Component {
   constructor(props) {
     super(props);
-    AsyncStorage.getItem('token', (error, value) => {
-      token = value;
-    });
+    storage.load({ key: 'loginState' }).then(ret => { token = ret.token;})
     this.state = {
       checked: true,
       areaCode: '86',
