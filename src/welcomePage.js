@@ -83,6 +83,7 @@ export default class MainPage extends Component {
         (responseJson) => {
           if (!responseJson.data) {
             console.log('获取用户数据失败');
+            this.props.navigation.replace('login');
           } else {
             storage.save({
               key: 'userBasicInfo',  // 注意:请不要在key中使用_下划线符号!
