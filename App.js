@@ -9,7 +9,7 @@ YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTIm
 import welcomePage from './src/welcomePage'; //登陆主页
 import main from './src/main' //第一个Tab
 import Login from './src/component/loginScreen/login';
-import myTeam from './src/component/userScreen/myTeam';
+import myTeam from './src/component/userScreen/userMenu/myTeam';
 import modifyNiki from './src/component/userScreen/userMenu/modifyNiki';
 import Register from './src/component/loginScreen/register';
 import tradeScreen from './src/component/tradeScreen/tradeScreen';
