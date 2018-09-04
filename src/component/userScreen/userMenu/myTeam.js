@@ -27,7 +27,7 @@ export default class myTeam extends Component {
         <View style={styles.listViewLeft}>
           <Image
             style={{width: 50, height: 50, borderRadius: 60, marginRight: 10}}
-            source={require('../../images/user.png')}
+            source={require('../../../images/user.png')}
           />
           <View style={styles.listViewMiddle}>
             <Text style={styles.textN}>昵称: {item.item.name}</Text>
