@@ -9,7 +9,6 @@ import {
   Text,
   TextInput,
   Image,
-  ScrollView,
   TouchableOpacity,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Feather';
@@ -21,12 +20,110 @@ export default class ReceiptCode1 extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: '',
-      count: '',
-      image: null
+      payType: 1,
+      accountName: '',
+      qrCode: '',
+      accountId: '',
+      showImg: false
     };
   }
+
+  //选择图片
+  _uploadPic(photo) {
+    const data = new FormData();
+    data.append('file', {
+      uri: photo.path,
+      type: photo.mime, // or photo.type
+      name: photo.path.slice(photo.path.lastIndexOf('/') + 1)
+    });
+    storage.load({
+      key: 'loginState',
+    }).then(ret => {
+      const url = global.Config.FetchURL + '/file/upload';
+      const opt = {
+        method: 'post',
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          'token': ret.token
+        },
+        body: data
+      }
+      this._uploadPicFetch(url, opt);
+    });
+  }
+
+  //回显图片
+  _uploadPicFetch(url, opt) {
+    fetch(url, opt)
+      .then((response) => response.json())
+      .then(responseData => {
+        this.setState({
+          accountId: global.Config.FetchURL + '/upload/' + responseData.data,
+          showImg: true
+        })
+      });
+  }
+
+  //点击上传图片
+  _handleButtonPress = () => {
+    ImagePicker.openPicker({
+      width: 300,
+      height: 400,
+      cropping: true
+    }).then(image => {
+      this._uploadPic(image)
+    });
+  };
+
+  //保存用户信息
+  _savePayInfo = () => {
+    storage.load({
+      key: 'loginState',
+    }).then(ret => {
+      const url = global.Config.FetchURL + '/user/saveUserPayInfo';
+      const opt = {
+        method: 'post',
+        headers: {
+          'Content-Type': global.Config.ContentType,
+          'Accept': global.Config.Accept,
+          'token': ret.token
+        },
+        body: JSON.stringify(this.state)
+      }
+      this._savePayInfoReq(url, opt);
+    });
+  }
+  //保存用户信息请求fetch
+  _savePayInfoReq(url, opt) {
+    fetch(url, opt)
+      .then((response) => response.json())
+      .then(responseData => {
+        if (responseData.code == 200) {
+          this.props.navigation.popToTop()
+        } else {
+          alert(responseData.message);
+        }
+      });
+  }
+
+  componentDidMount() {
+    storage.load({
+      key: 'userPayInfo',
+    }).then(ret => {
+      if (ret.weixin && ret.weixin.accountId) {
+        ret.weixin.showImg = true;
+      }
+      this.setState(ret.weixin);
+    });
+  }
+
   render() {
+    let hidderImg = this.state.showImg ?
+      <TouchableOpacity style={styles.topInfo}
+        onPress={this._handleButtonPress}>
+        <Image source={{ uri: this.state.accountId }} style={styles.img} />
+      </TouchableOpacity> :
+      <Ionicons name="file-plus" size={120} color="white" onPress={this._handleButtonPress} />;
     return (
       <SafeAreaView style={styles.container}>
         <ImageBackground source={require('../../../images/user_bg.jpg')} style={{ flex: 1 }} >
@@ -35,8 +132,8 @@ export default class ReceiptCode1 extends Component {
               <Text style={styles.txt}>微信收款姓名</Text>
               <TextInput
                 style={styles.txtInput}
-                onChangeText={(name) => this.setState({name})}
-                value={this.state.name}
+                onChangeText={(accountName) => this.setState({accountName})}
+                value={this.state.accountName}
                 underlineColorAndroid="transparent"
                 placeholder="请填写您微信绑定的账户姓名"
               />
@@ -47,8 +144,8 @@ export default class ReceiptCode1 extends Component {
               <Text style={styles.txt}>微信收款账号</Text>
               <TextInput
                 style={styles.txtInput}
-                onChangeText={(count) => this.setState({count})}
-                value={this.state.count}
+                onChangeText={(qrCode) => this.setState({qrCode})}
+                value={this.state.qrCode}
                 underlineColorAndroid="transparent"
                 placeholder="请填写需要绑定的微信账号"
               />
@@ -57,7 +154,7 @@ export default class ReceiptCode1 extends Component {
           <View style={[styles.listOne, {height: 200}]}>
             <View style={styles.listLeft}>
               <Text style={styles.txt}>微信收款二维码</Text>
-              <Ionicons name="file-plus" size={120} color="white" />
+              {hidderImg}
             </View>
           </View>
           <View style={styles.listOne}>
@@ -65,6 +162,7 @@ export default class ReceiptCode1 extends Component {
               <Button
                 containerStyle={{ padding: 10, height: 45, overflow: 'hidden', borderRadius: 4 }}
                 disabledContainerStyle={{ backgroundColor: '#441272' }}
+                onPress={this._savePayInfo}
                 style={{ fontSize: 20, color: '#FFFFFF' }}>
                 确定提交
               </Button>
@@ -108,10 +206,14 @@ const styles = StyleSheet.create({
     height: 60,
     width: '65%',
     fontSize: 16,
-    color: '#777777'
+    color: '#FFFFFF'
   },
   buttonstyle: {
     flex: 1, height: 45, width: '90%', margin: '5%'
+  },
+  img: {
+    width: 160,
+    height: 160
   }
   
 });

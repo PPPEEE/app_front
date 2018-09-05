@@ -22,9 +22,8 @@ export default class ReceiptCode1 extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      id:"",
       userId:"",
-      payType:"3",
+      payType: 3,
       bank:"",
       accountName:"",
       qrCode:"",
@@ -46,25 +45,24 @@ export default class ReceiptCode1 extends Component {
         },
         body: JSON.stringify(this.state)
       }
-      console.log(opts);
       fetch(url, opts)
         .then((res) => res.json())
         .then((resJson) => { 
-          console.log(resJson)
-          // this.setState({ users: resJson.data });
+          if(resJson.code == 200){
+            this.props.navigation.popToTop()
+          }else{
+            alert(resJson.message);
+          }
         })
     })
   }
 
   componentDidMount() {
     storage.load({
-      key: 'userBasicInfo'
+      key: 'userPayInfo',
     }).then(ret => {
-      this.setState({
-        userId: ret.UID,
-        id: 1,//带修改
-      })
-    })
+      this.setState(ret.card);
+    });
   }
 
   render() {
@@ -88,6 +86,7 @@ export default class ReceiptCode1 extends Component {
               ]}
                 style={{width: '100%'}}
                 textStyle={{fontSize: 16, color: 'white'}}
+                defaultValue={this.state.bank}
                 dropdownTextStyle={{fontSize: 16}}
                 onSelect={(index,value)=>this.setState({bank: value})}
               />

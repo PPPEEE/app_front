@@ -17,19 +17,70 @@ import { SafeAreaView, createStackNavigator } from 'react-navigation';
 
 
 export default class ReceiptCode extends Component {
-  
-  // getUserInfo() {
-    
-  // }
+  constructor(props) {
+    super(props);
+    this.state = {
+      weixin: '',
+      alipay: '',
+      card: '',
+    };
+  }
 
-  // //页面渲染完成后会主动回调该方法
-  // componentDidMount() {
-  //   // this.getUserInfo();
-  // }
+  //页面渲染完成后会主动回调该方法
+  componentDidMount() {
+    storage.load({
+      key: 'loginState',
+    }).then(ret => {
+      const url = global.Config.FetchURL + '/user/findUserPayInfo';
+      const opt = {
+        method: 'post',
+        headers:{
+          'Content-Type': global.Config.ContentType,
+          'Accept': global.Config.Accept,
+          'token': ret.token
+        },
+      }
+      fetch(url, opt)
+        .then((response) => response.json())
+        .then(responseData => {
+          console.log(responseData.data);
+          let weixin = null;
+          let alipay = null;
+          let card = null;
+          for(var i=0; i< responseData.data.length;i++){
+            if(responseData.data[i].payType == 1){
+              weixin = responseData.data[i]
+            }
+            if(responseData.data[i].payType == 2){
+              alipay = responseData.data[i]
+            }
+            if(responseData.data[i].payType == 3){
+              card = responseData.data[i]
+            }
+          }
+          this.addPayInfo(weixin, alipay, card)
+          this.setState({weixin, alipay, card});
+        });
+    });
+  }
+  addPayInfo = (weixin, alipay, card) => {
+    storage.save({
+      key: 'userPayInfo',  // 注意:请不要在key中使用_下划线符号!
+      data: {
+        weixin: weixin,
+        alipay: alipay,
+        card: card,
+      },
+    });
+  }
+
   onPress = (where) => {
     this.props.navigation.push(where);
   }
   render() {
+    var isBindW = this.state.weixin == null ? <Text style={styles.txt}>未绑定</Text> : null ;
+    var isBindA = this.state.alipay == null ? <Text style={styles.txt}>未绑定</Text> : null ;
+    var isBindC = this.state.card == null ? <Text style={styles.txt}>未绑定</Text> : null ;
     return (
       <SafeAreaView style={styles.container}>
         <ImageBackground source={require('../../../images/user_bg.jpg')} style={{ flex: 1 }} >
@@ -40,7 +91,7 @@ export default class ReceiptCode extends Component {
             </View>
             <TouchableOpacity style={styles.listLeft}
               onPress={() => this.onPress('ReceiptCode1')}>
-              <Text style={styles.txt}>未绑定</Text>
+              {isBindW}
               <Ionicons name="arrow-right" size={24} color="white"/>
             </TouchableOpacity>
           </View>
@@ -51,7 +102,7 @@ export default class ReceiptCode extends Component {
             </View>
             <TouchableOpacity style={styles.listLeft}
               onPress={() => this.onPress('ReceiptCode2')}>
-              <Text style={styles.txt}>未绑定</Text>
+              {isBindA}
               <Ionicons name="arrow-right" size={24} color="white"/>
             </TouchableOpacity>
           </View>
@@ -62,7 +113,7 @@ export default class ReceiptCode extends Component {
             </View>
             <TouchableOpacity style={styles.listLeft}
               onPress={() => this.onPress('ReceiptCode3')}>
-              <Text style={styles.txt}>未绑定</Text>
+              {isBindC}
               <Ionicons name="arrow-right" size={24} color="white"/>
             </TouchableOpacity>
           </View>
