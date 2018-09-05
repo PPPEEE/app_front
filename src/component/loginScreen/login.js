@@ -28,8 +28,8 @@ export default class Login extends Component {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          mobile: this.state.mobile || '15013669204',
-          password: this.state.password || '123456'
+          mobile: this.state.mobile ,
+          password: this.state.password 
         })
       }).then((res) => {
         return res.json();

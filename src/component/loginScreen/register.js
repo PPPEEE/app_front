@@ -18,25 +18,6 @@ export default class Register extends Component {
     this.sendVerifiCode = this.sendVerifiCode.bind(this);
     this.checkUserName = this.checkUserName.bind(this);
   }
-  checkUserName() {
-    fetch('http://120.78.205.55:8081/user/userNameExists', {
-      method: "POST",
-      headers: {
-        "Accept": "application/json",
-        "token":'2e43c15ede4a8be9ad39975ff5054f49',
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        'userName ': this.state.userName
-      })
-    }).then((res) => {
-      return res.json();
-    }).then((jsonData) => {
-      Alert.alert('提示', JSON.stringify(jsonData),);
-    }).catch((error) => {
-      Alert.error('error', JSON.stringify(error));
-    })
-  }
   sendVerifiCode() {
     fetch('http://120.78.205.55:8081/user/sendCode', {
       method: "POST",
@@ -100,6 +81,57 @@ export default class Register extends Component {
     });
   }
 
+  checkUserName() {
+    fetch('http://120.78.205.55:8081/user/userNameExists', {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        'userName ': this.state.userName
+      })
+    }).then((res) => {
+      return res.json();
+    }).then((jsonData) => {
+      this.setState({
+        invalidUsername: jsonData.code === '0'
+      })
+      if(jsonData.code === '0'){
+        this.setState({
+          nameTips: jsonData.message
+        });
+      }
+    }).catch((error) => {
+      // Alert.error('error', JSON.stringify(error));
+    })
+  }
+
+  checkVerifiCode(){
+    fetch(`{$global.Config.FetchURL}/user/checkCode`, {
+      method: "Post",
+      hearders: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        'mobile': this.state.mobile,
+        'code': this.state.verificode
+      })
+    }).then((res)=>{
+      return res.json();
+    }).then((jsonData) =>{
+      this.setState({
+          invalidCode: jsonData.code === '0'
+        })
+      if(jsonData.code === '0'){
+        this.setState({
+          codeTips: '验证码验证失败'
+        }) 
+      }
+    })
+  }
+
   render() {
     var checkIcon = this.state.checked ? "check" : null;
     return (
@@ -151,10 +183,8 @@ export default class Register extends Component {
                          underlineColorAndroid="transparent"
                          secureTextEntry={ true }
                          onChangeText={ (text) => {
-                                          if (text !== this.state.password) {
-                                             this.setState
-                                          }
-                                          return this.setState({
+                                          this.setState({
+                                            invalidPwd: text !== this.state.password,
                                             passwordConfirm: text
                                           });
                                         } } />
@@ -191,6 +221,8 @@ export default class Register extends Component {
                          style={ [styles.input, { width: 400 }] }
                          placeholderTextColor="#969696"
                          underlineColorAndroid="transparent"
+                         maxLength = {6}
+                         onBlur={this.checkVerifiCode}
                          onChangeText={ (text) => this.setState({
                                           verificode: text
                                         }) } />
@@ -222,7 +254,7 @@ export default class Register extends Component {
               <TouchableOpacity
                                 style={ styles.loginButton }
                                 onPress={ this.register }
-                                disabled={ this.state.invalidPwd || this.state.invalidUsername }>
+                                disabled={ this.state.invalidPwd || this.state.invalidUsername || this.state.invalidCode || !this.state.passwordConfirm}>
                 <Text style={ { fontSize: 40, color: '#0C2956' } }>
                   注册
                 </Text>
