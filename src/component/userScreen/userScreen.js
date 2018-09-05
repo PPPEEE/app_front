@@ -60,10 +60,13 @@ export default class userScreen extends Component {
       <SafeAreaView style={styles.container}>
         <ImageBackground source={require('../../images/user_bg.jpg')} style={{ flex: 1 }} >
           <View style={styles.top}>
-            <Image
-              style={{ width: 50, height: 50, borderRadius: 30, margin: '5%' }}
-              source={require('../../images/nohead.jpg')}
-            />
+            <TouchableOpacity style={styles.topInfo}
+            onPress={() => this.onPress('modifyUserInfo')}>
+              <Image
+                style={{ width: 50, height: 50, borderRadius: 30, margin: '15%' }}
+                source={require('../../images/nohead.jpg')}
+              />
+            </TouchableOpacity>
             <View style={styles.topInfo}>
               <Text style={styles.font}>{'UID: ' + this.state.UID}</Text>
               <Text style={styles.font}>{'会员等级: ' + this.state.level}</Text>
@@ -112,14 +115,20 @@ export default class userScreen extends Component {
               </View>
             </View>
             <View style={styles.listone}>
-              <View style={styles.one}>
-                <Ionicons name={'lock'} style={styles.fontIcon}></Ionicons>
-                <Text style={styles.font}>登录密码</Text>
-              </View>
-              <View style={styles.one}>
-                <Ionicons name={'dollar-sign'} style={styles.fontIcon}></Ionicons>
-                <Text style={styles.font}>支付密码</Text>
-              </View>
+              <TouchableOpacity style={styles.one}
+                onPress={() => this.onPress('modifyPwd')}>
+                <View style={{ flex: 1 }}>
+                  <Ionicons name={'lock'} style={styles.fontIcon}></Ionicons>
+                  <Text style={styles.font}>登录密码</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.one}
+                onPress={() => this.onPress('modifyTPwd')}>
+                <View style={{ flex: 1 }}>
+                  <Ionicons name={'dollar-sign'} style={styles.fontIcon}></Ionicons>
+                  <Text style={styles.font}>支付密码</Text>
+                </View>
+              </TouchableOpacity>
               <View style={styles.one}>
                 <MIcons name={'security'} style={styles.fontIcon}></MIcons>
                 <Text style={styles.font}>安全设置</Text>

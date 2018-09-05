@@ -14,6 +14,9 @@ import myTeam from './src/component/userScreen/userMenu/myTeam';
 import modifyNick from './src/component/userScreen/userMenu/modifyNick';
 import Register from './src/component/loginScreen/register';
 import tradeScreen from './src/component/tradeScreen/tradeScreen';
+import modifyUserInfo from './src/component/userScreen/userMenu/modifyUserInfo';
+import modifyPwd from './src/component/userScreen/userMenu/modifyPwd';
+import modifyTPwd from './src/component/userScreen/userMenu/modifyTPwd';
 import ReceiptCode from './src/component/userScreen/userMenu/ReceiptCode';
 import ReceiptCode1 from './src/component/userScreen/userMenu/ReceiptCode1';
 import ReceiptCode2 from './src/component/userScreen/userMenu/ReceiptCode2';
@@ -57,10 +60,37 @@ export default App = createStackNavigator({
       headerTintColor: '#FFFFFF',
     }),
   },
+  modifyUserInfo: {
+    screen: modifyUserInfo,
+    navigationOptions: ({ navigation }) => ({
+      title: '个人信息',
+      headerTitleStyle: {color: '#FFFFFF',},
+      headerStyle: {backgroundColor: '#551670',},
+      headerTintColor: '#FFFFFF',
+    }),
+  },
   modifyNick: {
     screen: modifyNick,
     navigationOptions: ({ navigation }) => ({
       title: '修改昵称',
+      headerTitleStyle: {color: '#FFFFFF',},
+      headerStyle: {backgroundColor: '#551670',},
+      headerTintColor: '#FFFFFF',
+    }),
+  },
+  modifyPwd: {
+    screen: modifyPwd,
+    navigationOptions: ({ navigation }) => ({
+      title: '修改登录密码',
+      headerTitleStyle: {color: '#FFFFFF',},
+      headerStyle: {backgroundColor: '#551670',},
+      headerTintColor: '#FFFFFF',
+    }),
+  },
+  modifyTPwd: {
+    screen: modifyTPwd,
+    navigationOptions: ({ navigation }) => ({
+      title: '修改支付密码',
       headerTitleStyle: {color: '#FFFFFF',},
       headerStyle: {backgroundColor: '#551670',},
       headerTintColor: '#FFFFFF',

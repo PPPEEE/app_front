@@ -16,8 +16,68 @@ export default class modifyNick extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: ''
+      avatar: '',
+      nickName: '',
+      realName: '',
+      gender: '保密',
+      birthday: '',
+      addr: '',
+      mobile: '',
+      showImg: false
     };
+  }
+
+  fetchUserInfo() {
+    storage.load({
+      key: 'loginState'
+    }).then(ret => {
+      const url = global.Config.FetchURL + '/user/findUserInfo';
+      const opts = {
+        method: 'POST',
+        headers: {
+          'Accept': global.Config.Accept,
+          'Content-Type': global.Config.ContentType,
+          'token': ret.token
+        },
+      }
+      fetch(url, opts)
+        .then((res) => res.json())
+        .then((resJson) => {
+          console.log(resJson);
+          this.setState( resJson.data );
+        })
+    })
+  }
+  _saveUserInfo = () => {
+    storage.load({
+      key: 'loginState',
+    }).then(ret => {
+      const url = global.Config.FetchURL + '/user/updateUserInfo';
+      const opt = {
+        method: 'post',
+        headers: {
+          'Content-Type': global.Config.ContentType,
+          'Accept': global.Config.Accept,
+          'token': ret.token
+        },
+        body: JSON.stringify(this.state)
+      }
+      this._saveUserInfoReq(url, opt);
+    });
+  }
+  _saveUserInfoReq(url, opt){
+    fetch(url, opt)
+    .then((response) => response.json())
+    .then(responseData => {
+      if (responseData.code == 200) {
+        this.props.navigation.popToTop()
+      } else {
+        alert(responseData.message);
+      }
+    });
+  }
+  componentDidMount() {
+    this.fetchUserInfo();
   }
   render() {
     return (
@@ -28,8 +88,8 @@ export default class modifyNick extends Component {
               <Text style={styles.txt}>昵称</Text>
               <TextInput
                 style={styles.txtInput}
-                onChangeText={(name) => this.setState({name})}
-                value={this.state.name}
+                onChangeText={(nickName) => this.setState({nickName})}
+                value={this.state.nickName}
                 underlineColorAndroid="transparent"
                 placeholder="请填写您的新昵称"
               />
@@ -40,6 +100,7 @@ export default class modifyNick extends Component {
               <Button
                 containerStyle={{ padding: 10, height: 45, overflow: 'hidden', borderRadius: 4 }}
                 disabledContainerStyle={{ backgroundColor: '#441272' }}
+                onPress={this._saveUserInfo}
                 style={{ fontSize: 20, color: '#FFFFFF' }}>
                 确定提交
               </Button>
@@ -83,7 +144,7 @@ const styles = StyleSheet.create({
     height: 60,
     width: '65%',
     fontSize: 16,
-    color: '#777777'
+    color: '#FFFFFF'
   },
   buttonstyle: {
     flex: 1, height: 45, width: '90%', margin: '5%'
