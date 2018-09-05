@@ -2,20 +2,26 @@
  * Created by mengqingdong on 2017/4/19.
  */
 import React, { Component } from 'react';
-import { StyleSheet, View, ImageBackground, Text, StatusBar, TouchableOpacity, TextInput } from 'react-native';
+import { StyleSheet, View, ImageBackground, Text, StatusBar, TouchableOpacity, TextInput, Alert } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import Button from 'react-native-button';
 import Resolutions from '../../../utils/resolutions';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ModalDropdown from 'react-native-modal-dropdown';
 
+let paymentsArr = [null, null, null]; //微信,支付宝,银行
+let token = '';
+
 export default class publish extends Component {
+
+
   constructor(props) {
     super();
     this.state = {
       buyColor: 'red',
       saleColor: 'white',
-      Balance: '55.75885'
+      DKBalance: '0',
+      payment: [false, false, false]
     }
 
     this.changeState = (stateName) => {
@@ -26,8 +32,8 @@ export default class publish extends Component {
           saleColor: 'white',
           current: 'buy',
           amount: '',
-          payment: 0,
-          paymentTime: '30分钟'
+          payment: [false, false, false],
+          paymentTime: '30分钟',
         };
       } else {
         state = {
@@ -35,20 +41,95 @@ export default class publish extends Component {
           saleColor: 'red',
           current: 'sale',
           amount: '',
-          payment: 0,
+          payment: [false, false, false],
           paymentTime: '30分钟'
         }
       }
       this.setState(state);
     }
-
+    this.publishDK = this.publishDK.bind(this);
+    this.allSale = this.allSale.bind(this);
     setTimeout(() => {
       this.changeState(this.props.navigation.getParam('whichState', 'buy'));
     }, 0);
   }
+
+  componentWillMount() {
+    storage.load({
+      key: 'loginState'
+    }).then((cache) => {
+      token = cache.token;
+      fetch(`${global.Config.FetchURL}/dks/findTotal`, {
+        method: 'post',
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "token": token
+        }
+      }).then((res)=>{
+        return res.json();
+      }).then(((jsonData)=>{
+        this.setState({
+          DKBalance: jsonData.data
+        });
+      }));
+      fetch(`${global.Config.FetchURL}/user/findUserPayInfo`, {
+        method: 'post',
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "token": token
+        }
+      }).then((res) => {
+        return res.json();
+      }).then((jsonData) => {
+        jsonData.data.map((item) => {
+          paymentsArr[item.payType - 1] = item;
+          return item;
+        })
+      });
+    })
+  }
+
+  publishDK() {
+    let payInfo = this.state.payment.map((value, index) => {
+      return value && (index + 1);
+    }).filter((value) => {
+      return value;
+    }).join(',');
+    fetch(`${global.Config.FetchURL}/dks/releaseDK`, {
+      method: 'post',
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "token": token
+      },
+      body: JSON.stringify({
+        dealNumber: this.state.amount,
+        type: (this.state.current === 'buy' ? 1 : 2),
+        status: 2,
+        minNumber: 0,
+        times: this.state.paymentTime.replace(/[^0-9]/g, ''),
+        payInfo: payInfo
+      })
+    }).then((res) => {
+      return res.json();
+    }).then((jsonData) => {
+      Alert.alert('提示', `发布DK${this.state.current === 'buy'?'买单':'卖单'}成功!`);
+    }).catch((error) => {
+    });
+  }
+
+  allSale() {
+    let amount = Math.ceil(Number(this.state.DKBalance) / 500) * 500;
+    this.setState({
+      amount: amount+''
+    });
+  }
+
   render() {
     const amoutArr = ['500', '1000', '1500', '2000'];
-    const payments = ['微信支付', '支付宝', '银行卡'];
+    const paymentsTitle = ['微信支付', '支付宝', '银行卡'];
     const amoutsRender = (amount) => {
       let borderColor = amount === this.state.amount ? 'rgb(159,68,184)' : 'rgb(90,22,133)'
       return (<TouchableOpacity
@@ -63,12 +144,22 @@ export default class publish extends Component {
                 </Text>
               </TouchableOpacity>);
     };
+
     const paymentRender = (payment, index) => {
-      let paymentColor = index === this.state.payment - 1 ? 'rgb(13,126,190)' : 'white';
+      let paymentColor = this.state.payment[index] ? 'rgb(13,126,190)' : 'white';
       return (<TouchableOpacity
                                 onPress={ () => {
+                                            if (paymentsArr[index] === null) {
+                                              this.props.navigation.push('ReceiptCode');
+                                              return;
+                                            }
                                             this.setState({
-                                              payment: index + 1
+                                              payment: this.state.payment.map((isChecked, payIndex) => {
+                                                if (payIndex === index) {
+                                                  return !isChecked;
+                                                }
+                                                return isChecked;
+                                              })
                                             })
                                           } }
                                 style={ { marginRight: 40 } }
@@ -135,12 +226,15 @@ export default class publish extends Component {
                          ref="tradeAmount"
                          placeholder="请输入您要交易的总数量"
                          value={ this.state.amount }
-                         style={ { fontSize: 40, padding: 0, margin: 0, color: 'white' } }
+                         style={ { fontSize: 40, padding: 0, margin: 0, color: this.state.invalidAmount ? 'red' : 'white' } }
                          placeholderTextColor="rgb(219,219,219)"
                          underlineColorAndroid="transparent"
-                         onChangeText={ (text) => this.setState({
-                                          amount: text
-                                        }) } />
+                         keyboardType="numeric"
+                         onChangeText={ (text) => {
+                                          this.setState({
+                                            amount: text
+                                          })
+                                        } } />
               <View style={ { flexDirection: 'row', marginTop: 40 } }>
                 { amoutArr.map(amoutsRender) }
               </View>
@@ -154,7 +248,7 @@ export default class publish extends Component {
               付款方式
             </Text>
             <View style={ [styles.formArea, { flexDirection: 'row' }] }>
-              { payments.map(paymentRender) }
+              { paymentsTitle.map(paymentRender) }
             </View>
           </View>
           <View style={ styles.rowContainer }>
@@ -189,20 +283,21 @@ export default class publish extends Component {
                 _
               </Text>
               <Text style={ { fontSize: 40, color: 'white' } }>
-                { this.state.Balance }
+                { this.state.DKBalance }
               </Text>
             </Text>
-            <TouchableOpacity style={ { borderWidth: 2, borderColor: 'rgb(63,32,92)', padding: 4, borderRadius: 8, backgroundColor: 'rgb(48,7,85)' } }>
+            <TouchableOpacity
+                              style={ { borderWidth: 2, borderColor: 'rgb(63,32,92)', padding: 4, borderRadius: 8, backgroundColor: 'rgb(48,7,85)' } }
+                              onPress={ this.allSale }>
               <Text style={ { color: 'white', fontSize: 32 } }>
-                全量买入
+                全量卖出
               </Text>
             </TouchableOpacity>
           </View>
           <View>
             <TouchableOpacity
-                              style={ {} }
-                              onPress={ () => {
-                                        } }>
+                              disabled={ this.state.payment.length < 1 || !this.state.amount || Number(this.state.amount) % 500 > 0 }
+                              onPress={ this.publishDK }>
               <ImageBackground
                                style={ { borderRadius: 80, width: 1000, height: 150 } }
                                source={ require('../../../images/Button_bg.jpg') }

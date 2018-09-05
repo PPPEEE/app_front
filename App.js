@@ -2,7 +2,7 @@
  * 
  */
 import React, { Component } from 'react';
-import { YellowBox, AsyncStorage, StatusBar, Platform} from 'react-native';
+import { YellowBox, AsyncStorage, StatusBar, Platform } from 'react-native';
 import { createStackNavigator } from 'react-navigation';
 import Storage from 'react-native-storage';
 YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTImageLoader']);
@@ -39,7 +39,13 @@ export default App = createStackNavigator({
     })
   },
   register: {
-    screen: Register
+    screen: Register,
+    navigationOptions: ({navigation}) => ({
+      headerStyle: {
+        paddingTop: navHeight,
+        backgroundColor: '#000733'
+      }
+    })
   },
   main: {
     screen: main,
@@ -71,10 +77,14 @@ export default App = createStackNavigator({
   },
   modifyNick: {
     screen: modifyNick,
-    navigationOptions: ({ navigation }) => ({
+    navigationOptions: ({navigation}) => ({
       title: '修改昵称',
-      headerTitleStyle: {color: '#FFFFFF',},
-      headerStyle: {backgroundColor: '#551670',},
+      headerTitleStyle: {
+        color: '#FFFFFF',
+      },
+      headerStyle: {
+        backgroundColor: '#551670',
+      },
       headerTintColor: '#FFFFFF',
     }),
   },
@@ -98,37 +108,53 @@ export default App = createStackNavigator({
   },
   ReceiptCode: {
     screen: ReceiptCode,
-    navigationOptions: ({ navigation }) => ({
+    navigationOptions: ({navigation}) => ({
       title: '收款方式',
-      headerTitleStyle: {color: '#FFFFFF',},
-      headerStyle: {backgroundColor: '#551670',},
+      headerTitleStyle: {
+        color: '#FFFFFF',
+      },
+      headerStyle: {
+        backgroundColor: '#551670',
+      },
       headerTintColor: '#FFFFFF',
     }),
   },
   ReceiptCode1: {
     screen: ReceiptCode1,
-    navigationOptions: ({ navigation }) => ({
+    navigationOptions: ({navigation}) => ({
       title: '绑定微信支付',
-      headerTitleStyle: {color: '#FFFFFF',},
-      headerStyle: {backgroundColor: '#551670',},
+      headerTitleStyle: {
+        color: '#FFFFFF',
+      },
+      headerStyle: {
+        backgroundColor: '#551670',
+      },
       headerTintColor: '#FFFFFF',
     }),
   },
   ReceiptCode2: {
     screen: ReceiptCode2,
-    navigationOptions: ({ navigation }) => ({
+    navigationOptions: ({navigation}) => ({
       title: '绑定支付宝',
-      headerTitleStyle: {color: '#FFFFFF',},
-      headerStyle: {backgroundColor: '#551670',},
+      headerTitleStyle: {
+        color: '#FFFFFF',
+      },
+      headerStyle: {
+        backgroundColor: '#551670',
+      },
       headerTintColor: '#FFFFFF',
     }),
   },
   ReceiptCode3: {
     screen: ReceiptCode3,
-    navigationOptions: ({ navigation }) => ({
+    navigationOptions: ({navigation}) => ({
       title: '绑定银行卡',
-      headerTitleStyle: {color: '#FFFFFF',},
-      headerStyle: {backgroundColor: '#551670',},
+      headerTitleStyle: {
+        color: '#FFFFFF',
+      },
+      headerStyle: {
+        backgroundColor: '#551670',
+      },
       headerTintColor: '#FFFFFF',
     }),
   },
@@ -195,12 +221,12 @@ var storage = new Storage({
   // 读写时在内存中缓存数据。默认启用。
   enableCache: true,
 
-  // 如果storage中没有相应数据，或数据已过期，
-  // 则会调用相应的sync方法，无缝返回最新数据。
-  // 你可以在构造函数这里就写好sync的方法
-  // 或是在任何时候，直接对storage.sync进行赋值修改
-  // 或是写到另一个文件里，这里require引入
-  // sync: require('你可以另外写一个文件专门处理sync')  
+// 如果storage中没有相应数据，或数据已过期，
+// 则会调用相应的sync方法，无缝返回最新数据。
+// 你可以在构造函数这里就写好sync的方法
+// 或是在任何时候，直接对storage.sync进行赋值修改
+// 或是写到另一个文件里，这里require引入
+// sync: require('你可以另外写一个文件专门处理sync')  
 });
 storage.sync = {
   // sync方法的名字必须和所存数据的key完全相同
@@ -219,7 +245,7 @@ storage.sync = {
           'token': ret.token
         },
       }
-      let { id, resolve, reject } = params;
+      let {id, resolve, reject} = params;
       fetch(url, opts).then(response => {
         return response.json();
       }).then(json => {

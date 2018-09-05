@@ -1,12 +1,16 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Picker, KeyboardAvoidingView } from 'react-native';
+import { Platform, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Picker, KeyboardAvoidingView, StatusBar } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Resolutions from '../../utils/resolutions';
 var token;
 export default class Register extends Component {
   constructor(props) {
     super(props);
-    storage.load({ key: 'loginState' }).then(ret => { token = ret.token;})
+    storage.load({
+      key: 'loginState'
+    }).then(ret => {
+      token = ret.token;
+    })
     this.state = {
       checked: true,
       areaCode: '86',
@@ -17,6 +21,7 @@ export default class Register extends Component {
     this.register = this.register.bind(this);
     this.sendVerifiCode = this.sendVerifiCode.bind(this);
     this.checkUserName = this.checkUserName.bind(this);
+    this.checkVerifiCode = this.checkVerifiCode.bind(this);
   }
   sendVerifiCode() {
     fetch('http://120.78.205.55:8081/user/sendCode', {
@@ -70,11 +75,11 @@ export default class Register extends Component {
     }).then((res) => {
       return res.json();
     }).then((jsonData) => {
-      if (jsonData.code === 200) {
+      if (jsonData.code === '200') {
         Alert.alert('提示', '注册成功');
         this.props.navigation.replace('login');
       } else {
-        Alert.alert('提示', '注册失败');
+        Alert.alert('提示', jsonData.message);
       }
     }).catch(error => {
 
@@ -96,19 +101,18 @@ export default class Register extends Component {
     }).then((jsonData) => {
       this.setState({
         invalidUsername: jsonData.code === '0'
-      })
-      if(jsonData.code === '0'){
+      });
+      if (jsonData.code === '0') {
         this.setState({
           nameTips: jsonData.message
         });
       }
     }).catch((error) => {
-      // Alert.error('error', JSON.stringify(error));
     })
   }
 
-  checkVerifiCode(){
-    fetch(`{$global.Config.FetchURL}/user/checkCode`, {
+  checkVerifiCode() {
+    fetch(`${global.Config.FetchURL}/user/checkCode`, {
       method: "Post",
       hearders: {
         "Accept": "application/json",
@@ -118,17 +122,12 @@ export default class Register extends Component {
         'mobile': this.state.mobile,
         'code': this.state.verificode
       })
-    }).then((res)=>{
+    }).then((res) => {
       return res.json();
-    }).then((jsonData) =>{
+    }).then((jsonData) => {
       this.setState({
-          invalidCode: jsonData.code === '0'
-        })
-      if(jsonData.code === '0'){
-        this.setState({
-          codeTips: '验证码验证失败'
-        }) 
-      }
+        invalidCode: jsonData.code === '0'
+      })
     })
   }
 
@@ -136,9 +135,12 @@ export default class Register extends Component {
     var checkIcon = this.state.checked ? "check" : null;
     return (
       <Resolutions.FixFullView>
+        <StatusBar
+                   translucent={ true }
+                   backgroundColor='rgba(0,0,0,0)' />
         <View style={ styles.container }>
           <KeyboardAvoidingView behavior="padding">
-            <View style={ [styles.formElement, { borderBottomWidth: 4, borderColor: '#203E86', marginTop: 100 }] }>
+            <View style={ [styles.formElement, { borderBottomWidth: 4, borderColor: this.state.invalidUsername ? 'red' : '#203E86', marginTop: 100 }] }>
               <Text style={ styles.iconWrapper }>
                 <Icon
                       name="user"
@@ -170,7 +172,7 @@ export default class Register extends Component {
                                           password: text
                                         }) } />
             </View>
-            <View style={ [styles.formElement, { borderBottomWidth: 4, borderColor: '#203E86' }] }>
+            <View style={ [styles.formElement, { borderBottomWidth: 4, borderColor: this.state.invalidPwd ? '#FF3E86' : '#203E86' }] }>
               <Text style={ styles.iconWrapper }>
                 <Icon
                       name="lock"
@@ -210,7 +212,7 @@ export default class Register extends Component {
                                           mobile: text
                                         }) } />
             </View>
-            <View style={ [styles.formElement, { borderBottomWidth: 4, borderColor: '#203E86' }] }>
+            <View style={ [styles.formElement, { borderBottomWidth: 4, borderColor: this.state.invalidCode ? 'red' : '#203E86' }] }>
               <Text style={ [styles.iconWrapper, { marginLeft: 20, marginRight: 10 }] }>
                 <Icon
                       name="commenting-o"
@@ -221,8 +223,8 @@ export default class Register extends Component {
                          style={ [styles.input, { width: 400 }] }
                          placeholderTextColor="#969696"
                          underlineColorAndroid="transparent"
-                         maxLength = {6}
-                         onBlur={this.checkVerifiCode}
+                         maxLength={ 6 }
+                         onBlur={ this.checkVerifiCode }
                          onChangeText={ (text) => this.setState({
                                           verificode: text
                                         }) } />
@@ -254,7 +256,10 @@ export default class Register extends Component {
               <TouchableOpacity
                                 style={ styles.loginButton }
                                 onPress={ this.register }
-                                disabled={ this.state.invalidPwd || this.state.invalidUsername || this.state.invalidCode || !this.state.passwordConfirm}>
+                                disabled={ this.state.invalidPwd || this.state.invalidUsername ||
+                                           this.state.invalidCode || !this.state.passwordConfirm ||
+                                           !this.state.password || !this.state.verificode ||
+                                           !this.state.refereeId }>
                 <Text style={ { fontSize: 40, color: '#0C2956' } }>
                   注册
                 </Text>

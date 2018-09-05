@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Image } from 'react-native';
+import { Platform, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Image, StatusBar } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Resolutions from '../../utils/resolutions';
 
@@ -28,24 +28,24 @@ export default class Login extends Component {
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          mobile: this.state.mobile ,
-          password: this.state.password 
+          mobile: this.state.mobile,
+          password: this.state.password
         })
       }).then((res) => {
         return res.json();
       }).then((jsonData) => {
         if (jsonData.code === 200) {
           storage.save({
-            key: 'loginState',  // 注意:请不要在key中使用_下划线符号!
+            key: 'loginState', // 注意:请不要在key中使用_下划线符号!
             data: {
               token: jsonData.data
             },
           });
           this.props.navigation.replace('main');
-        }else{
+        } else {
           Alert.alert('提示', jsonData.message);
         }
-      }).catch(()=>{
+      }).catch(() => {
 
       });
     }
@@ -53,6 +53,9 @@ export default class Login extends Component {
   render() {
     return (
       <Resolutions.FixFullView>
+        <StatusBar
+                   translucent={ true }
+                   backgroundColor='rgba(0,0,0,0)' />
         <View style={ styles.container }>
           <View style={ styles.logon }>
             <Image

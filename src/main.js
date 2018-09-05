@@ -15,9 +15,10 @@ import userScreen from './component/userScreen/userScreen';
 
 const TabBarComponent = (props) => (<ImageBackground
   {...props}
+  resizeMode="cover"
   source={require('./images/bottom_Nav.png')}
   style={styles.tabBarComponent}>
-  <BottomTabBar {...props} style={{ backgroundColor: 'transparent' }} />
+  <BottomTabBar {...props} style={{ backgroundColor: 'transparent' }}/>
 </ImageBackground>);
 
 
@@ -92,7 +93,7 @@ export default Home = createBottomTabNavigator(
 
 const styles = StyleSheet.create({
   tabBarComponent: {
-    borderTopWidth: .5,
+    borderTopWidth: 1,
     borderTopColor: '#A028EA',
     height: '8%'
     
