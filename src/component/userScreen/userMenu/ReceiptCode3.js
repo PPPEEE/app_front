@@ -22,11 +22,51 @@ export default class ReceiptCode1 extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: '',
-      count: '',
-      image: null
+      id:"",
+      userId:"",
+      payType:"3",
+      bank:"",
+      accountName:"",
+      qrCode:"",
+      bankBranch:"",
     };
   }
+
+  saveReceipt() {
+    storage.load({
+      key: 'loginState'
+    }).then(ret => {
+      const url = global.Config.FetchURL + '/user/saveUserPayInfo';
+      const opts = {
+        method: 'POST',
+        headers: {
+          'Accept': global.Config.Accept,
+          'Content-Type': global.Config.ContentType,
+          'token': ret.token
+        },
+        body: JSON.stringify(this.state)
+      }
+      console.log(opts);
+      fetch(url, opts)
+        .then((res) => res.json())
+        .then((resJson) => { 
+          console.log(resJson)
+          // this.setState({ users: resJson.data });
+        })
+    })
+  }
+
+  componentDidMount() {
+    storage.load({
+      key: 'userBasicInfo'
+    }).then(ret => {
+      this.setState({
+        userId: ret.UID,
+        id: 1,//带修改
+      })
+    })
+  }
+
   render() {
     return (
       <SafeAreaView style={styles.container}>
@@ -49,6 +89,7 @@ export default class ReceiptCode1 extends Component {
                 style={{width: '100%'}}
                 textStyle={{fontSize: 16, color: 'white'}}
                 dropdownTextStyle={{fontSize: 16}}
+                onSelect={(index,value)=>this.setState({bank: value})}
               />
             </View>
           </View>
@@ -57,8 +98,8 @@ export default class ReceiptCode1 extends Component {
               <Text style={styles.txt}>真实姓名</Text>
               <TextInput
                 style={styles.txtInput}
-                onChangeText={(count) => this.setState({count})}
-                value={this.state.count}
+                onChangeText={(accountName) => this.setState({accountName})}
+                value={this.state.accountName}
                 underlineColorAndroid="transparent"
                 placeholder="请填写开卡真实姓名"
               />
@@ -69,8 +110,8 @@ export default class ReceiptCode1 extends Component {
               <Text style={styles.txt}>银行卡号</Text>
               <TextInput
                 style={styles.txtInput}
-                onChangeText={(count) => this.setState({count})}
-                value={this.state.count}
+                onChangeText={(qrCode) => this.setState({qrCode})}
+                value={this.state.qrCode}
                 underlineColorAndroid="transparent"
                 placeholder="请填写需要绑定的银行卡号"
               />
@@ -81,8 +122,8 @@ export default class ReceiptCode1 extends Component {
               <Text style={styles.txt}>开户支行</Text>
               <TextInput
                 style={styles.txtInput}
-                onChangeText={(count) => this.setState({count})}
-                value={this.state.count}
+                onChangeText={(bankBranch) => this.setState({bankBranch})}
+                value={this.state.bankBranch}
                 underlineColorAndroid="transparent"
                 placeholder="请填写该银行卡的开户支行"
               />
@@ -93,6 +134,7 @@ export default class ReceiptCode1 extends Component {
               <Button
                 containerStyle={{ padding: 10, height: 45, overflow: 'hidden', borderRadius: 4 }}
                 disabledContainerStyle={{ backgroundColor: '#441272' }}
+                onPress={()=>{this.saveReceipt()}}
                 style={{ fontSize: 20, color: '#FFFFFF' }}>
                 确定提交
               </Button>
@@ -136,7 +178,7 @@ const styles = StyleSheet.create({
     height: 60,
     width: '70%',
     fontSize: 16,
-    color: '#777777'
+    color: '#FFFFFF'
   },
   buttonstyle: {
     flex: 1, height: 45, width: '90%', margin: '5%'

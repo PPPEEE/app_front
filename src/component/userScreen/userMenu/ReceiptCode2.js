@@ -15,6 +15,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Feather';
 import Button from 'react-native-button';
 import { SafeAreaView, createStackNavigator } from 'react-navigation';
+import ImagePicker from 'react-native-image-crop-picker';
 
 
 export default class ReceiptCode1 extends Component {
@@ -23,9 +24,44 @@ export default class ReceiptCode1 extends Component {
     this.state = {
       name: '',
       count: '',
-      image: null
+      image: null,
+      photos: ''
     };
   }
+
+  _uploadPic(photo) {
+    const data = new FormData();
+    data.append('files', {
+      uri: photo.path,
+      type: 'multipart/form-data', // or photo.type
+      name: 'testPhotoName'
+    });
+    // data.append('file', {
+    //   uri: photo.path,
+    // });
+    console.log(data);
+    const url = global.Config.FetchURL + '/flie/upload';
+    // fetch(url, {
+    //   method: 'post',
+    //   headers:{
+    //     'Content-Type':'multipart/form-data',
+    //   },
+    //   body: data
+    // }).then(res => {
+    //   console.log(res)
+    // });
+  }
+
+  _handleButtonPress = () => {
+    ImagePicker.openPicker({
+      width: 300,
+      height: 400,
+      cropping: true
+    }).then((image, data) => {
+      // this._uploadPic(image)
+      console.log(image, data);
+    });
+  };
   render() {
     return (
       <SafeAreaView style={styles.container}>
@@ -35,7 +71,7 @@ export default class ReceiptCode1 extends Component {
               <Text style={styles.txt}>支付宝收款姓名</Text>
               <TextInput
                 style={styles.txtInput}
-                onChangeText={(name) => this.setState({name})}
+                onChangeText={(name) => this.setState({ name })}
                 value={this.state.name}
                 underlineColorAndroid="transparent"
                 placeholder="请填写您支付宝绑定的账户姓名"
@@ -47,17 +83,17 @@ export default class ReceiptCode1 extends Component {
               <Text style={styles.txt}>支付宝收款账号</Text>
               <TextInput
                 style={styles.txtInput}
-                onChangeText={(count) => this.setState({count})}
+                onChangeText={(count) => this.setState({ count })}
                 value={this.state.count}
                 underlineColorAndroid="transparent"
                 placeholder="请填写需要绑定的支付宝账号"
               />
             </View>
           </View>
-          <View style={[styles.listOne, {height: 200}]}>
+          <View style={[styles.listOne, { height: 200 }]}>
             <View style={styles.listLeft}>
               <Text style={styles.txt}>支付宝收款二维码</Text>
-              <Ionicons name="file-plus" size={120} color="white" />
+              <Ionicons name="file-plus" size={120} color="white" onPress={this._handleButtonPress}/>
             </View>
           </View>
           <View style={styles.listOne}>
@@ -90,7 +126,7 @@ const styles = StyleSheet.create({
     height: 80,
     padding: 10
   },
-  listLeft:{
+  listLeft: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
@@ -113,5 +149,5 @@ const styles = StyleSheet.create({
   buttonstyle: {
     flex: 1, height: 45, width: '90%', margin: '5%'
   }
-  
+
 });
