@@ -9,46 +9,95 @@ import Resolutions from '../../../utils/resolutions';
 
 var count = 0;
 var payment = [require('../../../images/WeChat.png'), require('../../../images/Alipay.png'), require('../../../images/BankCard.png')];
+var defaultHead = require('../../../images/nohead.jpg');
 export default class entrust extends Component {
+  componentWillMount() {
+    storage.load({
+      key: 'loginState'
+    }).then((cache) => {
+      token = cache.token;
+      fetch(`${global.Config.FetchURL}/dks/dkByType`, {
+        method: 'post',
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "token": token
+        },
+        body: JSON.stringify({
+          type: 0
+        })
+      }).then((res) => {
+        return res.json();
+      }).then(((jsonData) => {
+        this.setState({
+          dataList: jsonData.data
+        });
+      }));
+    });
+  }
   constructor() {
     super();
     this.renderItem = this.renderItem.bind(this);
+    this.state = {
+      dataList: []
+    };
   }
-  renderItem = (item) => {
-
+  renderItem = (item, index) => {
+    var userPayInfo = item.item.user.userPayInfo;
     return (<ScrollView
-                        key={ item.key }
                         style={ styles.listItem }
                         showsHorizontalScrollIndicator={ false }
                         horizontal={ true }>
               <View style={ { flexDirection: 'row', width: 1339 } }>
                 <View style={ { width: 1080, justifyContent: 'space-between', flexDirection: 'row', padding: 40 } }>
-                  <View style={ { flexDirection: 'row'} }>
+                  <View style={ { flexDirection: 'row' } }>
                     <Image
-                           source={ require('../../../images/nohead.jpg') }
-                           style={ { height: 120, width: 120, borderRadius: 60, marginTop: 30 ,marginRight: 40} }></Image>
+                           source={ global.userDetail && global.userDetail.avatar ? {
+                                      uri: global.userDetail.avatar
+                                    } : defaultHead }
+                           style={ { height: 120, width: 120, borderRadius: 60, marginTop: 30, marginRight: 40 } }></Image>
                     <View>
-                      <View style={{ flexDirection: 'row', alignItems: 'center'}}>
-                        <Text style={{fontSize: 40,marginRight:20,fontWeight: 'bold',marginLeft: 12}}>
-                          { '宁静' }
+                      <View style={ { flexDirection: 'row', alignItems: 'center' } }>
+                        <Text style={ { fontSize: 40, marginRight: 20, fontWeight: 'bold' } }>
+                          { item.item.user.userName }
                         </Text>
-                        { payment.map((url) => {
-                            return (<Image
-                                           source={ url }
-                                           style={ { width: 35, height: 35 ,margin: 5} } />);
+                        { payment.map((url, index) => {
+                            for (var o in userPayInfo) {
+                              if (userPayInfo[o].payType === index) {
+                          
+                                return (<Image
+                                               key={ index }
+                                               source={ url }
+                                               style={ { width: 35, height: 35, marginLeft: 10 } } />);
+                              }
+                            }
+                            return;
                           }) }
                       </View>
-                      <View style={{margin: 12}}>
-                        <Text style={{fontSize: 34}}>限额{' '+0}</Text>
+                      <View style={ { marginTop: 20, marginLeft: 4 } }>
+                        <Text style={ { fontSize: 34 } }>
+                          限额
+                          { ' ' + item.item.minNumber }
+                        </Text>
                       </View>
-                      <View style={{margin: 12}}>
-                        <Text style={{fontSize: 34}}>编号:{' '+'************1998'}</Text>
+                      <View style={ { marginTop: 20, marginLeft: 4 } }>
+                        <Text style={ { fontSize: 34 } }>
+                          编号:
+                          { ' ' + item.item.id }
+                        </Text>
                       </View>
                     </View>
                   </View>
-                  <View>
-                    <Text>
-                      交易区
+                  <View style={ { alignItems: 'flex-end' } }>
+                    <Text style={ { fontSize: 40, fontWeight: 'bold', marginRight: 12 } }>
+                      { `${item.item.type === 1 ? '买入:': '卖出:'} ${item.item.dealNumber}` }
+                    </Text>
+                    <Text style={ { fontSize: 34, margin: 12 } }>
+                      实收:
+                      <Text style={ { fontWeight: 'bold', fontSize: 34 } }>
+                        { ' ' + item.item.money +' '}
+                      </Text>
+                      CNY
                     </Text>
                   </View>
                 </View>
@@ -62,29 +111,15 @@ export default class entrust extends Component {
             </ScrollView> );
   }
   render() {
-    var data = [{
-      key: 'Devin'
-    }, {
-      key: 'Jackson'
-    }, {
-      key: 'James'
-    }, {
-      key: 'Joel'
-    }, {
-      key: 'John'
-    }, {
-      key: 'Jillian'
-    }, {
-      key: 'Jimmy'
-    }, {
-      key: 'Julie'
-    }];
     return (
       <Resolutions.FixFullView>
         <SafeAreaView style={ styles.container }>
           <View style={ { height: 1536 } }>
             <FlatList
-                      data={ data }
+                      data={ this.state.dataList }
+                      keyExtractor={ (item, index) => {
+                                       return item.id
+                                     } }
                       renderItem={ this.renderItem } />
           </View>
         </SafeAreaView>

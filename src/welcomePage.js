@@ -2,7 +2,7 @@
  * Created by mengqingdong on 2017/4/19.
  */
 import React, { Component } from 'react';
-import { StyleSheet, View, ImageBackground, StatusBar} from 'react-native';
+import { StyleSheet, View, ImageBackground, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import Button from 'react-native-button';
 import CheckUpdate from './component/CheckUpdate';
@@ -29,6 +29,7 @@ export default class MainPage extends Component {
     }).then(ret => {
       // found data go to then() // console.log(ret.token);
       this.fetchUserBefore();
+      this.fetchUserDetail();
       setTimeout(() => {
         if (ret.token !== null) {
           this.props.navigation.replace('main');
@@ -76,6 +77,24 @@ export default class MainPage extends Component {
       }
     })
   }
+  fetchUserDetail() {
+    storage.load({
+      key: 'loginState'
+    }).then(r => {
+      fetch(`${global.Config.FetchURL}/user/findUserInfo`, {
+        method: 'post',
+        headers: {
+          'Accept': 'application/json',
+          'ContentType': 'application/json;charset=UTF-8',
+          'token': r.token
+        }
+      }).then((res) => {
+        return res.json();
+      }).then((jsonData) => {
+        global.userDetail = jsonData.data;
+      })
+    })
+  }
   fetchUserInfo(url, opts) {
     fetch(url, opts)
       .then((response) => response.json())
@@ -86,7 +105,7 @@ export default class MainPage extends Component {
             this.props.navigation.replace('login');
           } else {
             storage.save({
-              key: 'userBasicInfo',  // 注意:请不要在key中使用_下划线符号!
+              key: 'userBasicInfo', // 注意:请不要在key中使用_下划线符号!
               data: {
                 UID: responseJson.data.id,
                 level: responseJson.data.userLevel,
@@ -98,29 +117,31 @@ export default class MainPage extends Component {
             });
           }
         }
-      )
+    )
       .catch((error) => console.error(error))
   }
   render() {
     return (
-      <SafeAreaView style={styles.container}>
-        <StatusBar translucent={ true }  backgroundColor='rgba(0,0,0,0)'/>
+      <SafeAreaView style={ styles.container }>
+        <StatusBar
+                   translucent={ true }
+                   backgroundColor='rgba(0,0,0,0)' />
         <ImageBackground
-          source={require('./images/backgroundImg.jpg')}
-          style={{ width: '100%', height: '100%' }}>
-          <View style={styles.content}>
+                         source={ require('./images/backgroundImg.jpg') }
+                         style={ { width: '100%', height: '100%' } }>
+          <View style={ styles.content }>
             <Button
-              containerStyle={{ padding: 10, height: 45, width: '90%', margin: '5%', overflow: 'hidden', borderRadius: 4, backgroundColor: '#441272' }}
-              disabledContainerStyle={{ backgroundColor: '#441272' }}
-              style={{ fontSize: 20, color: '#FFFFFF' }}
-              onPress={() => this.props.navigation.replace('main')}
-            >欢迎进入DCCB
+                    containerStyle={ { padding: 10, height: 45, width: '90%', margin: '5%', overflow: 'hidden', borderRadius: 4, backgroundColor: '#441272' } }
+                    disabledContainerStyle={ { backgroundColor: '#441272' } }
+                    style={ { fontSize: 20, color: '#FFFFFF' } }
+                    onPress={ () => this.props.navigation.replace('main') }>
+              欢迎进入DCCB
             </Button>
-            <CheckUpdate newVersionState={this.newVersionState} />
+            <CheckUpdate newVersionState={ this.newVersionState } />
           </View>
         </ImageBackground>
       </SafeAreaView>
-    );
+      );
   }
 }
 
