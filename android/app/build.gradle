@@ -87,8 +87,8 @@ apply from: "../../node_modules/react-native-vector-icons/fonts.gradle"
  * the correct one based on the CPU architecture of their device.
  */
 def enableSeparateBuildPerCPUArchitecture = false
-def DEFAULT_GOOGLE_PLAY_SERVICES_VERSION    = "12.0.1"
 def DEFAULT_SUPPORT_LIBRARY_VERSION         = "27.1.0"
+
 /**
  * Run Proguard to shrink the Java bytecode in release builds.
  */
@@ -108,6 +108,17 @@ android {
         ndk {
             abiFilters "armeabi-v7a", "x86"
         }
+        multiDexEnabled true
+    }
+    signingConfigs {
+        release {
+            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE')) {
+                storeFile file(MYAPP_RELEASE_STORE_FILE)
+                storePassword MYAPP_RELEASE_STORE_PASSWORD
+                keyAlias MYAPP_RELEASE_KEY_ALIAS
+                keyPassword MYAPP_RELEASE_KEY_PASSWORD
+            }
+        }
     }
     splits {
         abi {
@@ -121,6 +132,7 @@ android {
         release {
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+            signingConfig signingConfigs.release
         }
     }
     // applicationVariants are e.g. debug, release
@@ -139,21 +151,18 @@ android {
 }
 
 dependencies {
-    def googlePlayServicesVersion = rootProject.hasProperty('googlePlayServicesVersion')  ? rootProject.googlePlayServicesVersion : DEFAULT_GOOGLE_PLAY_SERVICES_VERSION
-    def supportLibVersion = rootProject.hasProperty('supportLibVersion')  ? rootProject.supportLibVersion : DEFAULT_SUPPORT_LIBRARY_VERSION
- 
-    implementation  project(':react-native-vector-icons')
-    implementation  project(':react-native-image-crop-picker')
-    
-    implementation  fileTree(dir: "libs", include: ["*.jar"])
-    implementation  "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
-    implementation  "com.facebook.react:react-native:+"  // From node_modules
-    implementation  "com.google.zxing:core:3.2.1"
-    implementation  "com.drewnoakes:metadata-extractor:2.9.1"
-    implementation (project(':react-native-camera')) {
+
+    compile "com.google.zxing:core:3.2.1"
+    compile "com.drewnoakes:metadata-extractor:2.9.1"
+    compile project(':react-native-vector-icons')
+    compile project(':react-native-image-crop-picker')
+    compile fileTree(dir: "libs", include: ["*.jar"])
+    compile "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
+    compile "com.facebook.react:react-native:+"  // From node_modules
+    compile (project(':react-native-camera')) {
         exclude group: "com.google.android.gms"
-        implementation  "com.android.support:exifinterface:${rootProject.ext.supportLibVersion}"
-        implementation   ("com.google.android.gms:play-services-vision:$googlePlayServicesVersion") {
+        compile 'com.android.support:exifinterface:27.+'
+        compile ('com.google.android.gms:play-services-vision:12.0.1') {
             force = true
         }
     }
