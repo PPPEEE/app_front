@@ -20,15 +20,21 @@ export default class modifyTPwd extends Component {
     this.state = {
       payPwd: '',
       isSendCode: false,
+      verificode: '',
       seconds: 60,
       areaCode: '86',
       mobile: '',
-      type: '1'
+      type: '1',
+      invalidCode: false
     };
   }
 
   //发送验证码
   sendVerifiCode = () => {
+    if(this.state.mobile.length < 6){
+      alert('请填写正确的手机号码');
+      return;
+    }
     fetch('http://120.78.205.55:8081/user/sendCode', {
       method: "POST",
       headers: {
@@ -63,6 +69,10 @@ export default class modifyTPwd extends Component {
   }
 
   _saveTPwd = () => {
+    if(this.state.payPwd.length !== 6){
+      alert('请输入6位数字密码');
+      return;
+    }
     storage.load({
       key: 'loginState',
     }).then(ret => {
@@ -76,7 +86,12 @@ export default class modifyTPwd extends Component {
         },
         body: JSON.stringify({payPwd: this.state.payPwd})
       }
-      this._saveTPwdReq(url, opt);
+      if(this.state.mobile.length < 6){
+        alert('请输入正确的手机号码');
+        return;
+      }else{
+        this._checkVerifiCode(this._saveTPwdReq,url, opt);
+      }
     });
   }
   _saveTPwdReq(url, opt){
@@ -90,6 +105,34 @@ export default class modifyTPwd extends Component {
         alert(responseData.message);
       }
     });
+  }
+  _checkVerifiCode = (callbackFn, url, opt) => {
+    fetch(`${global.Config.FetchURL}/user/checkCode`, {
+      method: "Post",
+      hearders: {
+        "Accept": "application/json",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        'mobile': this.state.mobile,
+        'code': this.state.verificode
+      })
+    }).then((res) => {
+      return res.json();
+    }).then((jsonData) => {
+      if(jsonData.code == 401){
+        this.props.navigation.replace('login')
+      }else{
+        this.setState({
+          invalidCode: jsonData.code === '0'
+        })
+        if(this.state.invalidCode){
+          callbackFn(url, opt);
+        }else{
+          alert('请输入正确的手机验证码');
+        }
+      }
+    })
   }
 
   render() {
@@ -105,7 +148,9 @@ export default class modifyTPwd extends Component {
                 value={this.state.payPwd}
                 placeholderTextColor="#969696"
                 underlineColorAndroid="transparent"
-                placeholder="请填写您的新支付密码"
+                placeholder="设置新的6位数字支付密码"
+                keyboardType="numeric"
+                maxLength={6}
                 secureTextEntry={true}
               />
             </View>
@@ -113,12 +158,6 @@ export default class modifyTPwd extends Component {
           <View style={styles.listOne}>
             <View style={styles.listLeft}>
               <Text style={styles.txt}>手机号码</Text>
-              <Text style={styles.txt}>15013332222</Text>
-            </View>
-          </View>
-          <View style={styles.listOne}>
-            <View style={styles.listLeft}>
-              <Text style={styles.txt}>短信验证码</Text>
               <Text style={ { fontSize: 16, width: 40, height: 30, color: 'white', paddingTop: 5, marginRight: 0 } }>
                 { '+' + this.state.areaCode }
                 <Icon
@@ -126,12 +165,28 @@ export default class modifyTPwd extends Component {
                       style={ { fontSize: 10, color: 'white' } } />
               </Text>
               <TextInput
+                style={styles.txtInput}
+                onChangeText={(mobile) => this.setState({mobile})}
+                value={this.state.mobile}
+                placeholderTextColor="#969696"
+                underlineColorAndroid="transparent"
+                placeholder="请输入手机号码"
+                keyboardType="numeric"
+              />
+            </View>
+          </View>
+          <View style={styles.listOne}>
+            <View style={styles.listLeft}>
+              <Text style={styles.txt}>短信验证码</Text>
+              
+              <TextInput
                 placeholder="请填写验证码"
                 style={  { width: 100,fontSize: 16,color: '#FFFFFF' } }
                 placeholderTextColor="#969696"
                 underlineColorAndroid="transparent"
                 maxLength = {6}
                 onBlur={this.checkVerifiCode}
+                keyboardType="numeric"
                 onChangeText={ (text) => this.setState({
                                 verificode: text
                               }) } />

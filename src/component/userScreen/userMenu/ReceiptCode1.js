@@ -14,6 +14,7 @@ import {
 import Ionicons from 'react-native-vector-icons/Feather';
 import Button from 'react-native-button';
 import { SafeAreaView, createStackNavigator } from 'react-navigation';
+import ImagePicker from 'react-native-image-crop-picker';
 
 
 export default class ReceiptCode1 extends Component {
@@ -58,7 +59,7 @@ export default class ReceiptCode1 extends Component {
       .then((response) => response.json())
       .then(responseData => {
         this.setState({
-          accountId: global.Config.FetchURL + '/upload/' + responseData.data,
+          accountId: responseData.data,
           showImg: true
         })
       });
@@ -121,7 +122,7 @@ export default class ReceiptCode1 extends Component {
     let hidderImg = this.state.showImg ?
       <TouchableOpacity style={styles.topInfo}
         onPress={this._handleButtonPress}>
-        <Image source={{ uri: this.state.accountId }} style={styles.img} />
+        <Image source={{ uri: global.Config.FetchURL + '/upload/' +  this.state.accountId }} style={styles.img} />
       </TouchableOpacity> :
       <Ionicons name="file-plus" size={120} color="white" onPress={this._handleButtonPress} />;
     return (
