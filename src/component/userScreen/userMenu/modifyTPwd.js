@@ -84,7 +84,11 @@ export default class modifyTPwd extends Component {
           'Accept': global.Config.Accept,
           'token': ret.token
         },
-        body: JSON.stringify({payPwd: this.state.payPwd})
+        body: JSON.stringify({
+          payPwd: this.state.payPwd,
+          telephone: this.state.mobile,
+          code: this.state.verificode,
+        })
       }
       if(this.state.mobile.length < 6){
         alert('请输入正确的手机号码');
@@ -107,6 +111,10 @@ export default class modifyTPwd extends Component {
     });
   }
   _checkVerifiCode = (callbackFn, url, opt) => {
+    if(this.state.verificode.length != 6){
+      alert('请输入正确的验证码');
+      return;
+    }
     fetch(`${global.Config.FetchURL}/user/checkCode`, {
       method: "Post",
       hearders: {
