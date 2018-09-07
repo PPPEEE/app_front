@@ -47,6 +47,9 @@ export default class wantBuy extends Component {
     return (<TouchableOpacity
                         style={ styles.listItem }
                         showsHorizontalScrollIndicator={ false }
+                        onPress={()=>{
+                          this.props.navigation.push('buyOrder');
+                        }}
                         horizontal={ true }>
                 <View style={ { width: 1080, justifyContent: 'space-between', flexDirection: 'row', padding: 40 } }>
                   <View style={ { flexDirection: 'row' } }>
@@ -92,7 +95,7 @@ export default class wantBuy extends Component {
                       { `${item.item.type === 1 ? '买入:': '卖出:'} `+item.item.dealNumber }
                     </Text>
                     <Text style={ { fontSize: 34, margin: 12 } }>
-                      实收:
+                      实付:
                       <Text style={ { fontWeight: 'bold', fontSize: 34 } }>
                         { ' ' + item.item.money +' '}
                       </Text>

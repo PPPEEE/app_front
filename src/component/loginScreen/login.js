@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Platform, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Image, StatusBar } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Resolutions from '../../utils/resolutions';
+import welcome from '../../welcomePage';
 
 export default class Login extends Component {
   constructor(props) {
@@ -41,7 +42,9 @@ export default class Login extends Component {
               token: jsonData.data
             },
           });
-          this.props.navigation.replace('main');
+          welcome.fetchUserBefore().then(() => {
+            this.props.navigation.replace('main');
+          })
         } else {
           Alert.alert('提示', jsonData.message);
         }

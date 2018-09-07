@@ -60,11 +60,6 @@ var menus = [, {
 export default class homeScreen extends Component {
   constructor(props) {
     super();
-    this.state = {
-      uid: '1234567',
-      pv: 13444.24115,
-      pe: 55.75885555
-    }
     this.goPage = (item) => {
       this.props.navigation.navigate(item.route, item.param);
     }
@@ -74,9 +69,38 @@ export default class homeScreen extends Component {
       })
 
     }
+    this.state = {
+      initOpacity: 0,
+      uid: '***',
+      pe: '***',
+      pv: '***'
+    }
 
   }
-  componentDidMount() {
+  async componentDidMount() {
+    let cache = await storage.load({
+      key: 'loginState'
+    });
+    let res = await fetch(`${global.Config.FetchURL}/dks/findTotal`, {
+      method: 'post',
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "token": cache.token
+      }
+    })
+    res = await res.json();
+    this.setState({
+      pv: res.data
+    })
+    let userInfo = await storage.load({
+      key: 'userDetailInfo'
+    });
+
+    this.setState({
+      uid: userInfo.userId
+    })
+
     setTimeout(() => {
       this.setState({
         initOpacity: 1
@@ -85,6 +109,9 @@ export default class homeScreen extends Component {
   }
 
   render() {
+    var head = global.userDetail && global.userDetail.avatar ? {
+      uri: global.userDetail.avatar
+    } : require('../../images/nohead.jpg');
     return (
       <Resolutions.FixFullView>
         <SafeAreaView style={ styles.container }>
@@ -96,10 +123,10 @@ export default class homeScreen extends Component {
                       style={ { backgroundColor: 'rgb(51,11,84)' } }>
             <ImageBackground
                              source={ require('../../images/home2_bg.jpg') }
-                             style={ { width: 1080, height: 1920, marginTop: 700, opacity: this.state.initOpacity || 0 } }>
+                             style={ { width: 1080, height: 1920, marginTop: 700, opacity: this.state.initOpacity } }>
               <View style={ { flexDirection: 'row', alignItems: 'center', height: 450 } }>
                 <Image
-                       source={ require('../../images/nohead.jpg') }
+                       source={ head }
                        style={ { height: 210, width: 210, borderRadius: 105, marginLeft: 60, borderWidth: 20, borderColor: '#44246D', } }></Image>
                 <View style={ { marginLeft: 110 } }>
                   <Text style={ { color: 'white', fontSize: 36, marginLeft: 24 } }>
@@ -112,7 +139,7 @@ export default class homeScreen extends Component {
                           style={ { color: '#C17408', fontSize: 72, position: 'absolute', left: 15 } } />
                     <Text style={ { color: 'white', fontSize: 42, marginLeft: 24 } }>
                       PV
-                      { this.state.pv }
+                      { ' ' + this.state.pv }
                     </Text>
                   </View>
                 </View>
@@ -160,11 +187,11 @@ export default class homeScreen extends Component {
                 <View style={ { marginTop: 150, borderWidth: 20, borderColor: '#44246D', borderRadius: 125 } }>
                   <Image
                          style={ { width: 230, height: 230, borderRadius: 115 } }
-                         source={ require('../../images/nohead.jpg') } />
+                         source={ head } />
                 </View>
                 <Text style={ { fontSize: 55, color: 'white', height: 80, marginTop: 40 } }>
                   UID:
-                  { this.state.uid }
+                  { ' ' + this.state.uid }
                 </Text>
                 <View style={ styles.pvBar }>
                   <Icon
@@ -172,7 +199,7 @@ export default class homeScreen extends Component {
                         style={ { color: '#C17408', fontSize: 72, position: 'absolute', left: 15 } } />
                   <Text style={ { color: 'white', fontSize: 42, marginLeft: 24 } }>
                     PV
-                    { this.state.pv }
+                    { ' ' + this.state.pv }
                   </Text>
                 </View>
                 <View style={ { marginTop: 85, width: 420, height: 410, borderRadius: 200, paddingTop: 100 } }>

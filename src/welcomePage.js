@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-navigation';
 import Button from 'react-native-button';
 import CheckUpdate from './component/CheckUpdate';
 
+let _this = null;
 export default class MainPage extends Component {
 
   //弹出升级modal
@@ -23,19 +24,19 @@ export default class MainPage extends Component {
   }
 
   //render完之后获取用户信息
-  componentDidMount() {
-    storage.load({
-      key: 'loginState',
-    }).then(ret => {
-      // found data go to then() // console.log(ret.token);
-      this.fetchUserBefore();
-      this.fetchUserDetail();
+  async componentDidMount() {
+    _this = this;
+    try {
+      let ret = await storage.load({
+        key: 'loginState',
+      });
+      await fetchUser();
       setTimeout(() => {
         if (ret.token !== null) {
           this.props.navigation.replace('main');
         }
       }, 2000)
-    }).catch(err => {
+    } catch ( err ) {
       // any exception including data not found goes to catch() // console.warn(err.message);
       switch (err.name) {
         case 'NotFoundError':
@@ -47,79 +48,12 @@ export default class MainPage extends Component {
           this.props.navigation.replace('login');
           break;
       }
-    });
+    }
   }
-  fetchUserBefore() {
-    storage.load({
-      key: 'loginState'
-    }).then(ret => {
-      const url = global.Config.FetchURL + '/user/findUserBy';
-      const opts = {
-        method: 'POST',
-        headers: {
-          'Accept': global.Config.Accept,
-          'Content-Type': global.Config.ContentType,
-          'token': ret.token
-        },
-      }
-      this.fetchUserInfo(url, opts);
-    }).catch(err => {
-      // 如果没有找到数据且没有sync方法，
-      // 或者有其他异常，则在catch中返回
-      console.warn(err.message);
-      switch (err.name) {
-        case 'NotFoundError':
-          // TODO;
-          break;
-        case 'ExpiredError':
-          // TODO
-          break;
-      }
-    })
+  static async fetchUserBefore() {
+    return await fetchUser();
   }
-  fetchUserDetail() {
-    storage.load({
-      key: 'loginState'
-    }).then(r => {
-      fetch(`${global.Config.FetchURL}/user/findUserInfo`, {
-        method: 'post',
-        headers: {
-          'Accept': 'application/json',
-          'ContentType': 'application/json;charset=UTF-8',
-          'token': r.token
-        }
-      }).then((res) => {
-        return res.json();
-      }).then((jsonData) => {
-        global.userDetail = jsonData.data;
-      })
-    })
-  }
-  fetchUserInfo(url, opts) {
-    fetch(url, opts)
-      .then((response) => response.json())
-      .then(
-        (responseJson) => {
-          if (!responseJson.data) {
-            console.log('获取用户数据失败');
-            this.props.navigation.replace('login');
-          } else {
-            storage.save({
-              key: 'userBasicInfo', // 注意:请不要在key中使用_下划线符号!
-              data: {
-                UID: responseJson.data.id,
-                level: responseJson.data.userLevel,
-                phone: responseJson.data.telephone,
-                refereeId: responseJson.data.refereeId,
-                address: responseJson.data.address,
-                payInfo: responseJson.data.userPayInfo
-              },
-            });
-          }
-        }
-    )
-      .catch((error) => console.error(error))
-  }
+
   render() {
     return (
       <SafeAreaView style={ styles.container }>
@@ -142,6 +76,82 @@ export default class MainPage extends Component {
         </ImageBackground>
       </SafeAreaView>
       );
+  }
+}
+async function fetchUser() {
+  let ret;
+  try {
+    ret = await storage.load({
+      key: 'loginState'
+    })
+    const url = global.Config.FetchURL + '/user/findUserBy';
+    const opts = {
+      method: 'POST',
+      headers: {
+        'Accept': global.Config.Accept,
+        'Content-Type': global.Config.ContentType,
+        'token': ret.token
+      },
+    }
+    await fetchUserDetail(opts);
+    await fetchUserInfo(url, opts);
+    return;
+  } catch ( err ) {
+    alert(JSON.stringify(err));
+    console.warn(err.message);
+    // 如果没有找到数据且没有sync方法，
+    // 或者有其他异常，则在catch中返回
+    switch (err.name) {
+      case 'NotFoundError':
+        // TODO;
+        break;
+      case 'ExpiredError':
+        // TODO
+        break;
+    }
+  }
+}
+async function fetchUserDetail(opts) {
+  try {
+    let res = await fetch(`${global.Config.FetchURL}/user/findUserInfo`, opts);
+    let jsonData = await res.json();
+    // if (!jsonData.data) {
+    //   alert(JSON.stringify(jsonData));
+    //   _this.props.navigation.replace('login');
+    // } else {
+      storage.save({
+        key: 'userDetailInfo', // 注意:请不要在key中使用_下划线符号!
+        data: jsonData.data || {}
+      });
+    // }
+  } catch ( err ) {
+
+  }
+}
+
+async function fetchUserInfo(url, opts) {
+  try {
+    let response = await fetch(url, opts);
+    let responseJson = await response.json();
+    // alert(10);
+    if (!responseJson.data) {
+      console.log('获取用户数据失败');
+      _this.props.navigation.replace('login');
+    } else {
+      storage.save({
+        key: 'userBasicInfo', // 注意:请不要在key中使用_下划线符号!
+        data: {
+          UID: responseJson.data.id,
+          level: responseJson.data.userLevel,
+          phone: responseJson.data.telephone,
+          refereeId: responseJson.data.refereeId,
+          address: responseJson.data.address,
+          payInfo: responseJson.data.userPayInfo
+        },
+      });
+    }
+  } catch ( error ) {
+    console.error(error)
   }
 }
 
