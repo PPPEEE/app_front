@@ -45,6 +45,7 @@ export default class Login extends Component {
               token: jsonData.data
             },
           });
+          global.token = jsonData.data;
           welcome.fetchUserBefore().then(() => {
             this.props.navigation.replace('main');
           })

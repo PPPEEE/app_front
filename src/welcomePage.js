@@ -31,6 +31,7 @@ export default class MainPage extends Component {
         key: 'loginState',
       });
       await fetchUser();
+      global.token = ret.token;//保存全局token
       setTimeout(() => {
         if (ret.token !== null) {
           this.props.navigation.replace('main');
