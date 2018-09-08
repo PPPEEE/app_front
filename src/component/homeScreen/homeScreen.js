@@ -81,8 +81,8 @@ export default class homeScreen extends Component {
     let cache = await storage.load({
       key: 'loginState'
     });
-    let res = await fetch(`${global.Config.FetchURL}/dks/findTotal`, {
-      method: 'post',
+    let res = await fetch(`${global.Config.FetchURL}/balance/get`, {
+      method: 'get',
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
@@ -90,9 +90,15 @@ export default class homeScreen extends Component {
       }
     })
     res = await res.json();
-    this.setState({
-      pv: res.data
-    })
+    let obj = {};
+    for(var o in res.data){
+      if(res.data[o].coinType === 0){
+        obj.pe = res.data[o].balance;
+      }else{
+        obj.pv = res.data[o].balance;
+      }
+    }
+    this.setState(obj)
     let userInfo = await storage.load({
       key: 'userDetailInfo'
     });

@@ -22,6 +22,7 @@ export default class Login extends Component {
         this.refs.password.focus();
         return;
       }
+      console.log('login')
       fetch('http://120.78.205.55:8081/user/login', {
         method: "POST",
         headers: {
@@ -33,8 +34,10 @@ export default class Login extends Component {
           password: this.state.password
         })
       }).then((res) => {
+        console.log('login');
         return res.json();
       }).then((jsonData) => {
+        console.log(jsonData);
         if (jsonData.code === 200) {
           storage.save({
             key: 'loginState', // 注意:请不要在key中使用_下划线符号!

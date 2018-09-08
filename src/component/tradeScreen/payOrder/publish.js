@@ -66,9 +66,9 @@ export default class publish extends Component {
           "Content-Type": "application/json",
           "token": token
         }
-      }).then((res)=>{
+      }).then((res) => {
         return res.json();
-      }).then(((jsonData)=>{
+      }).then(((jsonData) => {
         this.setState({
           DKBalance: jsonData.data
         });
@@ -123,7 +123,7 @@ export default class publish extends Component {
   allSale() {
     let amount = Math.ceil(Number(this.state.DKBalance) / 500) * 500;
     this.setState({
-      amount: amount+''
+      amount: amount + ''
     });
   }
 
@@ -296,7 +296,7 @@ export default class publish extends Component {
           </View>
           <View>
             <TouchableOpacity
-                              disabled={ this.state.payment.length < 1 || !this.state.amount || Number(this.state.amount) % 500 > 0 }
+                              disabled={ (!this.state.payment[0] && !this.state.payment[1] && !this.state.payment[2]) || !this.state.amount || Number(this.state.amount) % 500 > 0 }
                               onPress={ this.publishDK }>
               <ImageBackground
                                style={ { borderRadius: 80, width: 1000, height: 150 } }

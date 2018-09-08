@@ -45,22 +45,23 @@ export default class wantBuy extends Component {
   renderItem = (item, index) => {
     var userPayInfo = item.item.user.userPayInfo;
     return (<TouchableOpacity
-                        style={ styles.listItem }
-                        showsHorizontalScrollIndicator={ false }
-                        onPress={()=>{
-                          this.props.navigation.push('buyOrder');
-                        }}
-                        horizontal={ true }>
-                <View style={ { width: 1080, justifyContent: 'space-between', flexDirection: 'row', padding: 40 } }>
+                              style={ styles.listItem }
+                              showsHorizontalScrollIndicator={ false }
+                              onPress={ () => {
+                                          this.props.navigation.push('buyOrder');
+                                        } }
+                              horizontal={ true }>
+             <View style={ { width: 1080, justifyContent: 'space-between', flexDirection: 'row', padding: 50 } }>
                   <View style={ { flexDirection: 'row' } }>
                     <Image
                            source={ global.userDetail && global.userDetail.avatar ? {
                                       uri: global.userDetail.avatar
                                     } : defaultHead }
-                           style={ { height: 120, width: 120, borderRadius: 60, marginTop: 30, marginRight: 40 } }></Image>
+                           resizeMode="cover"
+                           style={ { height: 150, width: 150, borderRadius: 75, marginTop: 20, marginRight: 40 } }></Image>
                     <View>
                       <View style={ { flexDirection: 'row', alignItems: 'center' } }>
-                        <Text style={ { fontSize: 40, marginRight: 20, fontWeight: 'bold' } }>
+                        <Text style={ [styles.primaryFont, { marginRight: 20 }] }>
                           { item.item.user.userName }
                         </Text>
                         { payment.map((url, index) => {
@@ -70,34 +71,34 @@ export default class wantBuy extends Component {
                                 return (<Image
                                                key={ index }
                                                source={ url }
-                                               style={ { width: 35, height: 35, marginLeft: 10 } } />);
+                                               style={ { width: 40, height: 40, marginLeft: 10 } } />);
                               }
                             }
                             return;
                           }) }
                       </View>
                       <View style={ { marginTop: 20, marginLeft: 4 } }>
-                        <Text style={ { fontSize: 34 } }>
+                        <Text style={ styles.lightFont }>
                           限额
                           { ' ' + item.item.minNumber }
                         </Text>
                       </View>
                       <View style={ { marginTop: 20, marginLeft: 4 } }>
-                        <Text style={ { fontSize: 34 } }>
+                        <Text style={ styles.lightFont }>
                           编号:
-                          { ' ' + item.item.id }
+                          { ' ' + item.item.orderNumber }
                         </Text>
                       </View>
                     </View>
                   </View>
                   <View style={ { alignItems: 'flex-end' } }>
-                    <Text style={ { fontSize: 40, fontWeight: 'bold', marginRight: 12 } }>
-                      { `${item.item.type === 1 ? '买入:': '卖出:'} `+item.item.dealNumber }
+                    <Text style={ [styles.primaryFont, { marginRight: 20 }] }>
+                      { `交易: ` + item.item.dealNumber }
                     </Text>
-                    <Text style={ { fontSize: 34, margin: 12 } }>
+                    <Text style={ [styles.lightFont, { margin: 20 }] }>
                       实付:
-                      <Text style={ { fontWeight: 'bold', fontSize: 34 } }>
-                        { ' ' + item.item.money +' '}
+                      <Text style={ [styles.primaryFont, { fontSize: 36 }] }>
+                        { ' ' + item.item.money + ' ' }
                       </Text>
                       CNY
                     </Text>
@@ -113,7 +114,8 @@ export default class wantBuy extends Component {
             <FlatList
                       data={ this.state.dataList }
                       keyExtractor={ (item, index) => {
-                                       return item.id
+                                       console.log(new String(index));
+                                       return new String(index)
                                      } }
                       renderItem={ this.renderItem } />
           </View>
@@ -125,16 +127,27 @@ export default class wantBuy extends Component {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    backgroundColor: 'rgb(246,237,254)'
   },
   content: {
     flex: 1,
     justifyContent: 'center',
   },
   listItem: {
-    height: 258,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(82,21,117, 0.7)'
+    height: 307,
+    borderBottomWidth: 4,
+    borderBottomColor: 'rgb(208,192,227)',
+    justifyContent: 'center'
+  },
+  primaryFont: {
+    fontSize: 40,
+    fontWeight: 'bold',
+    color: 'rgb(47,47,47)'
+  },
+  lightFont: {
+    color: 'rgb(147, 143, 153)',
+    fontSize: 36
   }
 });
 

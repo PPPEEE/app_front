@@ -22,6 +22,7 @@ import ReceiptCode1 from './src/component/userScreen/userMenu/ReceiptCode1';
 import ReceiptCode2 from './src/component/userScreen/userMenu/ReceiptCode2';
 import ReceiptCode3 from './src/component/userScreen/userMenu/ReceiptCode3';
 import publishScreen from './src/component/tradeScreen/payOrder/publish';
+import buyOrderScreen from './src/component/tradeScreen/payOrder/buyOrder';
 
 var navHeight = Platform.OS === 'android' ? StatusBar.currentHeight : 64;
 
@@ -175,6 +176,38 @@ export default App = createStackNavigator({
     screen: publishScreen,
     navigationOptions: ({navigation}) => ({
       title: '发布DK交易委托',
+      headerTitleStyle: {
+        color: '#FFFFFF',
+        fontSize: 14
+      },
+      headerStyle: {
+        // backgroundColor: 'rgba(0,0,0,0)',
+        paddingTop: navHeight
+      },
+      headerTintColor: '#FFFFFF',
+      headerTransparent: true
+    }),
+  },
+  buyOrder: {
+    screen: buyOrderScreen,
+    navigationOptions: ({navigation}) => ({
+      title: 'PE卖单',
+      headerTitleStyle: {
+        color: '#FFFFFF',
+        fontSize: 14
+      },
+      headerStyle: {
+        // backgroundColor: 'rgba(0,0,0,0)',
+        paddingTop: navHeight
+      },
+      headerTintColor: '#FFFFFF',
+      headerTransparent: true
+    }),
+  },
+  buyOrder: {
+    screen: buyOrderScreen,
+    navigationOptions: ({navigation}) => ({
+      title: 'PE买单',
       headerTitleStyle: {
         color: '#FFFFFF',
         fontSize: 14
