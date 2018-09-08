@@ -66,12 +66,12 @@ export default class wantBuy extends Component {
                         </Text>
                         { payment.map((url, index) => {
                             for (var o in userPayInfo) {
-                              if (userPayInfo[o].payType === index) {
+                              if (userPayInfo[o].payType === (index+1)) {
                           
                                 return (<Image
                                                key={ index }
                                                source={ url }
-                                               style={ { width: 40, height: 40, marginLeft: 10 } } />);
+                                               style={ { width: 36, height: 36, marginLeft: 10 } } />);
                               }
                             }
                             return;
