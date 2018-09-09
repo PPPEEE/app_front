@@ -48,7 +48,9 @@ export default class wantBuy extends Component {
                               style={ styles.listItem }
                               showsHorizontalScrollIndicator={ false }
                               onPress={ () => {
-                                          this.props.navigation.push('buyOrder');
+                                          this.props.navigation.push('buyOrder',{
+                                            orderId: item.item.id
+                                          });
                                         } }
                               horizontal={ true }>
              <View style={ { width: 1080, justifyContent: 'space-between', flexDirection: 'row', padding: 50 } }>

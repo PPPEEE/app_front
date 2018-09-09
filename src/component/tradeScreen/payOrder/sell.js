@@ -48,62 +48,64 @@ export default class wangSell extends Component {
                               style={ styles.listItem }
                               showsHorizontalScrollIndicator={ false }
                               onPress={ () => {
-                                          this.props.navigation.push('sellOrder');
+                                          this.props.navigation.push('sellOrder', {
+                                            orderId: item.item.id
+                                          });
                                         } }
                               horizontal={ true }>
               <View style={ { width: 1080, justifyContent: 'space-between', flexDirection: 'row', padding: 50 } }>
-                  <View style={ { flexDirection: 'row' } }>
-                    <Image
-                           source={ global.userDetail && global.userDetail.avatar ? {
-                                      uri: global.userDetail.avatar
-                                    } : defaultHead }
-                           resizeMode="cover"
-                           style={ { height: 150, width: 150, borderRadius: 75, marginTop: 20, marginRight: 40 } }></Image>
-                    <View>
-                      <View style={ { flexDirection: 'row', alignItems: 'center' } }>
-                        <Text style={ [styles.primaryFont, { marginRight: 20 }] }>
-                          { item.item.user.userName }
-                        </Text>
-                        { payment.map((url, index) => {
-                            for (var o in userPayInfo) {
-                              if (userPayInfo[o].payType === index) {
-                          
-                                return (<Image
-                                               key={ index }
-                                               source={ url }
-                                               style={ { width: 40, height: 40, marginLeft: 10 } } />);
-                              }
+                <View style={ { flexDirection: 'row' } }>
+                  <Image
+                         source={ global.userDetail && global.userDetail.avatar ? {
+                                    uri: global.userDetail.avatar
+                                  } : defaultHead }
+                         resizeMode="cover"
+                         style={ { height: 150, width: 150, borderRadius: 75, marginTop: 20, marginRight: 40 } }></Image>
+                  <View>
+                    <View style={ { flexDirection: 'row', alignItems: 'center' } }>
+                      <Text style={ [styles.primaryFont, { marginRight: 20 }] }>
+                        { item.item.user.userName }
+                      </Text>
+                      { payment.map((url, index) => {
+                          for (var o in userPayInfo) {
+                            if (userPayInfo[o].payType === (index + 1)) {
+                        
+                              return (<Image
+                                             key={ index }
+                                             source={ url }
+                                             style={ { width: 40, height: 40, marginLeft: 10 } } />);
                             }
-                            return;
-                          }) }
-                      </View>
-                      <View style={ { marginTop: 20, marginLeft: 4 } }>
-                        <Text style={ styles.lightFont }>
-                          限额
-                          { ' ' + item.item.minNumber }
-                        </Text>
-                      </View>
-                      <View style={ { marginTop: 20, marginLeft: 4 } }>
-                        <Text style={ styles.lightFont }>
-                          编号:
-                          { ' ' + item.item.orderNumber }
-                        </Text>
-                      </View>
+                          }
+                          return;
+                        }) }
+                    </View>
+                    <View style={ { marginTop: 20, marginLeft: 4 } }>
+                      <Text style={ styles.lightFont }>
+                        限额
+                        { ' ' + item.item.minNumber }
+                      </Text>
+                    </View>
+                    <View style={ { marginTop: 20, marginLeft: 4 } }>
+                      <Text style={ styles.lightFont }>
+                        编号:
+                        { ' ' + item.item.orderNumber }
+                      </Text>
                     </View>
                   </View>
-                  <View style={ { alignItems: 'flex-end' } }>
-                    <Text style={ [styles.primaryFont, { marginRight: 20 }] }>
-                      { `交易: ` + item.item.dealNumber }
-                    </Text>
-                    <Text style={ [styles.lightFont, { margin: 20 }] }>
-                      实付:
-                      <Text style={ [styles.primaryFont, { fontSize: 36 }] }>
-                        { ' ' + item.item.money + ' ' }
-                      </Text>
-                      CNY
-                    </Text>
-                  </View>
                 </View>
+                <View style={ { alignItems: 'flex-end' } }>
+                  <Text style={ [styles.primaryFont, { marginRight: 20 }] }>
+                    { `交易: ` + item.item.dealNumber }
+                  </Text>
+                  <Text style={ [styles.lightFont, { margin: 20 }] }>
+                    实付:
+                    <Text style={ [styles.primaryFont, { fontSize: 36 }] }>
+                      { ' ' + item.item.money + ' ' }
+                    </Text>
+                    CNY
+                  </Text>
+                </View>
+              </View>
             </TouchableOpacity> );
   }
   render() {

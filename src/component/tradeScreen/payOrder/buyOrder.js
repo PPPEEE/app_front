@@ -2,106 +2,73 @@
  * Created by mengqingdong on 2017/4/19.
  */
 import React, { Component } from 'react';
-import { StyleSheet, View, ImageBackground, Text, StatusBar, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { StyleSheet, View, ImageBackground, Text, StatusBar, TouchableOpacity, TextInput, Alert, Image } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import Button from 'react-native-button';
 import Resolutions from '../../../utils/resolutions';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ModalDropdown from 'react-native-modal-dropdown';
 
-let paymentsArr = [null, null, null]; //微信,支付宝,银行
-let token = '';
+var payment = [require('../../../images/WeChat.png'), require('../../../images/Alipay.png'), require('../../../images/BankCard.png')];
+var defaultHead = require('../../../images/nohead.jpg');
 
 export default class buyOrder extends Component {
-
 
   constructor(props) {
     super();
     this.state = {
       buyColor: 'red',
       saleColor: 'white',
-      DKBalance: '0',
+      PEBalance: '0',
       payment: [false, false, false]
     }
-
-    this.changeState = (stateName) => {
-      let state;
-      if (stateName === 'buy') {
-        state = {
-          buyColor: 'red',
-          saleColor: 'white',
-          current: 'buy',
-          amount: '',
-          payment: [false, false, false],
-          paymentTime: '30分钟',
-        };
-      } else {
-        state = {
-          buyColor: 'white',
-          saleColor: 'red',
-          current: 'sale',
-          amount: '',
-          payment: [false, false, false],
-          paymentTime: '30分钟'
-        }
-      }
-      this.setState(state);
-    }
     this.allIn = this.allIn.bind(this);
-    setTimeout(() => {
-      this.changeState(this.props.navigation.getParam('whichState', 'buy'));
-    }, 0);
   }
 
-  componentWillMount() {
-    storage.load({
-      key: 'loginState'
-    }).then((cache) => {
-      token = cache.token;
-      fetch(`${global.Config.FetchURL}/dks/findTotal`, {
-        method: 'post',
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-          "token": token
-        }
-      }).then((res) => {
-        return res.json();
-      }).then(((jsonData) => {
-        this.setState({
-          DKBalance: jsonData.data
-        });
-      }));
-      fetch(`${global.Config.FetchURL}/user/findUserPayInfo`, {
-        method: 'post',
-        headers: {
-          "Accept": "application/json",
-          "Content-Type": "application/json",
-          "token": token
-        }
-      }).then((res) => {
-        return res.json();
-      }).then((jsonData) => {
-        jsonData.data.map((item) => {
-          paymentsArr[item.payType - 1] = item;
-          return item;
-        })
-      });
+  async componentDidMount() {
+    let orderId = this.props.navigation.getParam('orderId');
+    console.log(orderId);
+    let res = await fetch(`${global.Config.FetchURL}/dks/findDkById`, {
+      method: 'post',
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "token": global.token
+      },
+      body: JSON.stringify({
+        id: orderId
+      })
     })
+    res = await res.json();
+    this.setState({
+      order: res.data
+    });
+    res = await fetch(`${global.Config.FetchURL}/balance/get`, {
+      method: 'get',
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "token": global.token
+      }
+    });
+    res = await res.json();
+    for (var o in res.data) {
+      if (res.data[o].coinType === 0) {
+        this.setState({
+          PEBalance: res.data[o].balance
+        })
+      }
+    }
   }
 
+  payForOrder(){
 
-  allIn() {
-    let amount = Math.ceil(Number(this.state.DKBalance) / 500) * 500;
-    this.setState({
-      amount: amount + ''
-    });
   }
 
   render() {
-    const amoutArr = ['500', '1000', '1500', '2000'];
     const paymentsTitle = ['微信支付', '支付宝', '银行卡'];
-
+    let userPayInfo = this.state.order && this.state.order.user && this.state.order.user.userPayInfo;
+    console.log(this.state.amount,'你爸妈');
     return (
       <Resolutions.FixFullView>
         <StatusBar
@@ -112,6 +79,40 @@ export default class buyOrder extends Component {
                          style={ { width: 1080, height: 1920, paddingTop: 200, alignItems: 'center' } }
                          resizeMode='contain'>
           <View style={ [styles.rowContainer, styles.whiteCard] }>
+            <View style={ { justifyContent: 'space-between', flexDirection: 'row', width: 880, borderBottomWidth: 2, borderBottomColor: 'rgb(223,207,242)', height: 210 } }>
+              <View>
+                <Text style={ { color: 'rgb(55,54,60)', fontSize: 40, marginBottom: 40 } }>
+                  { this.state.order && this.state.order.user && this.state.order.user.userName }
+                </Text>
+                <Text style={ { color: 'rgb(107,97,115)', fontSize: 34, marginBottom: 40 } }>
+                  { this.state.order && (`最小购买限额 ${this.state.order.minNumber}`) }
+                </Text>
+              </View>
+              <View style={ { alignItems: 'flex-end' } }>
+                <Text style={ { color: 'rgb(55,54,60)', fontSize: 40, marginBottom: 40 } }>
+                  { this.state.order && this.state.order.dealNumber }
+                </Text>
+                <View style={ { marginBottom: 40, height: 34, flexDirection: 'row' } }>
+                  { payment.map((url, index) => {
+                      for (var o in userPayInfo) {
+                        if (userPayInfo[o].payType === (index + 1)) {
+                          return (<Image
+                                         key={ index }
+                                         source={ url }
+                                         resizeMode='cover'
+                                         style={ { width: 34, height: 34, marginLeft: 20 } } />);
+                        }
+                      }
+                      return;
+                    }) }
+                </View>
+              </View>
+            </View>
+            <View style={ { width: 880, marginTop: 40 } }>
+              <Text style={ { fontSize: 34, color: 'rgb(161,154,173)' } }>
+                { this.state.order && (`编号: ${this.state.order.orderNumber}`) }
+              </Text>
+            </View>
           </View>
           <View style={ styles.rowContainer }>
             <Text style={ styles.label }>
@@ -139,7 +140,7 @@ export default class buyOrder extends Component {
             </Text>
             <View style={ [styles.formArea, { flexDirection: 'row' }] }>
               <Text style={ styles.primaryFont }>
-                400
+                { this.state.amount ? `${Number(this.state.amount)*0.8}` : 0 }
               </Text>
               <Text style={ styles.lightFont }>
                 { ' CNY' }
@@ -147,35 +148,17 @@ export default class buyOrder extends Component {
             </View>
           </View>
           <View style={ [styles.rowContainer, { borderBottomWidth: 0, justifyContent: 'space-between', opacity: this.state.current === 'buy' ? 0 : 1 }] }>
-            <Text>
-              <Text style={ { fontSize: 40, color: 'white' } }>
-                您当前可售DK:
-              </Text>
-              <Text style={ { color: 'rgba(0,0,0,0)', fontSize: 20, width: 20 } }>
-                _
-              </Text>
-              <Text style={ { fontSize: 40, color: 'white' } }>
-                { this.state.DKBalance }
-              </Text>
-            </Text>
-            <TouchableOpacity
-                              style={ { borderWidth: 2, borderColor: 'rgb(63,32,92)', padding: 4, borderRadius: 8, backgroundColor: 'rgb(48,7,85)' } }
-                              onPress={ this.allSale }>
-              <Text style={ { color: 'white', fontSize: 32 } }>
-                全量卖出
-              </Text>
-            </TouchableOpacity>
           </View>
           <View>
             <TouchableOpacity
                               disabled={ this.state.payment.length < 1 || !this.state.amount || Number(this.state.amount) % 500 > 0 }
-                              onPress={ this.publishDK }>
+                              onPress={ this.payForOrder }>
               <ImageBackground
                                style={ { borderRadius: 80, width: 1000, height: 150 } }
                                source={ require('../../../images/Button_bg.jpg') }
                                resizeMode="contain">
                 <Text style={ { color: 'white', fontSize: 60, textAlign: 'center', lineHeight: 140 } }>
-                  确定发布
+                  确定买入
                 </Text>
               </ImageBackground>
             </TouchableOpacity>
@@ -210,11 +193,14 @@ const styles = StyleSheet.create({
   },
   whiteCard: {
     borderBottomWidth: 0,
+    padding: 0,
     marginBottom: 40,
     backgroundColor: 'rgb(240,225,255)',
     borderRadius: 30,
     height: 450,
-    width: 1000
+    width: 1000,
+    flexDirection: 'column',
+    alignItems: 'center'
   },
   rowContainer: {
     flexDirection: 'row',
