@@ -11,6 +11,14 @@ var count = 0;
 var payment = [require('../../../images/WeChat.png'), require('../../../images/Alipay.png'), require('../../../images/BankCard.png')];
 var defaultHead = require('../../../images/nohead.jpg');
 export default class wangSell extends Component {
+  constructor() {
+    super();
+    this.state = {
+      dataList: []
+    };
+    this.renderItem = this.renderItem.bind(this);
+    this.getMoreList = this.getMoreList.bind(this);
+  }
   componentWillMount() {
     storage.load({
       key: 'loginState'
@@ -24,23 +32,48 @@ export default class wangSell extends Component {
           "token": token
         },
         body: JSON.stringify({
-          type: 1
+          type: 1,
+          pageNo: 1,
+          pageSize: 10,
+          status: '2'
         })
       }).then((res) => {
         return res.json();
       }).then(((jsonData) => {
+        console.log(jsonData.data);
         this.setState({
-          dataList: jsonData.data
+          dataList: jsonData.data.result,
+          pageNo: 1
         });
       }));
     });
   }
-  constructor() {
-    super();
-    this.renderItem = this.renderItem.bind(this);
-    this.state = {
-      dataList: []
-    };
+  async getMoreList() {
+    if (this.state.pageTotal <= this.state.pageNo) {
+      return;
+    }
+    let res = await fetch(`${global.Config.FetchURL}/dks/dkByType`, {
+      method: 'post',
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "token": global.token
+      },
+      body: JSON.stringify({
+        type: 1,
+        pageNo: this.state.pageNo + 1,
+        pageSize: 10,
+        status: "2"
+      })
+    });
+    res = await res.json();
+    console.log(res);
+    let dataList = this.state.dataList;
+    dataList = dataList.concat(res.data.result);
+    this.setState({
+      dataList: dataList,
+      pageNo: this.state.pageNo + 1
+    });
   }
   renderItem = (item, index) => {
     var userPayInfo = item.item.user.userPayInfo;
@@ -115,6 +148,8 @@ export default class wangSell extends Component {
           <View style={ { height: 1536 } }>
             <FlatList
                       data={ this.state.dataList }
+                      onEndReached={ this.getMoreList }
+                      onEndReachedThreshold={ 0.3 }
                       keyExtractor={ (item, index) => {
                                        return new String(index)
                                      } }

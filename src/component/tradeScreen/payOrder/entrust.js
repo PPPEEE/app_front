@@ -12,14 +12,20 @@ var count = 0;
 var payment = [require('../../../images/WeChat.png'), require('../../../images/Alipay.png'), require('../../../images/BankCard.png')];
 var defaultHead = require('../../../images/nohead.jpg');
 export default class entrust extends Component {
+  constructor() {
+    super();
+    this.renderItem = this.renderItem.bind(this);
+    this.getMoreList = this.getMoreList.bind(this);
+    this.revoke = this.revoke.bind(this);
+    this.state = {
+      dataList: []
+    };
+  }
   componentWillMount() {
     storage.load({
       key: 'loginState'
     }).then((cache) => {
       token = cache.token;
-      this.setState({
-        token: token
-      });
       fetch(`${global.Config.FetchURL}/dks/dkByType`, {
         method: 'post',
         headers: {
@@ -28,79 +34,91 @@ export default class entrust extends Component {
           "token": token
         },
         body: JSON.stringify({
-          type: 0
+          type: "0",
+          pageNo: 1,
+          pageSize: 10,
+          status: "2"
         })
       }).then((res) => {
         return res.json();
       }).then(((jsonData) => {
         this.setState({
-          dataList: jsonData.data.filter((item) => {
-            return item.status === 2;
-          })
+          dataList: jsonData.data.result,
+          pageTotal: jsonData.data.pageTotal,
+          pageNo: 1
         });
       }));
     });
   }
-  async revoke(id) {
+
+  async revoke(id, index) {
     this.setState({
       showLoading: true
     })
+
     let res = await fetch(`${global.Config.FetchURL}/dks/dkClean`, {
       method: 'post',
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
-        "token": this.state.token
+        "token": global.token
       },
       body: JSON.stringify({
         id: id
       })
     });
     res = await res.json();
-    let needAlert = res.code === 200;
+    let dataList = this.state.dataList.concat();
+    dataList.splice(index, 1);
+    this.setState({
+      dataList: dataList,
+      showLoading: false
+    })
+    if (res.code === 200) {
+      Alert.alert('提示', '撤销成功');
+    }
+  }
 
-    res = await fetch(`${global.Config.FetchURL}/dks/dkByType`, {
+  async getMoreList() {
+    if(this.state.pageTotal <= this.state.pageNo){
+      return;
+    }
+    let res = await fetch(`${global.Config.FetchURL}/dks/dkByType`, {
       method: 'post',
       headers: {
         "Accept": "application/json",
         "Content-Type": "application/json",
-        "token": this.state.token
+        "token": global.token
       },
       body: JSON.stringify({
-        type: 0
+        type: "0",
+        pageNo: this.state.pageNo+1,
+        pageSize: 10,
+        status: "2"
       })
-    });
+    })
     res = await res.json();
+    let dataList = this.state.dataList;
+    dataList = dataList.concat(res.data.result);
     this.setState({
-      dataList: res.data.filter((item) => {
-        return item.status === 2;
-      }),
-      showLoading: false,
-      scrollOffset: 0
+      dataList: dataList,
+      pageNo: this.state.pageNo+1
     });
-    if (needAlert) {
-      Alert.alert('提示', '撤销成功');
-    }
   }
-  constructor() {
-    super();
-    this.renderItem = this.renderItem.bind(this);
-    this.state = {
-      dataList: []
-    };
-  }
+
   renderItem = (item, index) => {
     var userPayInfo = item.item.user.userPayInfo;
-    console.log(userPayInfo);
     return (
       <ScrollView
                   style={ styles.listItem }
                   showsHorizontalScrollIndicator={ false }
-                  ref={ (scrollView)=>{
-                    if(scrollView !== null){
-                      scrollView.scrollTo({x: this.props.scrollOffset});
-                    }
-                  }}
+                  ref={ (scrollView) => {
+                          if (scrollView !== null) {
+                            scrollView.scrollTo({
+                              x: this.props.scrollOffset
+                            });
+                          }
+                        } }
                   horizontal={ true }>
         <View style={ { flexDirection: 'row', width: 1387, justifyContent: 'center' } }>
           <View style={ { width: 1080, justifyContent: 'space-between', flexDirection: 'row', padding: 50 } }>
@@ -118,7 +136,7 @@ export default class entrust extends Component {
                   </Text>
                   { payment.map((url, index) => {
                       for (var o in userPayInfo) {
-                        if (userPayInfo[o].payType === (index+1)) {
+                        if (userPayInfo[o].payType === (index + 1)) {
                     
                           return (<Image
                                          key={ index }
@@ -157,7 +175,7 @@ export default class entrust extends Component {
             </View>
           </View>
           <TouchableOpacity onPress={ () => {
-                                        this.revoke(item.item.id)
+                                        this.revoke(item.item.id, index)
                                       } }>
             <Text style={ { fontSize: 60, lineHeight: 307, textAlign: 'center', color: 'white', backgroundColor: 'red', width: 307, height: 307 } }>
               撤销
@@ -184,6 +202,8 @@ export default class entrust extends Component {
                                         index
                                       }) }
                       scrollOffset={ this.state.scrollOffset }
+                      onEndReached={ this.getMoreList }
+                      onEndReachedThreshold={ 0.3 }
                       keyExtractor={ (item, index) => {
                                        return new String(index)
                                      } }

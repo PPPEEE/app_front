@@ -80,7 +80,6 @@ export default class sellOrder extends Component {
   render() {
     const paymentsTitle = ['微信支付', '支付宝', '银行卡'];
     let userPayInfo = this.state.order && this.state.order.user && this.state.order.user.userPayInfo;
-    console.log(this.state.amount,'你爸妈');
     return (
       <Resolutions.FixFullView>
         <StatusBar
@@ -162,7 +161,7 @@ export default class sellOrder extends Component {
           <View style={ [styles.rowContainer, { borderBottomWidth: 0, justifyContent: 'space-between', opacity: this.state.current === 'buy' ? 0 : 1 }] }>
             <Text>
               <Text style={ { fontSize: 40, color: 'white' } }>
-                您当前可售DK:
+                您当前可售PE:
               </Text>
               <Text style={ { color: 'rgba(0,0,0,0)', fontSize: 20, width: 20 } }>
                 _

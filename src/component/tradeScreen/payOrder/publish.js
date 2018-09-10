@@ -115,7 +115,7 @@ export default class publish extends Component {
     }).then((res) => {
       return res.json();
     }).then((jsonData) => {
-      Alert.alert('提示', `发布DK${this.state.current === 'buy'?'买单':'卖单'}成功!`);
+      Alert.alert('提示', `发布PE${this.state.current === 'buy'?'买单':'卖单'}成功!`);
     }).catch((error) => {
     });
   }
@@ -277,7 +277,7 @@ export default class publish extends Component {
           <View style={ [styles.rowContainer, { borderBottomWidth: 0, justifyContent: 'space-between', opacity: this.state.current === 'buy' ? 0 : 1 }] }>
             <Text>
               <Text style={ { fontSize: 40, color: 'white' } }>
-                您当前可售DK:
+                您当前可售PE:
               </Text>
               <Text style={ { color: 'rgba(0,0,0,0)', fontSize: 20, width: 20 } }>
                 _

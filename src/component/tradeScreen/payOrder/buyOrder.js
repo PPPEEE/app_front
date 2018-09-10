@@ -22,7 +22,7 @@ export default class buyOrder extends Component {
       PEBalance: '0',
       payment: [false, false, false]
     }
-    this.allIn = this.allIn.bind(this);
+    this.payForOrder = this.payForOrder.bind(this);
   }
 
   async componentDidMount() {
