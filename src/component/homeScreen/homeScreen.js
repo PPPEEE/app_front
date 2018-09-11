@@ -199,7 +199,10 @@ export default class homeScreen extends Component {
                   UID:
                   { ' ' + this.state.uid }
                 </Text>
-                <View style={ styles.pvBar }>
+                <TouchableOpacity style={ styles.pvBar }
+                  onPress={() => {
+                    this.props.navigation.push('PVdetails');
+                  }}>
                   <Icon
                         name={ 'lock' }
                         style={ { color: '#C17408', fontSize: 72, position: 'absolute', left: 15 } } />
@@ -207,15 +210,18 @@ export default class homeScreen extends Component {
                     PV
                     { ' ' + this.state.pv }
                   </Text>
-                </View>
-                <View style={ { marginTop: 85, width: 420, height: 410, borderRadius: 200, paddingTop: 100 } }>
+                </TouchableOpacity>
+                <TouchableOpacity style={ { marginTop: 85, width: 420, height: 410, borderRadius: 200, paddingTop: 100 } }
+                  onPress={() => {
+                    this.props.navigation.push('PEdetails');
+                  }}>
                   <Text style={ { color: 'white', fontSize: 60, textAlign: 'center', fontWeight: 'bold' } }>
                     PE
                   </Text>
                   <Text style={ { color: 'white', fontSize: 48, textAlign: 'center' } }>
                     { this.state.pe.toString().substr(0, 9) }
                   </Text>
-                </View>
+                </TouchableOpacity>
                 <View style={ { marginTop: 85, height: 410, borderRadius: 200, paddingTop: 100 } }>
                   <Text style={ { color: 'white', fontSize: 65, textAlign: 'center', fontWeight: 'bold', marginBottom: 10 } }>
                     区块链既服务

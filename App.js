@@ -10,6 +10,8 @@ YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTIm
 import welcomePage from './src/welcomePage'; //登陆主页
 import main from './src/main' //第一个Tab
 import Login from './src/component/loginScreen/login';
+import PEdetails from './src/component/homeScreen/PEdetails';
+import PVdetails from './src/component/homeScreen/PVdetails';
 import myTeam from './src/component/userScreen/userMenu/myTeam';
 import modifyNick from './src/component/userScreen/userMenu/modifyNick';
 import Register from './src/component/loginScreen/register';
@@ -54,6 +56,30 @@ export default App = createStackNavigator({
     navigationOptions: ({navigation}) => ({
       header: null
     }),
+  },
+  PEdetails: {
+    screen: PEdetails,
+    navigationOptions: ({navigation}) => ({
+      title: 'PE明细',
+      headerTitleStyle: {color: '#FFFFFF',},
+      headerStyle: {
+        paddingTop: navHeight,
+        backgroundColor: '#000733'
+      },
+      headerTintColor: '#FFFFFF',
+    })
+  },
+  PVdetails: {
+    screen: PVdetails,
+    navigationOptions: ({navigation}) => ({
+      title: 'PV明细',
+      headerTitleStyle: {color: '#FFFFFF',},
+      headerStyle: {
+        paddingTop: navHeight,
+        backgroundColor: '#000733'
+      },
+      headerTintColor: '#FFFFFF',
+    })
   },
   myTeam: {
     screen: myTeam,
