@@ -26,6 +26,7 @@ import ReceiptCode3 from './src/component/userScreen/userMenu/ReceiptCode3';
 import publishScreen from './src/component/tradeScreen/payOrder/publish';
 import buyOrderScreen from './src/component/tradeScreen/payOrder/buyOrder';
 import sellOrderScreen from './src/component/tradeScreen/payOrder/sellOrder';
+import orderFlowScreen from './src/component/tradeScreen/historyOrder/orderFlow';
 
 var navHeight = Platform.OS === 'android' ? StatusBar.currentHeight : 64;
 
@@ -235,6 +236,22 @@ export default App = createStackNavigator({
     screen: sellOrderScreen,
     navigationOptions: ({navigation}) => ({
       title: 'PE买单',
+      headerTitleStyle: {
+        color: '#FFFFFF',
+        fontSize: 14
+      },
+      headerStyle: {
+        // backgroundColor: 'rgba(0,0,0,0)',
+        paddingTop: navHeight
+      },
+      headerTintColor: '#FFFFFF',
+      headerTransparent: true
+    }),
+  },
+  orderFlow: {
+    screen: orderFlowScreen,
+    navigationOptions: ({navigation}) => ({
+      title: '订单跟踪',
       headerTitleStyle: {
         color: '#FFFFFF',
         fontSize: 14

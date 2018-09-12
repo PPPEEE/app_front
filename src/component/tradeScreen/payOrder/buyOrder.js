@@ -62,13 +62,12 @@ export default class buyOrder extends Component {
   }
 
   payForOrder(){
-
+    this.props.navigation.push('orderFlow');
   }
 
   render() {
     const paymentsTitle = ['微信支付', '支付宝', '银行卡'];
     let userPayInfo = this.state.order && this.state.order.user && this.state.order.user.userPayInfo;
-    console.log(this.state.amount,'你爸妈');
     return (
       <Resolutions.FixFullView>
         <StatusBar
@@ -128,6 +127,10 @@ export default class buyOrder extends Component {
                          underlineColorAndroid="transparent"
                          keyboardType="numeric"
                          onChangeText={ (text) => {
+                                          text = text.replace(/[^0-9]/g,'');
+                                          if(Number(text) > this.state.order.dealNumber){
+                                            text = this.state.order.dealNumber+'';
+                                          }
                                           this.setState({
                                             amount: text
                                           })
@@ -140,7 +143,7 @@ export default class buyOrder extends Component {
             </Text>
             <View style={ [styles.formArea, { flexDirection: 'row' }] }>
               <Text style={ styles.primaryFont }>
-                { this.state.amount ? `${Number(this.state.amount)*0.8}` : 0 }
+                { this.state.amount ? `${Math.round(Number(this.state.amount)*0.8)}` : 0 }
               </Text>
               <Text style={ styles.lightFont }>
                 { ' CNY' }
