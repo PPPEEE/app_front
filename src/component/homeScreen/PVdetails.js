@@ -29,13 +29,18 @@ class InRecord extends Component {
   constructor() {
     super();
     this.state = {
-      dataList: []
+      dataList: [],
+      isRefresh: false,
+      page: {
+        pageNo: 1,
+        pageSize: 10
+      }
     };
   }
   componentWillMount() {
-    this.fetchAllData({pageNo:1, pageSize:10})
+    this.fetchAllData()
   }
-  fetchAllData = (page) => {
+  fetchAllData = (page = { pageNo: 1, pageSize: 10 }) => {
     fetch(`${global.Config.FetchURL}/balance/incomeList`, {
       method: 'post',
       headers: {
@@ -51,16 +56,45 @@ class InRecord extends Component {
       })
     }).then((res) => {
       return res.json();
-    }).then(((jsonData) => {
-      let tempList = this.state.dataList;
+    }).then((jsonData) => {
       this.setState({
-        dataList: tempList.concat(jsonData.data)
+        dataList: jsonData.data,
+        page: { pageNo: 1, pageSize: 10 }
       });
-    }));
+    });
+
+  }
+  //加载更多
+  _onLoadMore = () => {
+    fetch(`${global.Config.FetchURL}/balance/incomeList`, {
+      method: 'post',
+      headers: {
+        "Accept": global.Config.Accept,
+        "Content-Type": global.Config.ContentType,
+        "token": global.token
+      },
+      body: JSON.stringify({
+        coinType: 1,       //币种,0DK,1DN
+        incomeType: 1,  //收支类型,1为收入,2为支出,不填为全部，3为加速
+        pageNo: ++this.state.page.pageNo,
+        pageSize: this.state.page.pageSize
+      })
+    }).then((res) => {
+      return res.json();
+    }).then((jsonData) => {
+      if (jsonData.data.length > 0) {
+        let tempList = this.state.dataList;
+        this.setState({
+          dataList: tempList.concat(jsonData.data)
+        });
+      } else {
+        this.state.page.pageNo--;
+      }
+    });
   }
   //每一个列表渲染的方法
   _renderItem = (item) => {
-    var orderTypeItem;//类型
+    let orderTypeItem;//类型
     switch (item.item.bonusType) {
       case 1:
         orderTypeItem = '对冲奖励';
@@ -102,6 +136,13 @@ class InRecord extends Component {
             ItemSeparatorComponent={this._separator}
             renderItem={this._renderItem}
             keyExtractor={this._keyExtractor}
+            getItemLayout={(data, index) => (
+              { length: 90, offset: 90 * index, index }
+            )}
+            onRefresh={this.fetchAllData}
+            refreshing={this.state.isRefresh}
+            onEndReached={this._onLoadMore}
+            onEndReachedThreshold={0.3}
             data={this.state.dataList}>
           </FlatList>
         </View>
@@ -114,13 +155,18 @@ class OutRecord extends Component {
   constructor() {
     super();
     this.state = {
-      dataList: []
+      dataList: [],
+      isRefresh: false,
+      page: {
+        pageNo: 1,
+        pageSize: 10
+      }
     };
   }
   componentWillMount() {
-    this.fetchAllData({pageNo:1, pageSize:10})
+    this.fetchAllData()
   }
-  fetchAllData = (page) => {
+  fetchAllData = (page = { pageNo: 1, pageSize: 10 }) => {
     fetch(`${global.Config.FetchURL}/balance/incomeList`, {
       method: 'post',
       headers: {
@@ -137,18 +183,46 @@ class OutRecord extends Component {
     }).then((res) => {
       return res.json();
     }).then(((jsonData) => {
-      let tempList = this.state.dataList;
       this.setState({
-        dataList: tempList.concat(jsonData.data)
+        dataList: jsonData.data,
+        page: { pageNo: 1, pageSize: 10 }
       });
     }));
+  }
+  //加载更多
+  _onLoadMore = () => {
+    fetch(`${global.Config.FetchURL}/balance/incomeList`, {
+      method: 'post',
+      headers: {
+        "Accept": global.Config.Accept,
+        "Content-Type": global.Config.ContentType,
+        "token": global.token
+      },
+      body: JSON.stringify({
+        coinType: 1,       //币种,0DK,1DN
+        incomeType: 2,  //收支类型,1为收入,2为支出,不填为全部，3为加速
+        pageNo: ++this.state.page.pageNo,
+        pageSize: this.state.page.pageSize
+      })
+    }).then((res) => {
+      return res.json();
+    }).then((jsonData) => {
+      if (jsonData.data.length > 0) {
+        let tempList = this.state.dataList;
+        this.setState({
+          dataList: tempList.concat(jsonData.data)
+        });
+      } else {
+        this.state.page.pageNo--;
+      }
+    });
   }
   //每一个列表渲染的方法
   _renderItem = (item) => {
     var orderTypeItem;//类型
     switch (item.item.bonusType) {
       case 5:
-        orderTypeItem =  '每日释放';
+        orderTypeItem = '每日释放';
         break;
     }
     return (
@@ -184,6 +258,13 @@ class OutRecord extends Component {
             ItemSeparatorComponent={this._separator}
             renderItem={this._renderItem}
             keyExtractor={this._keyExtractor}
+            getItemLayout={(data, index) => (
+              { length: 90, offset: 90 * index, index }
+            )}
+            onRefresh={this.fetchAllData}
+            refreshing={this.state.isRefresh}
+            onEndReached={this._onLoadMore}
+            onEndReachedThreshold={0.3}
             data={this.state.dataList}>
           </FlatList>
         </View>
@@ -196,13 +277,18 @@ class OutFastRecord extends Component {
   constructor() {
     super();
     this.state = {
-      dataList: []
+      dataList: [],
+      isRefresh: false,
+      page: {
+        pageNo: 1,
+        pageSize: 10
+      }
     };
   }
   componentWillMount() {
-    this.fetchAllData({pageNo:1, pageSize:10})
+    this.fetchAllData()
   }
-  fetchAllData = (page) => {
+  fetchAllData = (page = { pageNo: 1, pageSize: 10 }) => {
     fetch(`${global.Config.FetchURL}/balance/incomeList`, {
       method: 'post',
       headers: {
@@ -211,29 +297,57 @@ class OutFastRecord extends Component {
         "token": global.token
       },
       body: JSON.stringify({
-        coinType: 0,       //币种,0DK,1DN
-        // incomeType: 1,  //收支类型,1为收入,2为支出,不填为全部
+        coinType: 1,       //币种,0DK,1DN
+        incomeType: 3,  //收支类型,1为收入,2为支出,不填为全部，3为加速
         pageNo: page.pageNo,
         pageSize: page.pageSize
       })
     }).then((res) => {
       return res.json();
-    }).then(((jsonData) => {
-      let tempList = this.state.dataList;
+    }).then((jsonData) => {
       this.setState({
-        dataList: tempList.concat(jsonData.data)
+        dataList: jsonData.data,
+        page: { pageNo: 1, pageSize: 10 }
       });
-    }));
+    });
+  }
+  //加载更多
+  _onLoadMore = () => {
+    fetch(`${global.Config.FetchURL}/balance/incomeList`, {
+      method: 'post',
+      headers: {
+        "Accept": global.Config.Accept,
+        "Content-Type": global.Config.ContentType,
+        "token": global.token
+      },
+      body: JSON.stringify({
+        coinType: 1,       //币种,0DK,1DN
+        incomeType: 3,  //收支类型,1为收入,2为支出,不填为全部，3为加速
+        pageNo: ++this.state.page.pageNo,
+        pageSize: this.state.page.pageSize
+      })
+    }).then((res) => {
+      return res.json();
+    }).then((jsonData) => {
+      if (jsonData.data.length > 0) {
+        let tempList = this.state.dataList;
+        this.setState({
+          dataList: tempList.concat(jsonData.data)
+        });
+      } else {
+        this.state.page.pageNo--;
+      }
+    });
   }
   //每一个列表渲染的方法
   _renderItem = (item) => {
     var orderTypeItem;//类型
     switch (item.item.bonusType) {
       case 3:
-        orderTypeItem =  '团队兑换奖励';
+        orderTypeItem = '团队兑换奖励';
         break;
       case 4:
-        orderTypeItem =  '团队流通奖励';
+        orderTypeItem = '团队流通奖励';
         break;
     }
     return (
@@ -244,7 +358,7 @@ class OutFastRecord extends Component {
             <Text style={styles.text}>{item.item.addTime.slice(0, 10) + orderTypeItem}</Text>
           </View>
           <View style={styles.listViewRight}>
-          <Text style={styles.txtBlack}>{item.item.amount}</Text>
+            <Text style={styles.txtBlack}>{item.item.amount}</Text>
           </View>
         </View>
       </View>
@@ -261,8 +375,6 @@ class OutFastRecord extends Component {
   _keyExtractor = (item, index) => item.id + '';
 
   render() {
-    console.log(this.state.dataList);
-
     return (
       <View style={{ flex: 1 }}>
         <View style={{ flex: 1 }}>
@@ -271,6 +383,13 @@ class OutFastRecord extends Component {
             ItemSeparatorComponent={this._separator}
             renderItem={this._renderItem}
             keyExtractor={this._keyExtractor}
+            getItemLayout={(data, index) => (
+              { length: 90, offset: 90 * index, index }
+            )}
+            onRefresh={this.fetchAllData}
+            refreshing={this.state.isRefresh}
+            onEndReached={this._onLoadMore}
+            onEndReachedThreshold={0.3}
             data={this.state.dataList}>
           </FlatList>
         </View>

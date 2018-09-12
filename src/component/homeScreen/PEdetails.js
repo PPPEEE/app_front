@@ -29,42 +29,18 @@ class AllRecord extends Component {
   constructor() {
     super();
     this.state = {
-      dataList: []
+      dataList: [],
+      isRefresh: false,
+      page: {
+        pageNo: 1,
+        pageSize: 10
+      }
     };
   }
   componentDidMount() {
-    this.fetchAllData({pageNo:1, pageSize:10})
-    // this.setState({dataList: [
-    //   { "bonusType": 0,//冻结
-    //     "id": 1,"userId": 100001,"amount": 15.964054,"bonusCoinType": 0,"addTime": "2018-09-08 12:07:03","status": 1,
-    //   },
-    //   { "bonusType": 2,//直推奖励
-    //     "id": 2,"userId": 100001,"bonusCoinType": 0,"amount": 5.964054,"addTime": "2018-09-08 12:07:03","status": 1,
-    //   },
-    //   { "bonusType": 3,//团队兑换奖励
-    //     "id": 2,"userId": 100001,"bonusCoinType": 0,"amount": 5.964054,"addTime": "2018-09-08 12:07:03","status": 1,
-    //   },
-    //   { "bonusType": 4,//团队流通奖励
-    //     "id": 2,"userId": 100001,"bonusCoinType": 0,"amount": 5.964054,"addTime": "2018-09-08 12:07:03","status": 1,
-    //   },
-    //   { "bonusType": 5,//每日释放
-    //     "id": 2,"userId": 100001,"bonusCoinType": 0,"amount": 5.964054,"addTime": "2018-09-08 12:07:03","status": 1
-    //   },
-    //   { "bonusType": 10,//兑换
-    //     "id": 2,"userId": 100001,"bonusCoinType": 0,"amount": 5.964054,"addTime": "2018-09-08 12:07:03","status": 1
-    //   },
-    //   { "bonusType": 11,//转账
-    //     "id": 2,"userId": 100001,"bonusCoinType": 0,"amount": 5.964054,"addTime": "2018-09-08 12:07:03","status": 1
-    //   },
-    //   { "bonusType": 12,//买卖+
-    //     "id": 2,"userId": 100001,"bonusCoinType": 0,"amount": +5.964054,"addTime": "2018-09-08 12:07:03","status": 1
-    //   },
-    //   { "bonusType": 12,//买卖-
-    //     "id": 2,"userId": 100001,"bonusCoinType": 0,"amount": -5.964054,"addTime": "2018-09-08 12:07:03","status": 1
-    //   }
-    // ]})
+    this.fetchAllData()
   }
-  fetchAllData = (page) => {
+  fetchAllData = (page = { pageNo: 1, pageSize: 10 }) => {
     fetch(`${global.Config.FetchURL}/balance/incomeList`, {
       method: 'post',
       headers: {
@@ -80,12 +56,39 @@ class AllRecord extends Component {
       })
     }).then((res) => {
       return res.json();
-    }).then(((jsonData) => {
-      let tempList = this.state.dataList;
+    }).then((jsonData) => {
       this.setState({
-        dataList: tempList.concat(jsonData.data)
+        dataList: jsonData.data
       });
-    }));
+    });
+  }
+  //加载更多
+  _onLoadMore = () => {
+    fetch(`${global.Config.FetchURL}/balance/incomeList`, {
+      method: 'post',
+      headers: {
+        "Accept": global.Config.Accept,
+        "Content-Type": global.Config.ContentType,
+        "token": global.token
+      },
+      body: JSON.stringify({
+        coinType: 0,       //币种,0DK,1DN
+        // incomeType: 1,  //收支类型,1为收入,2为支出,不填为全部，3为加速
+        pageNo: ++this.state.page.pageNo,
+        pageSize: this.state.page.pageSize
+      })
+    }).then((res) => {
+      return res.json();
+    }).then((jsonData) => {
+      if (jsonData.data.length > 0) {
+        let tempList = this.state.dataList;
+        this.setState({
+          dataList: tempList.concat(jsonData.data)
+        });
+      } else {
+        this.state.page.pageNo--;
+      }
+    });
   }
   //每一个列表渲染的方法
   _renderItem = (item) => {
@@ -97,7 +100,6 @@ class AllRecord extends Component {
         amountColor = <Text style={styles.txtBlack}>{item.item.amount}</Text>;
         break;
       case 2:
-        console.log(22222);
         orderTypeItem = <Text style={styles.text}>{item.item.addTime.slice(0, 10) + '直推奖励'}</Text>;
         amountColor = <Text style={styles.txtGreen}>{item.item.amount}</Text>;
         break;
@@ -115,7 +117,7 @@ class AllRecord extends Component {
         break;
       case 10:
         orderTypeItem = <Text style={styles.text}>{item.item.addTime.slice(0, 10) + '兑换'}</Text>;
-        amountColor = <Text style={styles.txtGreen}>{item.item.amount}</Text>;
+        amountColor = <Text style={styles.txtRed}>{item.item.amount}</Text>;
         break;
       case 11:
         orderTypeItem = <Text style={styles.text}>{item.item.addTime.slice(0, 10) + '转账'}</Text>;
@@ -164,6 +166,13 @@ class AllRecord extends Component {
             ItemSeparatorComponent={this._separator}
             renderItem={this._renderItem}
             keyExtractor={this._keyExtractor}
+            getItemLayout={(data, index) => (
+              { length: 90, offset: 90 * index, index }
+            )}
+            onRefresh={this.fetchAllData}
+            refreshing={this.state.isRefresh}
+            onEndReached={this._onLoadMore}
+            onEndReachedThreshold={0.3}
             data={this.state.dataList}>
           </FlatList>
         </View>
@@ -176,13 +185,18 @@ class InRecord extends Component {
   constructor() {
     super();
     this.state = {
-      dataList: []
+      dataList: [],
+      isRefresh: false,
+      page: {
+        pageNo: 1,
+        pageSize: 10
+      }
     };
   }
   componentWillMount() {
-    this.fetchAllData({pageNo:1, pageSize:10})
+    this.fetchAllData()
   }
-  fetchAllData = (page) => {
+  fetchAllData = (page = { pageNo: 1, pageSize: 10 }) => {
     fetch(`${global.Config.FetchURL}/balance/incomeList`, {
       method: 'post',
       headers: {
@@ -198,12 +212,40 @@ class InRecord extends Component {
       })
     }).then((res) => {
       return res.json();
-    }).then(((jsonData) => {
-      let tempList = this.state.dataList;
+    }).then((jsonData) => {
       this.setState({
-        dataList: tempList.concat(jsonData.data)
+        dataList: jsonData.data,
+        page: { pageNo: 1, pageSize: 10 }
       });
-    }));
+    });
+  }
+  //加载更多
+  _onLoadMore = () => {
+    fetch(`${global.Config.FetchURL}/balance/incomeList`, {
+      method: 'post',
+      headers: {
+        "Accept": global.Config.Accept,
+        "Content-Type": global.Config.ContentType,
+        "token": global.token
+      },
+      body: JSON.stringify({
+        coinType: 0,       //币种,0DK,1DN
+        incomeType: 1,  //收支类型,1为收入,2为支出,不填为全部，3为加速
+        pageNo: ++this.state.page.pageNo,
+        pageSize: this.state.page.pageSize
+      })
+    }).then((res) => {
+      return res.json();
+    }).then((jsonData) => {
+      if (jsonData.data.length > 0) {
+        let tempList = this.state.dataList;
+        this.setState({
+          dataList: tempList.concat(jsonData.data)
+        });
+      } else {
+        this.state.page.pageNo--;
+      }
+    });
   }
   //每一个列表渲染的方法
   _renderItem = (item) => {
@@ -258,6 +300,13 @@ class InRecord extends Component {
             ItemSeparatorComponent={this._separator}
             renderItem={this._renderItem}
             keyExtractor={this._keyExtractor}
+            getItemLayout={(data, index) => (
+              { length: 90, offset: 90 * index, index }
+            )}
+            onRefresh={this.fetchAllData}
+            refreshing={this.state.isRefresh}
+            onEndReached={this._onLoadMore}
+            onEndReachedThreshold={0.3}
             data={this.state.dataList}>
           </FlatList>
         </View>
@@ -270,13 +319,18 @@ class OutRecord extends Component {
   constructor() {
     super();
     this.state = {
-      dataList: []
+      dataList: [],
+      isRefresh: false,
+      page: {
+        pageNo: 1,
+        pageSize: 10
+      }
     };
   }
   componentWillMount() {
-    this.fetchAllData({pageNo:1, pageSize:10})
+    this.fetchAllData()
   }
-  fetchAllData = (page) => {
+  fetchAllData = (page = { pageNo: 1, pageSize: 10 }) => {
     fetch(`${global.Config.FetchURL}/balance/incomeList`, {
       method: 'post',
       headers: {
@@ -292,12 +346,40 @@ class OutRecord extends Component {
       })
     }).then((res) => {
       return res.json();
-    }).then(((jsonData) => {
-      let tempList = this.state.dataList;
+    }).then((jsonData) => {
       this.setState({
-        dataList: tempList.concat(jsonData.data)
+        dataList: jsonData.data,
+        page: { pageNo: 1, pageSize: 10 }
       });
-    }));
+    });
+  }
+  //加载更多
+  _onLoadMore = () => {
+    fetch(`${global.Config.FetchURL}/balance/incomeList`, {
+      method: 'post',
+      headers: {
+        "Accept": global.Config.Accept,
+        "Content-Type": global.Config.ContentType,
+        "token": global.token
+      },
+      body: JSON.stringify({
+        coinType: 0,       //币种,0DK,1DN
+        incomeType: 2,  //收支类型,1为收入,2为支出,不填为全部，3为加速
+        pageNo: ++this.state.page.pageNo,
+        pageSize: this.state.page.pageSize
+      })
+    }).then((res) => {
+      return res.json();
+    }).then((jsonData) => {
+      if (jsonData.data.length > 0) {
+        let tempList = this.state.dataList;
+        this.setState({
+          dataList: tempList.concat(jsonData.data)
+        });
+      } else {
+        this.state.page.pageNo--;
+      }
+    });
   }
   //每一个列表渲染的方法
   _renderItem = (item) => {
@@ -310,7 +392,7 @@ class OutRecord extends Component {
         orderTypeItem = '转账';
         break;
       case 12:
-        orderTypeItem =  '卖出';
+        orderTypeItem = '卖出';
         break;
     }
     return (
@@ -346,6 +428,13 @@ class OutRecord extends Component {
             ItemSeparatorComponent={this._separator}
             renderItem={this._renderItem}
             keyExtractor={this._keyExtractor}
+            getItemLayout={(data, index) => (
+              { length: 90, offset: 90 * index, index }
+            )}
+            onRefresh={this.fetchAllData}
+            refreshing={this.state.isRefresh}
+            onEndReached={this._onLoadMore}
+            onEndReachedThreshold={0.3}
             data={this.state.dataList}>
           </FlatList>
         </View>
@@ -362,7 +451,7 @@ class FrozenRecord extends Component {
     };
   }
   componentWillMount() {
-    this.fetchAllData({pageNo:1, pageSize:10})
+    this.fetchAllData({ pageNo: 1, pageSize: 10 })
   }
   fetchAllData = (page) => {
     fetch(`${global.Config.FetchURL}/balance/incomeList`, {
@@ -397,7 +486,7 @@ class FrozenRecord extends Component {
             <Text style={styles.text}>{item.item.addTime.slice(0, 10) + '冻结'}</Text>
           </View>
           <View style={styles.listViewRight}>
-          <Text style={styles.txtBlack}>{item.item.amount}</Text>
+            <Text style={styles.txtBlack}>{item.item.amount}</Text>
           </View>
         </View>
       </View>
@@ -414,8 +503,6 @@ class FrozenRecord extends Component {
   _keyExtractor = (item, index) => item.id + '';
 
   render() {
-    console.log(this.state.dataList);
-
     return (
       <View style={{ flex: 1 }}>
         <View style={{ flex: 1 }}>
