@@ -447,14 +447,19 @@ class FrozenRecord extends Component {
   constructor() {
     super();
     this.state = {
-      dataList: []
+      dataList: [],
+      isRefresh: false,
+      page: {
+        pageNo: 1,
+        pageSize: 10
+      }
     };
   }
   componentWillMount() {
-    this.fetchAllData({ pageNo: 1, pageSize: 10 })
+    this.fetchAllData()
   }
-  fetchAllData = (page) => {
-    fetch(`${global.Config.FetchURL}/balance/incomeList`, {
+  fetchAllData = (page = { pageNo: 1, pageSize: 10 }) => {
+    fetch(`${global.Config.FetchURL}/dks/dkByType`, {
       method: 'post',
       headers: {
         "Accept": global.Config.Accept,
@@ -462,19 +467,47 @@ class FrozenRecord extends Component {
         "token": global.token
       },
       body: JSON.stringify({
-        coinType: 0,       //币种,0DK,1DN
-        // incomeType: 1,  //收支类型,1为收入,2为支出,不填为全部
+        type: "0",
+        status: "2",
         pageNo: page.pageNo,
         pageSize: page.pageSize
       })
     }).then((res) => {
       return res.json();
-    }).then(((jsonData) => {
-      let tempList = this.state.dataList;
+    }).then((jsonData) => {
       this.setState({
-        dataList: tempList.concat(jsonData.data)
+        dataList: jsonData.data.result,
+        page: { pageNo: 1, pageSize: 10 }
       });
-    }));
+    });
+  }
+  //加载更多
+  _onLoadMore = () => {
+    fetch(`${global.Config.FetchURL}/dks/dkByType`, {
+      method: 'post',
+      headers: {
+        "Accept": global.Config.Accept,
+        "Content-Type": global.Config.ContentType,
+        "token": global.token
+      },
+      body: JSON.stringify({
+        type: "0",
+        status: "2",
+        pageNo: ++this.state.page.pageNo,
+        pageSize: this.state.page.pageSize
+      })
+    }).then((res) => {
+      return res.json();
+    }).then((jsonData) => {
+      if (jsonData.data.result.length > 0) {
+        let tempList = this.state.dataList;
+        this.setState({
+          dataList: tempList.concat(jsonData.data.result)
+        });
+      } else {
+        this.state.page.pageNo--;
+      }
+    });
   }
   //每一个列表渲染的方法
   _renderItem = (item) => {
@@ -482,11 +515,11 @@ class FrozenRecord extends Component {
       <View style={{ flex: 1, height: 90 }}>
         <View style={styles.container}>
           <View style={styles.listViewLeft}>
-            <Text style={styles.txt1}>{'记录时间: ' + item.item.addTime}</Text>
-            <Text style={styles.text}>{item.item.addTime.slice(0, 10) + '冻结'}</Text>
+            <Text style={styles.txt1}>{'订单编号: ' + item.item.orderNumber}</Text>
+            <Text style={styles.text}>冻结</Text>
           </View>
           <View style={styles.listViewRight}>
-            <Text style={styles.txtBlack}>{item.item.amount}</Text>
+            <Text style={styles.txtBlack}>{'PE: ' +item.item.dealNumber}</Text>
           </View>
         </View>
       </View>
@@ -511,6 +544,13 @@ class FrozenRecord extends Component {
             ItemSeparatorComponent={this._separator}
             renderItem={this._renderItem}
             keyExtractor={this._keyExtractor}
+            getItemLayout={(data, index) => (
+              { length: 90, offset: 90 * index, index }
+            )}
+            onRefresh={this.fetchAllData}
+            refreshing={this.state.isRefresh}
+            onEndReached={this._onLoadMore}
+            onEndReachedThreshold={0.3}
             data={this.state.dataList}>
           </FlatList>
         </View>
