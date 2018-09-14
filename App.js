@@ -12,6 +12,7 @@ import main from './src/main' //第一个Tab
 import Login from './src/component/loginScreen/login';
 import PEdetails from './src/component/homeScreen/PEdetails';
 import PVdetails from './src/component/homeScreen/PVdetails';
+import trunIn from './src/component/homeScreen/trunIn';
 import myTeam from './src/component/userScreen/userMenu/myTeam';
 import modifyNick from './src/component/userScreen/userMenu/modifyNick';
 import Register from './src/component/loginScreen/register';
@@ -65,7 +66,7 @@ export default App = createStackNavigator({
       headerTitleStyle: {color: '#FFFFFF',},
       headerStyle: {
         paddingTop: navHeight,
-        backgroundColor: '#000733'
+        backgroundColor: '#551670'
       },
       headerTintColor: '#FFFFFF',
     })
@@ -77,7 +78,19 @@ export default App = createStackNavigator({
       headerTitleStyle: {color: '#FFFFFF',},
       headerStyle: {
         paddingTop: navHeight,
-        backgroundColor: '#000733'
+        backgroundColor: '#551670'
+      },
+      headerTintColor: '#FFFFFF',
+    })
+  },
+  trunIn: {
+    screen: trunIn,
+    navigationOptions: ({navigation}) => ({
+      title: '收款',
+      headerTitleStyle: {color: '#FFFFFF',},
+      headerStyle: {
+        paddingTop: navHeight,
+        backgroundColor: '#551670'
       },
       headerTintColor: '#FFFFFF',
     })
@@ -90,6 +103,7 @@ export default App = createStackNavigator({
         color: '#FFFFFF',
       },
       headerStyle: {
+        paddingTop: navHeight,
         backgroundColor: '#551670',
       },
       headerTintColor: '#FFFFFF',
@@ -100,7 +114,7 @@ export default App = createStackNavigator({
     navigationOptions: ({ navigation }) => ({
       title: '个人信息',
       headerTitleStyle: {color: '#FFFFFF',},
-      headerStyle: {backgroundColor: '#551670',},
+      headerStyle: {paddingTop: navHeight, backgroundColor: '#551670',},
       headerTintColor: '#FFFFFF',
     }),
   },
@@ -112,6 +126,7 @@ export default App = createStackNavigator({
         color: '#FFFFFF',
       },
       headerStyle: {
+        paddingTop: navHeight,
         backgroundColor: '#551670',
       },
       headerTintColor: '#FFFFFF',
@@ -122,7 +137,7 @@ export default App = createStackNavigator({
     navigationOptions: ({ navigation }) => ({
       title: '修改登录密码',
       headerTitleStyle: {color: '#FFFFFF',},
-      headerStyle: {backgroundColor: '#551670',},
+      headerStyle: {paddingTop: navHeight, backgroundColor: '#551670',},
       headerTintColor: '#FFFFFF',
     }),
   },
@@ -131,7 +146,7 @@ export default App = createStackNavigator({
     navigationOptions: ({ navigation }) => ({
       title: '修改支付密码',
       headerTitleStyle: {color: '#FFFFFF',},
-      headerStyle: {backgroundColor: '#551670',},
+      headerStyle: {paddingTop: navHeight, backgroundColor: '#551670',},
       headerTintColor: '#FFFFFF',
     }),
   },
@@ -143,6 +158,7 @@ export default App = createStackNavigator({
         color: '#FFFFFF',
       },
       headerStyle: {
+        paddingTop: navHeight,
         backgroundColor: '#551670',
       },
       headerTintColor: '#FFFFFF',
@@ -156,6 +172,7 @@ export default App = createStackNavigator({
         color: '#FFFFFF',
       },
       headerStyle: {
+        paddingTop: navHeight,
         backgroundColor: '#551670',
       },
       headerTintColor: '#FFFFFF',
@@ -169,6 +186,7 @@ export default App = createStackNavigator({
         color: '#FFFFFF',
       },
       headerStyle: {
+        paddingTop: navHeight,
         backgroundColor: '#551670',
       },
       headerTintColor: '#FFFFFF',
@@ -182,6 +200,7 @@ export default App = createStackNavigator({
         color: '#FFFFFF',
       },
       headerStyle: {
+        paddingTop: navHeight,
         backgroundColor: '#551670',
       },
       headerTintColor: '#FFFFFF',
@@ -195,6 +214,7 @@ export default App = createStackNavigator({
         color: '#FFFFFF',
       },
       headerStyle: {
+        paddingTop: navHeight,
         backgroundColor: '#551670',
       },
       headerTintColor: '#FFFFFF',

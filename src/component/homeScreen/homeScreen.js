@@ -3,7 +3,7 @@
  */
 import React, { Component } from 'react';
 import { StyleSheet, View, Button, Text, Image, ImageBackground, ScrollView, TouchableOpacity, StatusBar } from 'react-native';
-import { SafeAreaView } from 'react-navigation';
+import { SafeAreaView, NavigationEvents } from 'react-navigation';
 import Resolutions from '../../utils/resolutions';
 import Icon from 'react-native-vector-icons/EvilIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -15,7 +15,7 @@ var menus = [, {
   key: '1'
 }, {
   label: '转入',
-  route: '',
+  route: 'trunIn',
   icon: 'credit-card-plus',
   key: '2'
 }, {
@@ -77,7 +77,10 @@ export default class homeScreen extends Component {
     }
 
   }
-  async componentDidMount() {
+  componentDidMount() {
+    this._getPEPV();
+  }
+  async _getPEPV() {
     let cache = await storage.load({
       key: 'loginState'
     });
@@ -121,6 +124,9 @@ export default class homeScreen extends Component {
     return (
       <Resolutions.FixFullView>
         <SafeAreaView style={ styles.container }>
+        <NavigationEvents
+          onDidFocus={payload => this._getPEPV()}
+        />
           <StatusBar
                      translucent={ true }
                      backgroundColor='rgba(0,0,0,0)' />
