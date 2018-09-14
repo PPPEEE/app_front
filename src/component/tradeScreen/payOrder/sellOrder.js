@@ -24,6 +24,7 @@ export default class sellOrder extends Component {
       payment: [false, false, false]
     }
     this.allIn = this.allIn.bind(this);
+    this.payForOrder = this.payForOrder.bind(this);
   }
 
   async componentDidMount() {
@@ -63,7 +64,11 @@ export default class sellOrder extends Component {
   }
 
   payForOrder(){
-    
+    this.props.navigation.push('orderFlow',{
+      order: this.state.order,
+      isBuyOrder: false,
+      dealNumber: this.state.amount
+    });
   }
 
   allIn() {

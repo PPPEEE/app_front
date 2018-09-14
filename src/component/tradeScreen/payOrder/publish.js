@@ -20,7 +20,7 @@ export default class publish extends Component {
     this.state = {
       buyColor: 'red',
       saleColor: 'white',
-      DKBalance: '0',
+      PEBalance: '0',
       payment: [false, false, false]
     }
 
@@ -59,8 +59,8 @@ export default class publish extends Component {
       key: 'loginState'
     }).then((cache) => {
       token = cache.token;
-      fetch(`${global.Config.FetchURL}/dks/findTotal`, {
-        method: 'post',
+      fetch(`${global.Config.FetchURL}/balance/get`, {
+        method: 'get',
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
@@ -69,9 +69,14 @@ export default class publish extends Component {
       }).then((res) => {
         return res.json();
       }).then(((jsonData) => {
-        this.setState({
-          DKBalance: jsonData.data
-        });
+        console.log(jsonData);
+        for (var o in jsonData.data) {
+          if (jsonData.data[o].coinType === 0) {
+            this.setState({
+              PEBalance: jsonData.data[o].balance
+            })
+          }
+        }
       }));
       fetch(`${global.Config.FetchURL}/user/findUserPayInfo`, {
         method: 'post',
@@ -115,13 +120,31 @@ export default class publish extends Component {
     }).then((res) => {
       return res.json();
     }).then((jsonData) => {
-      Alert.alert('提示', `发布PE${this.state.current === 'buy'?'买单':'卖单'}成功!`);
+      console.log(JSON.stringify({
+        dealNumber: this.state.amount,
+        type: (this.state.current === 'buy' ? 1 : 2),
+        status: 2,
+        minNumber: 0,
+        times: this.state.paymentTime.replace(/[^0-9]/g, ''),
+        payInfo: payInfo
+      }));
+      console.log(jsonData);
+      if(jsonData.code === 200){
+        Alert.alert('提示', `发布PE${this.state.current === 'buy'?'买单':'卖单'}成功!`);
+        if(this.state.current !== 'buy'){
+           this.setState({
+             PEBalance: Number(this.state.PEBalance) - Number(this.state.amount)+''
+           })
+        }
+      }else{
+        Alert.alert('警告', jsonData.message);
+      }
     }).catch((error) => {
     });
   }
 
   allSale() {
-    let amount = Math.ceil(Number(this.state.DKBalance) / 500) * 500;
+    let amount = Math.ceil(Number(this.state.PEBalance) / 500) * 500;
     this.setState({
       amount: amount + ''
     });
@@ -283,7 +306,7 @@ export default class publish extends Component {
                 _
               </Text>
               <Text style={ { fontSize: 40, color: 'white' } }>
-                { this.state.DKBalance }
+                { this.state.PEBalance }
               </Text>
             </Text>
             <TouchableOpacity

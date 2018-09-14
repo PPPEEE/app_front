@@ -2,7 +2,7 @@
  * Created by mengqingdong on 2017/4/19.
  */
 import React, { Component } from 'react';
-import { StyleSheet, View, ImageBackground, Text, StatusBar, TouchableOpacity, TextInput, Alert, Image } from 'react-native';
+import { StyleSheet, View, ImageBackground, Text, StatusBar, TouchableOpacity, TextInput, Alert, Image, Modal } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import Button from 'react-native-button';
 import Resolutions from '../../../utils/resolutions';
@@ -20,61 +20,59 @@ export default class orderFlow extends Component {
       buyColor: 'red',
       saleColor: 'white',
       PEBalance: '0',
-      payment: [false, false, false]
+      payment: [false, false, false],
+      payInfo: []
     }
     this.payForOrder = this.payForOrder.bind(this);
   }
 
   async componentDidMount() {
-    let orderId = this.props.navigation.getParam('orderId');
-    console.log(orderId);
-    let res = await fetch(`${global.Config.FetchURL}/dks/findDkById`, {
-      method: 'post',
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-        "token": global.token
-      },
-      body: JSON.stringify({
-        id: orderId
-      })
-    })
-    res = await res.json();
+    let order = this.props.navigation.getParam('order');
+    console.log(order);
+    let isBuyOrder = this.props.navigation.getParam('isBuyOrder');
+    let dealNumber = this.props.navigation.getParam('dealNumber');
     this.setState({
-      order: res.data
+      order: order,
+      payInfo: order.user.userPayInfo,
+      isBuyOrder: isBuyOrder,
+      dealNumber: dealNumber,
+      times: `${order.times-1}分${59}秒`
     });
-    res = await fetch(`${global.Config.FetchURL}/balance/get`, {
-      method: 'get',
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-        "token": global.token
-      }
-    });
-    res = await res.json();
-    for (var o in res.data) {
-      if (res.data[o].coinType === 0) {
-        this.setState({
-          PEBalance: res.data[o].balance
-        })
-      }
-    }
+
+    let totalSeconds = order.times * 60;
+    let timer = setInterval(() => {
+      totalSeconds--;
+      let minutes = Math.floor(totalSeconds / 60);
+      let seconds = totalSeconds % 60;
+      this.setState({
+        times: `${minutes}分${seconds}秒`
+      });
+    }, 1000);
   }
 
   payForOrder() {}
 
   _paymentRender = (pay, index) => {
     let paymentColor = this.state.payment[index] ? 'rgb(13,126,190)' : 'white';
+    let paymentArr = ['微信', '支付宝', '银行卡'];
+    let hasPaymentArr = this.state.payInfo.map((info) => info.payType);
+    if (!hasPaymentArr.includes(index + 1)) {
+      return null;
+    }
     return (<View
                   style={ { marginTop: 40 } }
                   key={ index }>
-              <View style={ { flexDirection: 'row', justifyContent: 'flex-start' } }>
-                <MaterialCommunityIcons
-                                        name="check-circle-outline"
-                                        style={ { color: paymentColor, fontSize: 50 } } />
+              <View style={ { flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' } }>
+                { this.state.isBuyOrder ? <MaterialCommunityIcons
+                                                                  name="check-circle-outline"
+                                                                  style={ { color: paymentColor, fontSize: 50, marginRight: 20 } } /> : null }
                 <Image
                        source={ payment[index] }
-                       style={ { width: 50, height: 50, marginLeft: 40 } } />
+                       style={ { width: 50, height: 50, marginTop: 5 } }
+                       resizeMode="cover" />
+                <Text style={ { fontSize: 40, marginLeft: 20, color: 'rgb(255,255,255)' } }>
+                  { paymentArr[index] }
+                </Text>
                 { index === 2 ? (
                   null
                   ) : (
@@ -98,7 +96,8 @@ export default class orderFlow extends Component {
   }
   render() {
     const paymentsTitle = ['微信支付', '支付宝', '银行卡'];
-    let userPayInfo = this.state.order && this.state.order.user && this.state.order.user.userPayInfo;
+    let user = this.state.order && this.state.order.user || {};
+    let order = this.state.order || {};
     return (
       <Resolutions.FixFullView>
         <StatusBar
@@ -112,55 +111,117 @@ export default class orderFlow extends Component {
             <View style={ { justifyContent: 'flex-start', width: 900, borderBottomWidth: 2, borderBottomColor: 'rgb(255,255,255)' } }>
               <View>
                 <Text style={ { fontSize: 40, color: "rgb(147,147,147)" } }>
-                  订单: #115366853040577
+                  订单:
+                  { order.orderNumber }
                 </Text>
               </View>
               <View style={ { marginTop: 40, marginBottom: 20 } }>
                 <Text style={ { fontSize: 60, color: 'rgb(233,233,233)' } }>
                   您向
-                  { '申佳' }购买PE
+                  { user.userName }
+                  { this.state.isBuyOrder ? '购买' : '出售' }PE
                 </Text>
               </View>
               <View style={ { marginBottom: 20 } }>
                 <Text style={ { fontSize: 40, color: 'white' } }>
-                  { `交易数量:      500 PE` }
+                  { `交易数量:      ${this.state.dealNumber} PE` }
                 </Text>
               </View>
               <View style={ { marginBottom: 20 } }>
                 <Text style={ { fontSize: 40, color: 'white' } }>
-                  { `交易金额:      400 CNY` }
+                  { `交易金额:      ${this.state.dealNumber && Math.round(Number(this.state.dealNumber)*0.8)} CNY` }
                 </Text>
               </View>
               <Text style={ { fontSize: 40, color: "rgb(147,147,147)", marginTop: 40 } }>
-                选择付款方式
+                卖方收款方式
               </Text>
             </View>
             <View style={ { justifyContent: 'flex-start', width: 900, borderBottomWidth: 2, borderBottomColor: 'rgb(255,255,255)', paddingBottom: 40 } }>
               { paymentsTitle.map(this._paymentRender) }
             </View>
             <View style={ { flexDirection: 'row', width: 900, justifyContent: 'flex-start', alignItems: 'center', margin: 40 } }>
-              <Text style={ { fontSize: 40, color: 'white' } }>
-                待支付,请于
-                <Text style={ { color: 'red' } }>
-                  14分35秒
-                </Text>内向申佳支付400CNY
-              </Text>
+              { this.state.isBuyOrder
+                ? (<Text style={ { fontSize: 40, color: 'white' } }>
+                     待支付,请于
+                     <Text style={ { color: 'red' } }>
+                       { this.state.times }
+                     </Text>内向申佳支付
+                     { this.state.dealNumber && Math.round(Number(this.state.dealNumber) * 0.8) }CNY
+                   </Text>)
+                : <Text style={ { fontSize: 40, color: 'white' } }>
+                    等待对方支付,
+                    { user.userName }将于
+                    <Text style={ { color: 'red' } }>
+                      { this.state.times }
+                    </Text>内向您支付
+                    <Text style={ { color: 'rgb(46,132,255)' } }>
+                      { this.state.dealNumber && Math.round(Number(this.state.dealNumber) * 0.8) }CNY
+                    </Text>
+                  </Text> }
             </View>
           </View>
-          <View style={ { marginTop: 80 } }>
+          <View style={ { flexDirection: 'row', height: 60, marginTop: 40, width: 1000, justifyContent: 'flex-start', alignItems: 'center' } }>
             <TouchableOpacity
-                              disabled={ (!this.state.payment[0] && !this.state.payment[1] && !this.state.payment[2]) || !this.state.amount || Number(this.state.amount) % 500 > 0 }
-                              onPress={ this.publishDK }>
-              <ImageBackground
-                               style={ { borderRadius: 80, width: 1000, height: 150 } }
-                               source={ require('../../../images/Button_bg.jpg') }
-                               resizeMode="contain">
-                <Text style={ { color: 'white', fontSize: 60, textAlign: 'center', lineHeight: 140 } }>
-                  去支付
-                </Text>
-              </ImageBackground>
+                              onPress={ () => {
+                                          this.setState({
+                                            modalVisible: true
+                                          })
+                                        } }
+                              style={ { marginLeft: 50 } }>
+              <Text style={ { color: "rgb(255,255,255)", fontSize: 40 } }>
+                常见问题
+              </Text>
             </TouchableOpacity>
           </View>
+          <View style={ { marginTop: 40 } }>
+            { !this.state.isBuyOrder
+              ? (<View style={ { borderRadius: 20, width: 1000, height: 150, borderWidth: 2, borderColor: 'rgb(255,255,255)', alignItems: 'center' } }>
+                   <Text style={ { color: 'rgb(255,255,255)', fontSize: 60, textAlign: 'center', height: 150, lineHeight: 150 } }>
+                     等待对方支付
+                   </Text>
+                 </View>)
+              : (<TouchableOpacity onPress={ this.payForOrder }>
+                   <ImageBackground
+                                    style={ { borderRadius: 80, width: 1000, height: 150 } }
+                                    source={ require('../../../images/Button_bg.jpg') }
+                                    resizeMode="contain">
+                     <Text style={ { color: 'white', fontSize: 60, textAlign: 'center', lineHeight: 140 } }>
+                       去支付
+                     </Text>
+                   </ImageBackground>
+                 </TouchableOpacity>) }
+          </View>
+          <Modal
+                 animationType="slide"
+                 transparent={ false }
+                 presentationStyle="formSheet"
+                 visible={ this.state.modalVisible }>
+            <View style={ { marginTop: 22 } }>
+              <View>
+                <Text>
+                  常见收款风险
+                </Text>
+                <Text>
+                  请反复确认是否收到对方款项，不要相信任何催促放币的理由，确认收到款项后再放行数字资产，避免造成损失！
+                </Text>
+                <Text>
+                  买方下单后一直未付款，如何处理
+                </Text>
+                <Text>
+                  请反复确认是否收到对方款项，不要相信任何催促放币的理由，确认收到款项后再放行数字资产，避免造成损失！
+                </Text>
+                <TouchableOpacity onPress={ () => {
+                                              this.setState({
+                                                modalVisible: false
+                                              })
+                                            } }>
+                  <Text>
+                    Hide Modal
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
         </ImageBackground>
       </Resolutions.FixFullView>
       );

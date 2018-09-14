@@ -61,8 +61,30 @@ export default class buyOrder extends Component {
     }
   }
 
-  payForOrder(){
-    this.props.navigation.push('orderFlow');
+  async payForOrder() {
+    let res = await fetch(`${global.Config.FetchURL}/dks/dkPurchase`, {
+      method: 'post',
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "token": global.token
+      },
+      body: JSON.stringify({
+        id: this.state.order.id,
+        dealNumber: this.state.amount
+      })
+    });
+    res = await res.json();
+    if (res.code === 200) {
+      this.props.navigation.push('orderFlow', {
+        order: this.state.order,
+        isBuyOrder: true,
+        dealNumber: this.state.amount
+      });
+    }else{
+      Alert.alert('提示', '买入处理异常');
+    }
+
   }
 
   render() {
@@ -127,9 +149,9 @@ export default class buyOrder extends Component {
                          underlineColorAndroid="transparent"
                          keyboardType="numeric"
                          onChangeText={ (text) => {
-                                          text = text.replace(/[^0-9]/g,'');
-                                          if(Number(text) > this.state.order.dealNumber){
-                                            text = this.state.order.dealNumber+'';
+                                          text = text.replace(/[^0-9]/g, '');
+                                          if (Number(text) > this.state.order.dealNumber) {
+                                            text = this.state.order.dealNumber + '';
                                           }
                                           this.setState({
                                             amount: text
