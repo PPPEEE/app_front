@@ -10,7 +10,7 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 
 var menus = [, {
   label: '转出',
-  route: '',
+  route: 'trunOut',
   icon: 'credit-card',
   key: '1'
 }, {
@@ -61,7 +61,11 @@ export default class homeScreen extends Component {
   constructor(props) {
     super();
     this.goPage = (item) => {
-      this.props.navigation.navigate(item.route, item.param);
+      if(item.route === 'trunOut'){
+        this.props.navigation.navigate(item.route, {pe: this.state.pe});
+      }else{
+        this.props.navigation.navigate(item.route, item.param);
+      }
     }
     this.scrollToView = (e) => {
       this.setState({

@@ -13,6 +13,7 @@ import Login from './src/component/loginScreen/login';
 import PEdetails from './src/component/homeScreen/PEdetails';
 import PVdetails from './src/component/homeScreen/PVdetails';
 import trunIn from './src/component/homeScreen/trunIn';
+import trunOut from './src/component/homeScreen/trunOut';
 import myTeam from './src/component/userScreen/userMenu/myTeam';
 import modifyNick from './src/component/userScreen/userMenu/modifyNick';
 import Register from './src/component/loginScreen/register';
@@ -87,6 +88,18 @@ export default App = createStackNavigator({
     screen: trunIn,
     navigationOptions: ({navigation}) => ({
       title: '收款',
+      headerTitleStyle: {color: '#FFFFFF',},
+      headerStyle: {
+        paddingTop: navHeight,
+        backgroundColor: '#551670'
+      },
+      headerTintColor: '#FFFFFF',
+    })
+  },
+  trunOut: {
+    screen: trunOut,
+    navigationOptions: ({navigation}) => ({
+      title: '转出',
       headerTitleStyle: {color: '#FFFFFF',},
       headerStyle: {
         paddingTop: navHeight,
@@ -286,7 +299,7 @@ export default App = createStackNavigator({
   }
 },
   {
-    initialRouteName: 'welcome', // 默认显示界面
+    initialRouteName: 'welcome', // 默认显示界面trunOut
   // navigationOptions: {
   //     header: {
   // backTitle: 'Back',
