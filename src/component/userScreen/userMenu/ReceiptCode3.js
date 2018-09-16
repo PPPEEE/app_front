@@ -9,7 +9,7 @@ import {
   Text,
   TextInput,
   Image,
-  ScrollView,
+  ToastAndroid,
   TouchableOpacity,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Feather';
@@ -32,6 +32,10 @@ export default class ReceiptCode1 extends Component {
   }
 
   saveReceipt() {
+    if(this.state.bank.length <= 0||this.state.accountName <= 0||this.state.qrCode <= 0||this.state.bankBranch <= 0){
+      ToastAndroid.show('请填写完整资料', ToastAndroid.SHORT);
+      return;
+    }
     storage.load({
       key: 'loginState'
     }).then(ret => {
@@ -100,6 +104,7 @@ export default class ReceiptCode1 extends Component {
                 onChangeText={(accountName) => this.setState({accountName})}
                 value={this.state.accountName}
                 underlineColorAndroid="transparent"
+                placeholderTextColor="#969696"
                 placeholder="请填写开卡真实姓名"
               />
             </View>
@@ -112,6 +117,7 @@ export default class ReceiptCode1 extends Component {
                 onChangeText={(qrCode) => this.setState({qrCode})}
                 value={this.state.qrCode}
                 underlineColorAndroid="transparent"
+                placeholderTextColor="#969696"
                 placeholder="请填写需要绑定的银行卡号"
               />
             </View>
@@ -124,6 +130,7 @@ export default class ReceiptCode1 extends Component {
                 onChangeText={(bankBranch) => this.setState({bankBranch})}
                 value={this.state.bankBranch}
                 underlineColorAndroid="transparent"
+                placeholderTextColor="#969696"
                 placeholder="请填写该银行卡的开户支行"
               />
             </View>

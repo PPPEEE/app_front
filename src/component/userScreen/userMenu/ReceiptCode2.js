@@ -10,6 +10,7 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
+  ToastAndroid
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Feather';
 import Button from 'react-native-button';
@@ -78,6 +79,10 @@ export default class ReceiptCode1 extends Component {
 
   //保存用户信息
   _savePayInfo = () => {
+    if(this.state.accountName.length <= 0||this.state.qrCode <= 0||!this.state.showImg){
+      ToastAndroid.show('请填写完整资料', ToastAndroid.SHORT);
+      return;
+    }
     storage.load({
       key: 'loginState',
     }).then(ret => {
@@ -137,6 +142,7 @@ export default class ReceiptCode1 extends Component {
                 onChangeText={(accountName) => this.setState({ accountName })}
                 value={this.state.accountName}
                 underlineColorAndroid="transparent"
+                placeholderTextColor="#969696"
                 placeholder="请填写您支付宝绑定的账户姓名"
               />
             </View>
@@ -149,6 +155,7 @@ export default class ReceiptCode1 extends Component {
                 onChangeText={(qrCode) => this.setState({ qrCode })}
                 value={this.state.qrCode}
                 underlineColorAndroid="transparent"
+                placeholderTextColor="#969696"
                 placeholder="请填写需要绑定的支付宝账号"
               />
             </View>
