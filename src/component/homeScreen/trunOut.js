@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import Button from 'react-native-button';
 
-export default class trunIn extends Component {
+export default class trunOut extends Component {
   constructor() {
     super();
     this.state = {
@@ -22,7 +22,8 @@ export default class trunIn extends Component {
       address: '',
       seconds: 60,
       verificode: '',
-      amount: ''
+      amount: '',
+      payPwd: ''
     };
   }
   componentWillMount() {
@@ -46,7 +47,8 @@ export default class trunIn extends Component {
       body: JSON.stringify({
         'address': this.state.address,
         'amount': this.state.amount,
-        'verificode': this.state.verificode
+        'verificode': this.state.verificode,
+        'payPwd': this.state.payPwd
       })
     }).then((res) => {
       return res.json();
@@ -63,6 +65,9 @@ export default class trunIn extends Component {
       ToastAndroid.show("请填写转账地址", ToastAndroid.SHORT);
     }else if(this.state.amount.length <= 0){
       ToastAndroid.show("请填写转账数量", ToastAndroid.SHORT);
+      return;
+    }else if(this.state.payPwd.length <= 0){
+      ToastAndroid.show("请填写支付密码", ToastAndroid.SHORT);
       return;
     }else if(this.state.verificode.length <= 0){
       ToastAndroid.show("请填写手机验证码", ToastAndroid.SHORT);
@@ -109,7 +114,7 @@ export default class trunIn extends Component {
     return (
       <ImageBackground source={require('../../images/user_bg.jpg')} style={{ flex: 1 }} >
         <View style={styles.container}>
-          <View style={{height: 200, justifyContent: 'center'}}>
+          <View style={{height: 160, justifyContent: 'center'}}>
             <Text style={styles.txt}>您的PE数量</Text>
             <Text style={styles.txt1}>{this.state.pe}</Text>
           </View>
@@ -136,6 +141,19 @@ export default class trunIn extends Component {
                   placeholderTextColor="#969696"
                   underlineColorAndroid="transparent"
                   placeholder="请填写钱包地址"
+                />
+              </View>
+            </View>
+            <View style={styles.listOne}>
+              <View style={styles.listLeft}>
+                <Text style={styles.txt}>支付密码</Text>
+                <TextInput
+                  style={styles.txtInput}
+                  onChangeText={(payPwd) => this.setState({payPwd})}
+                  value={this.state.payPwd}
+                  placeholderTextColor="#969696"
+                  underlineColorAndroid="transparent"
+                  placeholder="请填写支付密码"
                 />
               </View>
             </View>
@@ -198,7 +216,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    height: 80,
+    height: 60,
     padding: 10
   },
   listLeft:{
