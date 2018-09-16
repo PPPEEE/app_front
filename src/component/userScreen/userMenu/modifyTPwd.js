@@ -8,7 +8,8 @@ import {
   ImageBackground,
   Text,
   TextInput,
-  TouchableOpacity
+  TouchableOpacity,
+  ToastAndroid
 } from 'react-native';
 import Button from 'react-native-button';
 import { SafeAreaView } from 'react-navigation';
@@ -24,9 +25,38 @@ export default class modifyTPwd extends Component {
       seconds: 60,
       areaCode: '86',
       mobile: '',
-      type: '1',
+      type: '3',
       invalidCode: false
     };
+  }
+
+  componentDidMount() {
+    this._fetchUserInfo();
+  }
+
+  //获取用户信息
+  _fetchUserInfo() {
+    storage.load({
+      key: 'loginState'
+    }).then(ret => {
+      const url = global.Config.FetchURL + '/user/findUserInfo';
+      const opts = {
+        method: 'POST',
+        headers: {
+          'Accept': global.Config.Accept,
+          'Content-Type': global.Config.ContentType,
+          'token': ret.token
+        },
+      }
+      fetch(url, opts)
+        .then((res) => res.json())
+        .then((resJson) => {
+          console.log(resJson);
+          this.setState({
+            mobile: resJson.data.mobile
+          });
+        })
+    })
   }
 
   //发送验证码
@@ -35,7 +65,7 @@ export default class modifyTPwd extends Component {
       alert('请填写正确的手机号码');
       return;
     }
-    fetch('http://120.78.205.55:8081/user/sendCode', {
+    fetch(global.Config.FetchURL + '/user/sendCode', {
       method: "POST",
       headers: {
         "Accept": "application/json",
@@ -69,8 +99,8 @@ export default class modifyTPwd extends Component {
   }
 
   _saveTPwd = () => {
-    if(this.state.payPwd.length !== 6){
-      alert('请输入6位数字密码');
+    if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)^\S+[\s\S]{7,31}$/.test(this.state.payPwd)){
+      ToastAndroid.show("请输入8-32位大小写字母加数字支付密码", ToastAndroid.SHORT);
       return;
     }
     storage.load({
@@ -91,7 +121,7 @@ export default class modifyTPwd extends Component {
         })
       }
       if(this.state.mobile.length < 6){
-        alert('请输入正确的手机号码');
+        ToastAndroid.show("请输入正确的手机号码", ToastAndroid.SHORT);
         return;
       }else{
         this._checkVerifiCode(this._saveTPwdReq,url, opt);
@@ -103,7 +133,7 @@ export default class modifyTPwd extends Component {
     .then((response) => response.json())
     .then(responseData => {
       console.log(responseData);
-      if (responseData.code == 200) {
+      if (responseData.code === 200) {
         this.props.navigation.popToTop()
       } else {
         alert(responseData.message);
@@ -116,23 +146,24 @@ export default class modifyTPwd extends Component {
       return;
     }
     fetch(`${global.Config.FetchURL}/user/checkCode`, {
-      method: "Post",
-      hearders: {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
+      method: "post",
+      headers: {
+        'Content-Type': global.Config.ContentType,
+        'Accept': global.Config.Accept,
       },
       body: JSON.stringify({
-        'mobile': this.state.mobile,
-        'code': this.state.verificode
+        "mobile": (this.state.mobile+''),
+        "code": (this.state.verificode+'')
       })
     }).then((res) => {
       return res.json();
     }).then((jsonData) => {
+      console.log(jsonData);
       if(jsonData.code == 401){
         this.props.navigation.replace('login')
       }else{
         this.setState({
-          invalidCode: jsonData.code === '0'
+          invalidCode: jsonData.data
         })
         if(this.state.invalidCode){
           callbackFn(url, opt);
@@ -156,9 +187,8 @@ export default class modifyTPwd extends Component {
                 value={this.state.payPwd}
                 placeholderTextColor="#969696"
                 underlineColorAndroid="transparent"
-                placeholder="设置新的6位数字支付密码"
-                keyboardType="numeric"
-                maxLength={6}
+                placeholder="设置新的支付密码"
+                maxLength={32}
                 secureTextEntry={true}
               />
             </View>
@@ -189,7 +219,7 @@ export default class modifyTPwd extends Component {
               
               <TextInput
                 placeholder="请填写验证码"
-                style={  { width: 100,fontSize: 16,color: '#FFFFFF' } }
+                style={  { width: 120,fontSize: 16,color: '#FFFFFF' } }
                 placeholderTextColor="#969696"
                 underlineColorAndroid="transparent"
                 maxLength = {6}

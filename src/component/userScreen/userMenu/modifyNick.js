@@ -8,6 +8,7 @@ import {
   ImageBackground,
   Text,
   TextInput,
+  ToastAndroid,
 } from 'react-native';
 import Button from 'react-native-button';
 import { SafeAreaView } from 'react-navigation';
@@ -49,6 +50,10 @@ export default class modifyNick extends Component {
     })
   }
   _saveUserInfo = () => {
+    if(this.state.nickName.length <= 0){
+      ToastAndroid.show("请填写昵称", ToastAndroid.SHORT);
+      return;
+    }
     storage.load({
       key: 'loginState',
     }).then(ret => {
@@ -90,6 +95,7 @@ export default class modifyNick extends Component {
                 style={styles.txtInput}
                 onChangeText={(nickName) => this.setState({nickName})}
                 value={this.state.nickName}
+                placeholderTextColor="#969696"
                 underlineColorAndroid="transparent"
                 placeholder="请填写您的新昵称"
               />

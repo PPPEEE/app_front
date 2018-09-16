@@ -8,6 +8,7 @@ import {
   ImageBackground,
   Text,
   TextInput,
+  ToastAndroid,
 } from 'react-native';
 import Button from 'react-native-button';
 import { SafeAreaView } from 'react-navigation';
@@ -23,8 +24,16 @@ export default class modifyPwd extends Component {
   }
 
   _savePwd = () => {
+    if(this.state.pwd.length<=0||this.state.newPwd.length<=0||this.state.newPwd2.length<=0){
+      ToastAndroid.show("请填写完整", ToastAndroid.SHORT);
+      return;
+    }
     if(this.state.newPwd !== this.state.newPwd2){
-      alert('请输入两次相同的新密码');
+      ToastAndroid.show("请输入两次相同的新密码", ToastAndroid.SHORT);
+      return;
+    }
+    if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)^\S+[\s\S]{7,31}$/.test(this.state.newPwd)){
+      ToastAndroid.show("密码由8-32位大小写字母和数字组成", ToastAndroid.SHORT);
       return;
     }
     storage.load({
@@ -47,10 +56,12 @@ export default class modifyPwd extends Component {
     fetch(url, opt)
     .then((response) => response.json())
     .then(responseData => {
+      console.log(responseData);
       if (responseData.code == 200) {
+        ToastAndroid.show('修改成功', ToastAndroid.SHORT);
         this.props.navigation.popToTop()
       } else {
-        alert(responseData.message);
+        ToastAndroid.show(responseData.message, ToastAndroid.SHORT);
       }
     });
   }
@@ -67,6 +78,7 @@ export default class modifyPwd extends Component {
                 onChangeText={(pwd) => this.setState({pwd})}
                 value={this.state.pwd}
                 underlineColorAndroid="transparent"
+                placeholderTextColor="#969696"
                 placeholder="请填写您的旧密码"
                 secureTextEntry={true}
               />
@@ -80,6 +92,7 @@ export default class modifyPwd extends Component {
                 onChangeText={(newPwd) => this.setState({newPwd})}
                 value={this.state.newPwd}
                 underlineColorAndroid="transparent"
+                placeholderTextColor="#969696"
                 placeholder="请填写您的新密码"
                 secureTextEntry={true}
               />
@@ -93,6 +106,7 @@ export default class modifyPwd extends Component {
                 onChangeText={(newPwd2) => this.setState({newPwd2})}
                 value={this.state.newPwd2}
                 underlineColorAndroid="transparent"
+                placeholderTextColor="#969696"
                 placeholder="请确认您的新密码"
                 secureTextEntry={true}
               />

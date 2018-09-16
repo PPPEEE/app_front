@@ -155,6 +155,7 @@ export default class modifyUserInfo extends Component {
               onChangeText={(nickName) => this.setState({nickName})}
               value={this.state.nickName}
               underlineColorAndroid="transparent"
+              placeholderTextColor="#969696"
               placeholder="请填写您的新昵称"
             />
           </View>
@@ -165,6 +166,7 @@ export default class modifyUserInfo extends Component {
               onChangeText={(realName) => this.setState({realName})}
               value={this.state.realName}
               underlineColorAndroid="transparent"
+              placeholderTextColor="#969696"
               placeholder="请填写您的姓名"
             />
           </View>
@@ -187,6 +189,7 @@ export default class modifyUserInfo extends Component {
               onChangeText={(birthday) => this.setState({birthday})}
               value={this.state.birthday}
               underlineColorAndroid="transparent"
+              placeholderTextColor="#969696"
               placeholder="请填写您的生日"
             />
           </View>
@@ -197,6 +200,7 @@ export default class modifyUserInfo extends Component {
               onChangeText={(addr) => this.setState({addr})}
               value={this.state.addr}
               underlineColorAndroid="transparent"
+              placeholderTextColor="#969696"
               placeholder="请选择你所在地区"
             />
           </View>
