@@ -133,7 +133,7 @@ export default class wangSell extends Component {
                   <Text style={ [styles.lightFont, { margin: 20 }] }>
                     实付:
                     <Text style={ [styles.primaryFont, { fontSize: 36 }] }>
-                      { ' ' + item.item.money + ' ' }
+                      { ' ' + Math.round(item.item.dealNumber*0.8) + ' ' }
                     </Text>
                     CNY
                   </Text>

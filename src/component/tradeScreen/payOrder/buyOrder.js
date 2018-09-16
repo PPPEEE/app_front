@@ -77,9 +77,9 @@ export default class buyOrder extends Component {
     res = await res.json();
     if (res.code === 200) {
       this.props.navigation.push('orderFlow', {
-        order: this.state.order,
-        isBuyOrder: true,
-        dealNumber: this.state.amount
+        id: res.data,
+        dealNumber: this.state.amount,
+        isNewOrder: true
       });
     }else{
       Alert.alert('提示', '买入处理异常');

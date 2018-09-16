@@ -21,6 +21,7 @@ export default class Register extends Component {
     this.register = this.register.bind(this);
     this.sendVerifiCode = this.sendVerifiCode.bind(this);
     this.checkUserName = this.checkUserName.bind(this);
+    this.checkPassword = this.checkPassword.bind(this);
     this.checkVerifiCode = this.checkVerifiCode.bind(this);
   }
   sendVerifiCode() {
@@ -57,6 +58,17 @@ export default class Register extends Component {
     }, 1000)
   }
   register() {
+    let nameInvalid = this.checkUserName();
+    let pwdInvalid = this.checkPassword();
+    if(nameInvalid || pwdInvalid || this.state.password !== this.state.passwordConfirm){
+      let tips = '';
+      tips += !nameInvalid ? '' : '用户名应为8-32位非空字符。';
+      tips += !pwdInvalid ? '' : '密码应为8-32位非空字符。';
+      tips += this.state.password === this.state.passwordConfirm ? '' : '两次密码输入需一致。';
+      console.log(nameInvalid,pwdInvalid,this.state.password !== this.state.passwordConfirm);
+      Alert.alert('提示', tips);
+      return;
+    }
     fetch('http://120.78.205.55:8081/user/register', {
       method: "POST",
       headers: {
@@ -87,40 +99,54 @@ export default class Register extends Component {
   }
 
   checkUserName() {
-    fetch('http://120.78.205.55:8081/user/userNameExists', {
-      method: "POST",
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        'userName ': this.state.userName
-      })
-    }).then((res) => {
-      return res.json();
-    }).then((jsonData) => {
-      this.setState({
-        invalidUsername: jsonData.code === '0'
-      });
-      if (jsonData.code === '0') {
-        this.setState({
-          nameTips: jsonData.message
-        });
-      }
-    }).catch((error) => {
-    })
+    let invalid = !/^[\S]{8,32}$/.test(this.state.userName);
+    this.setState({
+      invalidUsername: invalid
+    });
+    return invalid;
+    // fetch('http://120.78.205.55:8081/user/userNameExists', {
+    //   method: "POST",
+    //   headers: {
+    //     "Accept": "application/json",
+    //     "Content-Type": "application/json"
+    //   },
+    //   body: JSON.stringify({
+    //     'userName ': this.state.userName
+    //   })
+    // }).then((res) => {
+    //   return res.json();
+    // }).then((jsonData) => {
+    //   this.setState({
+    //     invalidUsername: jsonData.code === '0'
+    //   });
+    //   if (jsonData.code === '0') {
+    //     this.setState({
+    //       nameTips: jsonData.message
+    //     });
+    //   }
+    //   console.log(jsonData);
+    // }).catch((error) => {
+    // })
+  }
+
+  checkPassword(){
+    let invalid = !/^[\S]{8,32}$/.test(this.state.password);
+    this.setState({
+      invalidUserPwd: invalid
+    });
+    return invalid;
   }
 
   checkVerifiCode() {
     fetch(`${global.Config.FetchURL}/user/checkCode`, {
-      method: "Post",
-      hearders: {
-        "Accept": "application/json",
+      method: "POST",
+      headers: {
+        Accept: "application/json",
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        'mobile': this.state.mobile,
-        'code': this.state.verificode
+        "mobile": this.state.mobile+'',
+        "code": this.state.verificode+''
       })
     }).then((res) => {
       return res.json();
@@ -128,6 +154,11 @@ export default class Register extends Component {
       this.setState({
         invalidCode: jsonData.code === '0'
       })
+      console.log(jsonData);
+      console.log(JSON.stringify({
+        "mobile": this.state.mobile+'',
+        "code": this.state.verificode+''
+      }))
     })
   }
 
@@ -140,7 +171,7 @@ export default class Register extends Component {
                    backgroundColor='rgba(0,0,0,0)' />
         <View style={ styles.container }>
           <KeyboardAvoidingView behavior="padding">
-            <View style={ [styles.formElement, { borderBottomWidth: 4, borderColor: this.state.invalidUsername ? 'red' : '#203E86', marginTop: 100 }] }>
+            <View style={ [styles.formElement, { borderBottomWidth: 4, borderColor: '#203E86', marginTop: 100 }] }>
               <Text style={ styles.iconWrapper }>
                 <Icon
                       name="user"
@@ -151,10 +182,12 @@ export default class Register extends Component {
                          style={ styles.input }
                          placeholderTextColor="#969696"
                          underlineColorAndroid="transparent"
-                         onChangeText={ (text) => this.setState({
-                                          userName: text
-                                        }) }
-                         onBlur={ this.checkUserName } />
+                         maxLength={ 32 }
+                         onChangeText={ (text) => {
+                                          this.setState({
+                                            userName: text
+                                          })
+                                        } } />
             </View>
             <View style={ [styles.formElement, { borderBottomWidth: 4, borderColor: '#203E86' }] }>
               <Text style={ styles.iconWrapper }>
@@ -172,7 +205,7 @@ export default class Register extends Component {
                                           password: text
                                         }) } />
             </View>
-            <View style={ [styles.formElement, { borderBottomWidth: 4, borderColor: this.state.invalidPwd ? '#FF3E86' : '#203E86' }] }>
+            <View style={ [styles.formElement, { borderBottomWidth: 4, borderColor: '#203E86' }] }>
               <Text style={ styles.iconWrapper }>
                 <Icon
                       name="lock"
@@ -186,8 +219,7 @@ export default class Register extends Component {
                          secureTextEntry={ true }
                          onChangeText={ (text) => {
                                           this.setState({
-                                            invalidPwd: text !== this.state.password,
-                                            passwordConfirm: text
+                                            passwordConfirm: text,
                                           });
                                         } } />
             </View>
@@ -208,6 +240,8 @@ export default class Register extends Component {
                          style={ [styles.input, { width: 585 }] }
                          placeholderTextColor="#969696"
                          underlineColorAndroid="transparent"
+                         keyboardType="numeric"
+                         maxLength={ 11 }
                          onChangeText={ (text) => this.setState({
                                           mobile: text
                                         }) } />
@@ -223,6 +257,7 @@ export default class Register extends Component {
                          style={ [styles.input, { width: 400 }] }
                          placeholderTextColor="#969696"
                          underlineColorAndroid="transparent"
+                         keyboardType="numeric"
                          maxLength={ 6 }
                          onBlur={ this.checkVerifiCode }
                          onChangeText={ (text) => this.setState({
@@ -256,8 +291,7 @@ export default class Register extends Component {
               <TouchableOpacity
                                 style={ styles.loginButton }
                                 onPress={ this.register }
-                                disabled={ this.state.invalidPwd || this.state.invalidUsername ||
-                                           this.state.invalidCode || !this.state.passwordConfirm ||
+                                disabled={ this.state.invalidCode || !this.state.passwordConfirm ||
                                            !this.state.password || !this.state.verificode ||
                                            !this.state.refereeId }>
                 <Text style={ { fontSize: 40, color: '#0C2956' } }>

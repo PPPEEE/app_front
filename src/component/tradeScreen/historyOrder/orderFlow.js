@@ -2,7 +2,7 @@
  * Created by mengqingdong on 2017/4/19.
  */
 import React, { Component } from 'react';
-import { StyleSheet, View, ImageBackground, Text, StatusBar, TouchableOpacity, TextInput, Alert, Image, Modal } from 'react-native';
+import { StyleSheet, View, ImageBackground, Text, StatusBar, TouchableOpacity, TextInput, Alert, Image, Modal, Clipboard } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import Button from 'react-native-button';
 import Resolutions from '../../../utils/resolutions';
@@ -11,6 +11,7 @@ import ModalDropdown from 'react-native-modal-dropdown';
 
 var payment = [require('../../../images/WeChat.png'), require('../../../images/Alipay.png'), require('../../../images/BankCard.png')];
 var defaultHead = require('../../../images/nohead.jpg');
+var orderRefreshTimer;
 
 export default class orderFlow extends Component {
 
@@ -21,26 +22,72 @@ export default class orderFlow extends Component {
       saleColor: 'white',
       PEBalance: '0',
       payment: [false, false, false],
+      modalVisible: false,
+      qrCodeVisible: false,
       payInfo: []
     }
-    this.payForOrder = this.payForOrder.bind(this);
+    this.nextFlow = this.nextFlow.bind(this);
+    this.refreshFlow = this.refreshFlow.bind(this);
+  }
+
+  getBtnTitle(type, status) {
+    var title = '';
+    if (status === 3) {
+      title = type === 1 ? '确认付款' : '等待付款';
+      return title;
+    }
+
+    if (status === 6) {
+      title = type === 1 ? '等待确认收款' : '确认收款';
+    }
+
+    if (status === 1) {
+      title = '已完成';
+    }
+    return title;
+  }
+
+  componentWillUnmount(){
+    clearInterval(orderRefreshTimer);
   }
 
   async componentDidMount() {
-    let order = this.props.navigation.getParam('order');
+    let orderId = this.props.navigation.getParam('id');
+    let isNewOrder = this.props.navigation.getParam('isNewOrder');
+    let order = await this.getOrderInfo(orderId);
+    let totalSeconds = 0;
+
+    if (!isNewOrder) {
+      let res = await fetch(`${global.Config.FetchURL}/dks/getExpiryTime`, {
+        method: 'post',
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "token": global.token
+        },
+        body: JSON.stringify({
+          id: orderId
+        })
+      })
+      res = await res.json();
+      totalSeconds = res.data;
+    } else {
+      totalSeconds = order.times * 60;
+    }
     console.log(order);
-    let isBuyOrder = this.props.navigation.getParam('isBuyOrder');
-    let dealNumber = this.props.navigation.getParam('dealNumber');
     this.setState({
       order: order,
-      payInfo: order.user.userPayInfo,
-      isBuyOrder: isBuyOrder,
-      dealNumber: dealNumber,
-      times: `${order.times-1}分${59}秒`
+      payInfo: order.payUser.userPayInfo,
+      isBuyOrder: order.type === 1,
+      dealNumber: order.dealNumber,
+      buttonTitle: this.getBtnTitle(order.type, order.status),
+      times: `${Math.floor(totalSeconds/60)}分${Math.floor(totalSeconds%60)}秒`
     });
 
-    let totalSeconds = order.times * 60;
     let timer = setInterval(() => {
+      if (totalSeconds === 1) {
+        clearInterval(timer);
+      }
       totalSeconds--;
       let minutes = Math.floor(totalSeconds / 60);
       let seconds = totalSeconds % 60;
@@ -48,9 +95,75 @@ export default class orderFlow extends Component {
         times: `${minutes}分${seconds}秒`
       });
     }, 1000);
+
+    orderRefreshTimer = setInterval(() => {
+      this.refreshFlow(this.state.order.id)
+    }, 15000);
   }
 
-  payForOrder() {}
+  async getOrderInfo(orderId) {
+    let res = await fetch(`${global.Config.FetchURL}/dks/findDkById`, {
+      method: 'post',
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "token": global.token
+      },
+      body: JSON.stringify({
+        id: orderId,
+      })
+    });
+    res = await res.json();
+    return res.data;
+  }
+
+  async nextFlow() {
+    if (this.state.order.status === 3 && this.state.order.type === 1) {
+      let res = await fetch(`${global.Config.FetchURL}/dks/paymentCommitOder`, {
+        method: 'post',
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "token": global.token
+        },
+        body: JSON.stringify({
+          id: this.state.order.id,
+        })
+      });
+      res = await res.json();
+      if (res.code === 200) {
+        Alert.alert('提示', '确认付款成功,请等待对方确认收款');
+        this.refreshFlow(this.state.order.id);
+      }
+    }
+
+    if (this.state.order.status === 6 && this.state.order.type === 2) {
+      let res = await fetch(`${global.Config.FetchURL}/dks/commit`, {
+        method: 'post',
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "token": global.token
+        },
+        body: JSON.stringify({
+          id: this.state.order.id,
+        })
+      });
+      res = await res.json();
+      if (res.code === 200) {
+        Alert.alert('提示', '确认收款成功,所售资产将放行给对方');
+        this.refreshFlow(this.state.order.id);
+      }
+    }
+  }
+
+  async refreshFlow(id) {
+    let order = await this.getOrderInfo(id);
+    this.setState({
+      order: order,
+      buttonTitle: this.getBtnTitle(order.type, order.status),
+    });
+  }
 
   _paymentRender = (pay, index) => {
     let paymentColor = this.state.payment[index] ? 'rgb(13,126,190)' : 'white';
@@ -59,13 +172,13 @@ export default class orderFlow extends Component {
     if (!hasPaymentArr.includes(index + 1)) {
       return null;
     }
+    let payInfo = this.state.payInfo.sort((x, y) => {
+      return x.payType - y.payType
+    });
     return (<View
                   style={ { marginTop: 40 } }
                   key={ index }>
               <View style={ { flexDirection: 'row', justifyContent: 'flex-start', alignItems: 'center' } }>
-                { this.state.isBuyOrder ? <MaterialCommunityIcons
-                                                                  name="check-circle-outline"
-                                                                  style={ { color: paymentColor, fontSize: 50, marginRight: 20 } } /> : null }
                 <Image
                        source={ payment[index] }
                        style={ { width: 50, height: 50, marginTop: 5 } }
@@ -73,30 +186,45 @@ export default class orderFlow extends Component {
                 <Text style={ { fontSize: 40, marginLeft: 20, color: 'rgb(255,255,255)' } }>
                   { paymentArr[index] }
                 </Text>
-                { index === 2 ? (
-                  null
-                  ) : (
-                  <MaterialCommunityIcons
-                                          name="qrcode"
-                                          style={ { color: 'white', fontSize: 50, marginLeft: 40 } } />
-                  ) }
+                <TouchableOpacity onPress={ () => {
+                                              if (index === 2) {
+                                                Clipboard.setString(payInfo[index].qrCode + '');
+                                                Alert.alert('提示', '已复制卡号到粘贴板');
+                                                return;
+                                              }
+                                              this.setState({
+                                                accountId: payInfo[index].accountId,
+                                                qrCodeVisible: true,
+                                                openQrCode: true
+                                              })
+                                            } }>
+                  { index === 2 ? (
+                    <MaterialCommunityIcons
+                                            name="content-paste"
+                                            style={ { color: 'white', fontSize: 50, marginLeft: 40 } } />
+                    ) : (
+                    <MaterialCommunityIcons
+                                            name="qrcode"
+                                            style={ { color: 'white', fontSize: 50, marginLeft: 40 } } />
+                    ) }
+                </TouchableOpacity>
               </View>
               <View style={ { flexDirection: 'row', justifyContent: 'flex-start', marginTop: 20 } }>
                 <Text style={ { color: 'white', fontSize: 40 } }>
-                  { '申佳' }
+                  { this.state.order && this.state.order.payUser && this.state.order.payUser.userName }
                 </Text>
                 <Text style={ { color: 'white', fontSize: 40, paddingLeft: 20 } }>
-                  { index === 2 ? '6501366920415013669204' : '15013669204' }
+                  { payInfo[index].qrCode }
                 </Text>
                 <Text style={ { color: 'white', fontSize: 40, paddingLeft: 20 } }>
-                  { index === 2 ? '农业银行' : '' }
+                  { index === 2 ? payInfo[index].Bank : '' }
                 </Text>
               </View>
             </View>);
   }
   render() {
     const paymentsTitle = ['微信支付', '支付宝', '银行卡'];
-    let user = this.state.order && this.state.order.user || {};
+    let user = this.state.order && this.state.order.payUser || {};
     let order = this.state.order || {};
     return (
       <Resolutions.FixFullView>
@@ -145,8 +273,11 @@ export default class orderFlow extends Component {
                      待支付,请于
                      <Text style={ { color: 'red' } }>
                        { this.state.times }
-                     </Text>内向申佳支付
-                     { this.state.dealNumber && Math.round(Number(this.state.dealNumber) * 0.8) }CNY
+                     </Text>内向
+                     { user.userName }支付
+                     <Text style={ { color: 'rgb(46,132,255)' } }>
+                       { this.state.dealNumber && Math.round(Number(this.state.dealNumber) * 0.8) }CNY
+                     </Text>
                    </Text>)
                 : <Text style={ { fontSize: 40, color: 'white' } }>
                     等待对方支付,
@@ -174,53 +305,70 @@ export default class orderFlow extends Component {
             </TouchableOpacity>
           </View>
           <View style={ { marginTop: 40 } }>
-            { !this.state.isBuyOrder
-              ? (<View style={ { borderRadius: 20, width: 1000, height: 150, borderWidth: 2, borderColor: 'rgb(255,255,255)', alignItems: 'center' } }>
-                   <Text style={ { color: 'rgb(255,255,255)', fontSize: 60, textAlign: 'center', height: 150, lineHeight: 150 } }>
-                     等待对方支付
-                   </Text>
-                 </View>)
-              : (<TouchableOpacity onPress={ this.payForOrder }>
-                   <ImageBackground
-                                    style={ { borderRadius: 80, width: 1000, height: 150 } }
-                                    source={ require('../../../images/Button_bg.jpg') }
-                                    resizeMode="contain">
-                     <Text style={ { color: 'white', fontSize: 60, textAlign: 'center', lineHeight: 140 } }>
-                       去支付
-                     </Text>
-                   </ImageBackground>
-                 </TouchableOpacity>) }
+            <TouchableOpacity
+                              onPress={ this.nextFlow }
+                              disabled={ !this.state.openQrCode }>
+              <ImageBackground
+                               style={ { borderRadius: 80, width: 1000, height: 150 } }
+                               source={ require('../../../images/Button_bg.jpg') }
+                               resizeMode="contain">
+                <Text style={ { color: 'white', fontSize: 60, textAlign: 'center', lineHeight: 140 } }>
+                  { this.state.buttonTitle }
+                </Text>
+              </ImageBackground>
+            </TouchableOpacity>
           </View>
           <Modal
                  animationType="slide"
-                 transparent={ false }
-                 presentationStyle="formSheet"
+                 transparent={ true }
                  visible={ this.state.modalVisible }>
-            <View style={ { marginTop: 22 } }>
-              <View>
-                <Text>
-                  常见收款风险
-                </Text>
-                <Text>
-                  请反复确认是否收到对方款项，不要相信任何催促放币的理由，确认收到款项后再放行数字资产，避免造成损失！
-                </Text>
-                <Text>
-                  买方下单后一直未付款，如何处理
-                </Text>
-                <Text>
-                  请反复确认是否收到对方款项，不要相信任何催促放币的理由，确认收到款项后再放行数字资产，避免造成损失！
-                </Text>
-                <TouchableOpacity onPress={ () => {
-                                              this.setState({
-                                                modalVisible: false
-                                              })
-                                            } }>
-                  <Text>
-                    Hide Modal
+            <TouchableOpacity
+                              style={ { width: "100%", height: "100%" } }
+                              onPress={ () => {
+                                          this.setState({
+                                            modalVisible: false
+                                          })
+                                        } }>
+              <View style={ { backgroundColor: "rgba(0,0,0,0.5)", width: "100%", height: "100%", alignItems: 'center', justifyContent: 'center' } }>
+                <View style={ { height: '60%', width: '80%', backgroundColor: 'white', borderRadius: 10, padding: 20 } }>
+                  <Text style={ { fontWeight: 'bold', marginBottom: 15, marginTop: 15 } }>
+                    常见收款风险
                   </Text>
-                </TouchableOpacity>
+                  <Text>
+                    请反复确认是否收到对方款项，不要相信任何催促放币的理由，确认收到款项后再放行数字资产，避免造成损失！
+                  </Text>
+                  <Text style={ { fontWeight: 'bold', marginBottom: 15, marginTop: 15 } }>
+                    买方下单后一直未付款，如何处理
+                  </Text>
+                  <Text>
+                    目前暂时不支持取消订单，请等待后续更新。未收到款项前请勿点击放行数字资产。
+                  </Text>
+                  <Text style={ { fontWeight: 'bold', marginBottom: 15, marginTop: 15 } }>
+                    未及时确认收款放行数字资产会造成什么影响
+                  </Text>
+                  <Text>
+                    收到款项后，若您未及时放行，这会影响您在平台的信誉；同时，未处理之前您的资产也会一直冻结在平台钱包。
+                  </Text>
+                </View>
               </View>
-            </View>
+            </TouchableOpacity>
+          </Modal>
+          <Modal
+                 animationType="slide"
+                 transparent={ true }
+                 visible={ this.state.qrCodeVisible }>
+            <TouchableOpacity
+                              style={ { backgroundColor: "rgba(0,0,0,0.5)", width: "100%", height: "100%", alignItems: 'center', justifyContent: 'center' } }
+                              onPress={ () => {
+                                          this.setState({
+                                            qrCodeVisible: false
+                                          })
+                                        } }>
+              <Image
+                     source={ { uri: global.Config.FetchURL + '/upload/' + this.state.accountId } }
+                     style={ { width: '80%', height: '60%' } }
+                     resizeMode="contain" />
+            </TouchableOpacity>
           </Modal>
         </ImageBackground>
       </Resolutions.FixFullView>

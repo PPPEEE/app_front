@@ -2,7 +2,7 @@
  * Created by mengqingdong on 2017/4/19.
  */
 import React, { Component } from 'react';
-import { StyleSheet, View, ImageBackground, Text, StatusBar, TouchableOpacity, TextInput, Alert, Image } from 'react-native';
+import { StyleSheet, View, ImageBackground, Text, StatusBar, TouchableOpacity, TextInput, ToastAndroid, Image } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import Button from 'react-native-button';
 import Resolutions from '../../../utils/resolutions';
@@ -63,19 +63,60 @@ export default class sellOrder extends Component {
     }
   }
 
-  payForOrder(){
-    this.props.navigation.push('orderFlow',{
-      order: this.state.order,
-      isBuyOrder: false,
-      dealNumber: this.state.amount
+  async payForOrder() {
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)^\S+[\s\S]{7,31}$/.test(this.state.payPwd)) {
+      ToastAndroid.show("请输入8-32位大小写字母加数字支付密码", ToastAndroid.SHORT);
+      return;
+    }
+    let res = await fetch(`${global.Config.FetchURL}/user/userPayPwdIsOk`, {
+      method: 'post',
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "token": token
+      },
+      body: JSON.stringify({
+        payPwd: this.state.payPwd
+      })
     });
+
+    res = await res.json();
+
+    if(!res.data){
+      ToastAndroid.show("支付密码错误", ToastAndroid.SHORT);
+      return;
+    }
+    
+    res = await fetch(`${global.Config.FetchURL}/dks/dkPurchase`, {
+      method: 'post',
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "token": global.token
+      },
+      body: JSON.stringify({
+        id: this.state.order.id,
+        dealNumber: this.state.amount
+      })
+    });
+    res = await res.json();
+    if (res.code === 200) {
+      this.props.navigation.push('orderFlow', {
+        id: res.data,
+        dealNumber: this.state.amount,
+        isNewOrder: true
+      });
+    } else {
+      ToastAndroid.show('买入处理异常', ToastAndroid.SHORT);
+    }
+
   }
 
   allIn() {
     let amount = Math.ceil(Number(this.state.PEBalance) / 500) * 500;
     let dealNumber = Number(this.state.order && this.state.order.dealNumber);
-    if(amount > dealNumber){
-       amount = dealNumber; 
+    if (amount > dealNumber) {
+      amount = dealNumber;
     }
     this.setState({
       amount: amount + ''
@@ -161,6 +202,24 @@ export default class sellOrder extends Component {
               <Text style={ styles.lightFont }>
                 { ' CNY' }
               </Text>
+            </View>
+          </View>
+          <View style={ styles.rowContainer }>
+            <Text style={ styles.label }>
+              支付密码
+            </Text>
+            <View style={ [styles.formArea] }>
+              <TextInput
+                         placeholder="请输入您的支付密码"
+                         style={ { fontSize: 40, padding: 0, margin: 0, flex: 1, color: 'white' } }
+                         secureTextEntry={ true }
+                         placeholderTextColor="rgb(219,219,219)"
+                         onChangeText={ (text) => {
+                                          this.setState({
+                                            payPwd: text
+                                          });
+                                        } }
+                         underlineColorAndroid="transparent" />
             </View>
           </View>
           <View style={ [styles.rowContainer, { borderBottomWidth: 0, justifyContent: 'space-between', opacity: this.state.current === 'buy' ? 0 : 1 }] }>

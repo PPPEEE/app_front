@@ -17,8 +17,39 @@ var ITEM_HEIGHT = 150;
 
 export default class allTrade extends Component {
 
+  async componentDidMount(){
+    let res = await fetch(`${global.Config.FetchURL}/dks/dkByType`, {
+        method: 'post',
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "token": token
+        },
+        body: JSON.stringify({
+          type: '2',
+          pageNo: 1,
+          pageSize: 10,
+          status: 0
+        })
+      })
+
+    res = res.json();
+    console.log(res);
+
+  }
+
   _flatList;
   //每一个列表渲染的方法
+  //底部显示文字
+  _footer = () => {
+    return <Text style={[styles.txt, { backgroundColor: 'black' }]}>暂无更多数据</Text>;
+  }
+  //每一行的线
+  _separator = () => {
+    return <View style={{ height: 1, backgroundColor: '#d6bfe4' }} />;
+  }
+  _keyExtractor = (item, index) => item.id;
+
   _renderItem = (item) => {
     var bgColor = item.index % 2 == 0 ? '#f6edfe' : '#ebe5f0';
     var orderType = item.item.type == '0' ? '买入: ' : '卖出: ';
@@ -51,16 +82,6 @@ export default class allTrade extends Component {
       </View>
     )
   }
-  //底部显示文字
-  _footer = () => {
-    return <Text style={[styles.txt, { backgroundColor: 'black' }]}>暂无更多数据</Text>;
-  }
-  //每一行的线
-  _separator = () => {
-    return <View style={{ height: 1, backgroundColor: '#d6bfe4' }} />;
-  }
-  _keyExtractor = (item, index) => item.id;
-
   render() {
     var data = [];
     for (var i = 0; i < 4; i++) {

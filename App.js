@@ -10,13 +10,14 @@ YellowBox.ignoreWarnings(['Warning: isMounted(...) is deprecated', 'Module RCTIm
 import welcomePage from './src/welcomePage'; //登陆主页
 import main from './src/main' //第一个Tab
 import Login from './src/component/loginScreen/login';
+import Register from './src/component/loginScreen/register';
+import ForgetPwd from './src/component/loginScreen/ForgetPwd';
 import PEdetails from './src/component/homeScreen/PEdetails';
 import PVdetails from './src/component/homeScreen/PVdetails';
 import trunIn from './src/component/homeScreen/trunIn';
 import trunOut from './src/component/homeScreen/trunOut';
 import myTeam from './src/component/userScreen/userMenu/myTeam';
 import modifyNick from './src/component/userScreen/userMenu/modifyNick';
-import Register from './src/component/loginScreen/register';
 import tradeScreen from './src/component/tradeScreen/tradeScreen';
 import modifyUserInfo from './src/component/userScreen/userMenu/modifyUserInfo';
 import modifyPwd from './src/component/userScreen/userMenu/modifyPwd';
@@ -285,6 +286,22 @@ export default App = createStackNavigator({
     screen: orderFlowScreen,
     navigationOptions: ({navigation}) => ({
       title: '订单跟踪',
+      headerTitleStyle: {
+        color: '#FFFFFF',
+        fontSize: 14
+      },
+      headerStyle: {
+        // backgroundColor: 'rgba(0,0,0,0)',
+        paddingTop: navHeight
+      },
+      headerTintColor: '#FFFFFF',
+      headerTransparent: true
+    }),
+  },
+  forgetPwd:{
+    screen: ForgetPwd,
+    navigationOptions: ({navigation}) => ({
+      title: '修改密码',
       headerTitleStyle: {
         color: '#FFFFFF',
         fontSize: 14

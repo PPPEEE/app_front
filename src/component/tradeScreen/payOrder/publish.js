@@ -2,7 +2,7 @@
  * Created by mengqingdong on 2017/4/19.
  */
 import React, { Component } from 'react';
-import { StyleSheet, View, ImageBackground, Text, StatusBar, TouchableOpacity, TextInput, Alert } from 'react-native';
+import { StyleSheet, View, ImageBackground, Text, StatusBar, TouchableOpacity, TextInput, ToastAndroid } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import Button from 'react-native-button';
 import Resolutions from '../../../utils/resolutions';
@@ -96,13 +96,41 @@ export default class publish extends Component {
     })
   }
 
-  publishDK() {
+  async publishDK() {
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)^\S+[\s\S]{7,31}$/.test(this.state.payPwd)) {
+      ToastAndroid.show("请输入8-32位大小写字母加数字支付密码", ToastAndroid.SHORT);
+      return;
+    }
+    if (Number(this.state.amount) % 500 > 0) {
+      ToastAndroid.show("交易数量只能为500的倍数", ToastAndroid.SHORT);
+      return;
+    }
     let payInfo = this.state.payment.map((value, index) => {
       return value && (index + 1);
     }).filter((value) => {
       return value;
     }).join(',');
-    fetch(`${global.Config.FetchURL}/dks/releaseDK`, {
+
+    let res = await fetch(`${global.Config.FetchURL}/user/userPayPwdIsOk`, {
+      method: 'post',
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+        "token": token
+      },
+      body: JSON.stringify({
+        payPwd: this.state.payPwd
+      })
+    });
+
+    res = await res.json();
+
+    if(!res.data){
+      ToastAndroid.show("支付密码错误", ToastAndroid.SHORT);
+      return;
+    }
+
+    res = await fetch(`${global.Config.FetchURL}/dks/releaseDK`, {
       method: 'post',
       headers: {
         "Accept": "application/json",
@@ -117,30 +145,19 @@ export default class publish extends Component {
         times: this.state.paymentTime.replace(/[^0-9]/g, ''),
         payInfo: payInfo
       })
-    }).then((res) => {
-      return res.json();
-    }).then((jsonData) => {
-      console.log(JSON.stringify({
-        dealNumber: this.state.amount,
-        type: (this.state.current === 'buy' ? 1 : 2),
-        status: 2,
-        minNumber: 0,
-        times: this.state.paymentTime.replace(/[^0-9]/g, ''),
-        payInfo: payInfo
-      }));
-      console.log(jsonData);
-      if(jsonData.code === 200){
-        Alert.alert('提示', `发布PE${this.state.current === 'buy'?'买单':'卖单'}成功!`);
-        if(this.state.current !== 'buy'){
-           this.setState({
-             PEBalance: Number(this.state.PEBalance) - Number(this.state.amount)+''
-           })
-        }
-      }else{
-        Alert.alert('警告', jsonData.message);
-      }
-    }).catch((error) => {
     });
+    res = await res.json();
+
+    if (res.code === 200) {
+      ToastAndroid.show(`发布PE${this.state.current === 'buy'?'买单':'卖单'}成功!`, ToastAndroid.SHORT);
+      if (this.state.current !== 'buy') {
+        this.setState({
+          PEBalance: Number(this.state.PEBalance) - Number(this.state.amount) + ''
+        })
+      }
+    } else {
+      ToastAndroid.show(res.message, ToastAndroid.SHORT);
+    }
   }
 
   allSale() {
@@ -240,7 +257,7 @@ export default class publish extends Component {
             </TouchableOpacity>
             <View style={ styles.underline }></View>
           </View>
-          <View style={ styles.rowContainer }>
+          <View style={ [styles.rowContainer, { paddingTop: 20 }] }>
             <Text style={ styles.label }>
               交易数量
             </Text>
@@ -297,6 +314,24 @@ export default class publish extends Component {
                                       style={ { color: 'white', fontSize: 60 } } />
             </View>
           </View>
+          { this.state.current === 'buy' ? null : (<View style={ styles.rowContainer }>
+                                                     <Text style={ styles.label }>
+                                                       支付密码
+                                                     </Text>
+                                                     <View style={ [styles.formArea] }>
+                                                       <TextInput
+                                                                  placeholder="请输入您的支付密码"
+                                                                  style={ { fontSize: 40, padding: 0, margin: 0, flex: 1, color:'white' } }
+                                                                  secureTextEntry={true}
+                                                                  placeholderTextColor="rgb(219,219,219)"
+                                                                  onChangeText={ (text) => {
+                                                                                   this.setState({
+                                                                                     payPwd: text
+                                                                                   });
+                                                                                 } }
+                                                                  underlineColorAndroid="transparent" />
+                                                     </View>
+                                                   </View>) }
           <View style={ [styles.rowContainer, { borderBottomWidth: 0, justifyContent: 'space-between', opacity: this.state.current === 'buy' ? 0 : 1 }] }>
             <Text>
               <Text style={ { fontSize: 40, color: 'white' } }>
@@ -319,8 +354,10 @@ export default class publish extends Component {
           </View>
           <View>
             <TouchableOpacity
-                              disabled={ (!this.state.payment[0] && !this.state.payment[1] && !this.state.payment[2]) || !this.state.amount || Number(this.state.amount) % 500 > 0 }
-                              onPress={ this.publishDK }>
+                              disabled={ (!this.state.payment[0] && !this.state.payment[1] && !this.state.payment[2]) || !this.state.amount }
+                              onPress={ () => {
+                                          this.publishDK();
+                                        } }>
               <ImageBackground
                                style={ { borderRadius: 80, width: 1000, height: 150 } }
                                source={ require('../../../images/Button_bg.jpg') }
