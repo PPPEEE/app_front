@@ -263,6 +263,9 @@ class InRecord extends Component {
       case 5:
         orderTypeItem = '释放';
         break;
+      case 11:
+        orderTypeItem = '转账';
+        break;
       case 12:
         orderTypeItem = '买入';
         break;

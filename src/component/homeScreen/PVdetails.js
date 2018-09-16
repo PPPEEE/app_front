@@ -102,6 +102,9 @@ class InRecord extends Component {
       case 10:
         orderTypeItem = '兑换';
         break;
+      case 11:
+        orderTypeItem = '转账';
+        break;
     }
     return (
       <View style={{ flex: 1, height: 90 }}>

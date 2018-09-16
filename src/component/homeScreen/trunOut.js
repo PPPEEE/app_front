@@ -9,12 +9,9 @@ import {
   Text,
   TextInput,
   ToastAndroid,
-  ToastAndroid,
   TouchableOpacity,
 } from 'react-native';
-import Sicon from 'react-native-vector-icons/SimpleLineIcons';
 import Button from 'react-native-button';
-import { createMaterialTopTabNavigator, SafeAreaView } from 'react-navigation';
 
 export default class trunIn extends Component {
   constructor() {
@@ -37,11 +34,10 @@ export default class trunIn extends Component {
       })
     })
     this.state.pe = this.props.navigation.getParam('pe', '******');
-    // this._fetchImageData()
   }
   _doFetch = () => {
     fetch(`${global.Config.FetchURL}/transfer/transfer`, {
-      method: 'get',
+      method: 'post',
       headers: {
         "Accept": global.Config.Accept,
         "Content-Type": global.Config.ContentType,
@@ -55,24 +51,32 @@ export default class trunIn extends Component {
     }).then((res) => {
       return res.json();
     }).then((jsonData) => {
-      if(jsonData.code === 0){
+      if(jsonData.code === 200){
         ToastAndroid.show("转账成功", ToastAndroid.SHORT);
+      }else{
+        ToastAndroid.show(jsonData.message, ToastAndroid.SHORT);
       }
     });
   }
   _fetchTransfer = () => {
-    if(this.state.address.length>0 && this.state.amount.length > 0 && this.state.verificode.length > 0){
-      this._doFetch();
+    if(this.state.address.length <= 0){
+      ToastAndroid.show("请填写转账地址", ToastAndroid.SHORT);
+    }else if(this.state.amount.length <= 0){
+      ToastAndroid.show("请填写转账数量", ToastAndroid.SHORT);
+      return;
+    }else if(this.state.verificode.length <= 0){
+      ToastAndroid.show("请填写手机验证码", ToastAndroid.SHORT);
+      return;
     }else{
-      ToastAndroid.show("请填写完整", ToastAndroid.SHORT);
+      this._doFetch();
     }
   }
   _sendVerifiCode = () => {
-    fetch('http://120.78.205.55:8081/user/sendCode', {
+    fetch(`${global.Config.FetchURL}/user/sendCode`, {
       method: "POST",
       headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json"
+        "Accept": global.Config.Accept,
+        "Content-Type": global.Config.ContentType
       },
       body: JSON.stringify({
         'areaCode': this.state.areaCode,
@@ -114,8 +118,8 @@ export default class trunIn extends Component {
                 <Text style={styles.txt}>转账数量</Text>
                 <TextInput
                   style={styles.txtInput}
-                  onChangeText={(address) => this.setState({address})}
-                  value={this.state.address}
+                  onChangeText={(amount) => this.setState({amount})}
+                  value={this.state.amount}
                   placeholderTextColor="#969696"
                   underlineColorAndroid="transparent"
                   placeholder="请填写您要转账的数量"
@@ -127,8 +131,8 @@ export default class trunIn extends Component {
                 <Text style={styles.txt}>收款账户</Text>
                 <TextInput
                   style={styles.txtInput}
-                  onChangeText={(amount) => this.setState({amount})}
-                  value={this.state.amount}
+                  onChangeText={(address) => this.setState({address})}
+                  value={this.state.address}
                   placeholderTextColor="#969696"
                   underlineColorAndroid="transparent"
                   placeholder="请填写钱包地址"
