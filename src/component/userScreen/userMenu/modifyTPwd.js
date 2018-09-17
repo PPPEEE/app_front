@@ -128,7 +128,7 @@ export default class modifyTPwd extends Component {
       }
     });
   }
-  _saveTPwdReq(url, opt){
+  _saveTPwdReq = (url, opt) => {
     fetch(url, opt)
     .then((response) => response.json())
     .then(responseData => {

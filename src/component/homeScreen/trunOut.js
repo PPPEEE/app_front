@@ -47,7 +47,7 @@ export default class trunOut extends Component {
       body: JSON.stringify({
         'address': this.state.address,
         'amount': this.state.amount,
-        'verificode': this.state.verificode,
+        'verifiCode': this.state.verificode,
         'payPwd': this.state.payPwd
       })
     }).then((res) => {
@@ -55,6 +55,7 @@ export default class trunOut extends Component {
     }).then((jsonData) => {
       if(jsonData.code === 200){
         ToastAndroid.show("转账成功", ToastAndroid.SHORT);
+        this.props.navigation.popToTop();
       }else{
         ToastAndroid.show(jsonData.message, ToastAndroid.SHORT);
       }
