@@ -41,9 +41,17 @@ export default class userScreen extends Component {
     storage.load({
       key: 'userBasicInfo'
     }).then(ret => {
+      let tempLevel;
+      if(ret.level === 0){
+        tempLevel = '临时会员';
+      }else if(ret.level === 1){
+        tempLevel = '普通会有';
+      }else if(ret.level === 2){
+        tempLevel = 'VIP会员';
+      }
       this.setState({
         UID: ret.UID,
-        level: ret.level
+        level: tempLevel
       })
     })
   }
