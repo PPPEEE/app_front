@@ -14,8 +14,8 @@ import { RNCamera } from 'react-native-camera';
 
 export default class scanCode extends Component {
 
-  getQR(code){
-    alert(JSON.stringify(code));
+  getQR = (code) => {
+    this.props.navigation.navigate('trunOut', {qrcode: code.data});
   }
   render() {
     return (
@@ -33,12 +33,6 @@ export default class scanCode extends Component {
             permissionDialogMessage={'We need your permission to use your camera phone'}
         />
         <View style={{flex: 0, flexDirection: 'row', justifyContent: 'center',}}>
-        <TouchableOpacity
-            onPress={this.takePicture.bind(this)}
-            style = {styles.capture}
-        >
-            <Text style={{fontSize: 14}}> SNAP </Text>
-        </TouchableOpacity>
         </View>
       </View>
     );

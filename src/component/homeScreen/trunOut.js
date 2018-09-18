@@ -34,7 +34,10 @@ export default class trunOut extends Component {
         phone: ret.phone,
       })
     })
-    this.state.pe = this.props.navigation.getParam('pe', '******');
+    this.setState({
+      pe: global.userPE||'***',
+      address: this.props.navigation.getParam('qrcode', '')
+    })
   }
   _doFetch = () => {
     fetch(`${global.Config.FetchURL}/transfer/transfer`, {

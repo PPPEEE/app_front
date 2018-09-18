@@ -105,7 +105,8 @@ export default class homeScreen extends Component {
         obj.pv = res.data[o].balance;
       }
     }
-    this.setState(obj)
+    this.setState(obj);
+    global.userPE = obj.pe;
     let userInfo = await storage.load({
       key: 'userDetailInfo'
     });
