@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Picker, KeyboardAvoidingView, StatusBar } from 'react-native';
+import { Platform, StyleSheet, Text, View, TextInput, TouchableOpacity, ToastAndroid, Picker, KeyboardAvoidingView, StatusBar } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Resolutions from '../../utils/resolutions';
 var token;
@@ -66,7 +66,7 @@ export default class Register extends Component {
       tips += !pwdInvalid ? '' : '密码应为8-32位非空字符。';
       tips += this.state.password === this.state.passwordConfirm ? '' : '两次密码输入需一致。';
       console.log(nameInvalid,pwdInvalid,this.state.password !== this.state.passwordConfirm);
-      Alert.alert('提示', tips);
+      ToastAndroid.show(tips, ToastAndroid.SHORT);
       return;
     }
     fetch('http://120.78.205.55:8081/user/register', {
@@ -88,10 +88,10 @@ export default class Register extends Component {
       return res.json();
     }).then((jsonData) => {
       if (jsonData.code === '200') {
-        Alert.alert('提示', '注册成功');
+        ToastAndroid.show('注册成功', ToastAndroid.SHORT);
         this.props.navigation.replace('login');
       } else {
-        Alert.alert('提示', jsonData.message);
+        ToastAndroid.show(jsonData.message, ToastAndroid.SHORT);
       }
     }).catch(error => {
 

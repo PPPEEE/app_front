@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Platform, StyleSheet, Text, View, TextInput, TouchableOpacity, Alert, Picker, KeyboardAvoidingView, StatusBar } from 'react-native';
+import { Platform, StyleSheet, Text, View, TextInput, TouchableOpacity, ToastAndroid, Picker, KeyboardAvoidingView, StatusBar } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import Resolutions from '../../utils/resolutions';
 
@@ -59,7 +59,7 @@ export default class ForgetPwd extends Component {
       let tips = '';
       tips += !nameInvalid ? '' : '用户名应为8-32位非空字符。';
       tips += !pwdInvalid ? '' : '密码应为8-32位非空字符。';
-      Alert.alert('提示', tips);
+      ToastAndroid.show(tips, ToastAndroid.SHORT);
       return;
     }
     fetch('http://120.78.205.55:8081/user/getPwdUser', {
@@ -79,10 +79,10 @@ export default class ForgetPwd extends Component {
     }).then((jsonData) => {
       console.log(jsonData);
       if (jsonData.code === 200) {
-        Alert.alert('提示', '修改成功');
+        ToastAndroid.show('修改成功', ToastAndroid.SHORT);
         this.props.navigation.replace('login');
       } else {
-        Alert.alert('提示', jsonData.message);
+        ToastAndroid.show(jsonData.message, ToastAndroid.SHORT);
       }
     }).catch(error => {
       console.log(error);

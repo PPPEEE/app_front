@@ -2,7 +2,7 @@
  * Created by mengqingdong on 2017/4/19.
  */
 import React, { Component } from 'react';
-import { StyleSheet, View, Text, ScrollView, FlatList, TouchableOpacity, Image, Alert } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, FlatList, TouchableOpacity, Image, ToastAndroid } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import Button from 'react-native-button';
 import Resolutions from '../../../utils/resolutions';
@@ -75,7 +75,7 @@ export default class entrust extends Component {
       showLoading: false
     })
     if (res.code === 200) {
-      Alert.alert('提示', '撤销成功');
+      ToastAndroid.show("撤销成功", ToastAndroid.SHORT);
     }
   }
 

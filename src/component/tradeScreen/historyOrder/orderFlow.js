@@ -2,7 +2,7 @@
  * Created by mengqingdong on 2017/4/19.
  */
 import React, { Component } from 'react';
-import { StyleSheet, View, ImageBackground, Text, StatusBar, TouchableOpacity, TextInput, Alert, Image, Modal, Clipboard } from 'react-native';
+import { StyleSheet, View, ImageBackground, Text, StatusBar, TouchableOpacity, TextInput, ToastAndroid, Image, Modal, Clipboard } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import Button from 'react-native-button';
 import Resolutions from '../../../utils/resolutions';
@@ -133,7 +133,7 @@ export default class orderFlow extends Component {
       });
       res = await res.json();
       if (res.code === 200) {
-        Alert.alert('提示', '确认付款成功,请等待对方确认收款');
+        ToastAndroid.show('确认付款成功,请等待对方确认收款', ToastAndroid.SHORT);
         this.refreshFlow(this.state.order.id);
       }
     }
@@ -152,7 +152,7 @@ export default class orderFlow extends Component {
       });
       res = await res.json();
       if (res.code === 200) {
-        Alert.alert('提示', '确认收款成功,所售资产将放行给对方');
+        ToastAndroid.show('确认收款成功,所售资产将放行给对方', ToastAndroid.SHORT);
         this.refreshFlow(this.state.order.id);
       }
     }
@@ -193,7 +193,7 @@ export default class orderFlow extends Component {
                 <TouchableOpacity onPress={ () => {
                                               if (index === 2) {
                                                 Clipboard.setString(payInfo.qrCode + '');
-                                                Alert.alert('提示', '已复制银行卡号到粘贴板');
+                                                ToastAndroid.show('已复制银行卡号到粘贴板', ToastAndroid.SHORT);
                                                 this.setState({
                                                   openQrCode: true
                                                 });

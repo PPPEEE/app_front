@@ -98,7 +98,7 @@ async function fetchUser() {
     await fetchUserInfo(url, opts);
     return;
   } catch ( err ) {
-    alert(JSON.stringify(err));
+    ToastAndroid.show(JSON.stringify(err), ToastAndroid.SHORT);
     console.warn(err.message);
     // 如果没有找到数据且没有sync方法，
     // 或者有其他异常，则在catch中返回

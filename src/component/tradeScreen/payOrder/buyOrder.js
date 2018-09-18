@@ -2,7 +2,7 @@
  * Created by mengqingdong on 2017/4/19.
  */
 import React, { Component } from 'react';
-import { StyleSheet, View, ImageBackground, Text, StatusBar, TouchableOpacity, TextInput, Alert, Image } from 'react-native';
+import { StyleSheet, View, ImageBackground, Text, StatusBar, TouchableOpacity, TextInput, ToastAndroid, Image } from 'react-native';
 import { SafeAreaView } from 'react-navigation';
 import Button from 'react-native-button';
 import Resolutions from '../../../utils/resolutions';
@@ -91,7 +91,7 @@ export default class buyOrder extends Component {
         isNewOrder: true
       });
     } else {
-      Alert.alert('提示', '买入处理异常');
+      ToastAndroid.show('买入处理异常', ToastAndroid.SHORT);
     }
 
   }
