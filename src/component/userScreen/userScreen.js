@@ -2,15 +2,7 @@
  * 
  */
 import React, { Component } from 'react';
-import {
-  StyleSheet,
-  View,
-  ImageBackground,
-  Text,
-  Image,
-  ScrollView,
-  TouchableOpacity,
-} from 'react-native';
+import { StyleSheet, View, ImageBackground, Text, Image, ScrollView, TouchableOpacity, StatusBar, Platform } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Feather';
 import EIcons from 'react-native-vector-icons/Entypo';
 import MIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -65,131 +57,218 @@ export default class userScreen extends Component {
   }
   render() {
     return (
-      <SafeAreaView style={styles.container}>
-        <ImageBackground source={require('../../images/user_bg.jpg')} style={{ flex: 1 }} >
-          <View style={styles.top}>
-            <TouchableOpacity style={styles.topInfo}
-            onPress={() => this.onPress('modifyUserInfo')}>
-              <Image
-                style={{ width: 50, height: 50, borderRadius: 30, margin: '15%' }}
-                source={require('../../images/nohead.jpg')}
-              />
-            </TouchableOpacity>
-            <View style={styles.topInfo}>
-              <Text style={styles.font}>{'UID: ' + this.state.UID}</Text>
-              <Text style={styles.font}>{'会员等级: ' + this.state.level}</Text>
-            </View>
-            <TouchableOpacity style={styles.topInfo}
-              onPress={() => this.logout()}>
-              <Ionicons name={'log-out'} style={styles.font}>退出登录</Ionicons>
-            </TouchableOpacity>
+      <SafeAreaView style={ styles.container }>
+        <ImageBackground
+                         source={ require('../../images/top_nav.jpg') }
+                         style={ styles.top }>
+          <TouchableOpacity
+                            style={ styles.topInfo }
+                            onPress={ () => this.onPress('modifyUserInfo') }>
+            <Image
+                   style={ { width: 50, height: 50, borderRadius: 30, margin: '15%' } }
+                   source={ require('../../images/nohead.jpg') } />
+          </TouchableOpacity>
+          <View style={ styles.topInfo }>
+            <Text style={ [styles.font, {color:'white'}]}>
+              { 'UID: ' + this.state.UID }
+            </Text>
+            <Text style={ styles.font }>
+              { '会员等级: ' + this.state.level }
+            </Text>
           </View>
-          <ScrollView style={styles.middle}>
-            <View style={styles.listone}>
-              <TouchableOpacity style={styles.one}
-                onPress={() => this.onPress('modifyNick')}>
-                <View style={{ flex: 1 }}>
-                  <Ionicons name={'user'} style={styles.fontIcon}></Ionicons>
-                  <Text style={styles.font}>昵称</Text>
+          <TouchableOpacity
+                            style={ styles.topInfo }
+                            onPress={ () => this.logout() }>
+            <Ionicons
+                      name={ 'log-out' }
+                      style={ styles.font }>
+              退出登录
+            </Ionicons>
+          </TouchableOpacity>
+        </ImageBackground>
+        <ImageBackground source={ require('../../images/index_bg.jpg') } style={{flex: 1}}>
+          <ScrollView style={ styles.middle }>
+            <View style={ styles.listone }>
+              <TouchableOpacity
+                                style={ styles.one }
+                                onPress={ () => this.onPress('modifyNick') }>
+                <View style={ { flex: 1 } }>
+                  <Ionicons
+                            name={ 'user' }
+                            style={ styles.fontIcon }></Ionicons>
+                  <Text style={ styles.font }>
+                    昵称
+                  </Text>
                 </View>
               </TouchableOpacity>
-              <View style={styles.one}>
-                <FIcons name={'language'} style={styles.fontIcon}></FIcons>
-                <Text style={styles.font}>多语言</Text>
+              <View style={ styles.one }>
+                <FIcons
+                        name={ 'language' }
+                        style={ styles.fontIcon }></FIcons>
+                <Text style={ styles.font }>
+                  多语言
+                </Text>
               </View>
-              <TouchableOpacity style={styles.one}
-                onPress={() => this.onPress('myTeam')}>
-                <View style={{ flex: 1 }}>
-                  <FIcons name={'group'} style={styles.fontIcon}></FIcons>
-                  <Text style={styles.font}>我的团队</Text>
+              <TouchableOpacity
+                                style={ styles.one }
+                                onPress={ () => this.onPress('myTeam') }>
+                <View style={ { flex: 1 } }>
+                  <FIcons
+                          name={ 'group' }
+                          style={ styles.fontIcon }></FIcons>
+                  <Text style={ styles.font }>
+                    我的团队
+                  </Text>
                 </View>
               </TouchableOpacity>
             </View>
-            <View style={styles.listone}>
-              <TouchableOpacity style={styles.one}
-                onPress={() => this.onPress('ReceiptCode')}>
-                <View style={{ flex: 1 }}>
-                <FIcons name={'id-card-o'} style={styles.fontIcon}></FIcons>
-                <Text style={styles.font}>我的收款账户</Text>
+            <View style={ styles.listone }>
+              <TouchableOpacity
+                                style={ styles.one }
+                                onPress={ () => this.onPress('ReceiptCode') }>
+                <View style={ { flex: 1 } }>
+                  <FIcons
+                          name={ 'id-card-o' }
+                          style={ styles.fontIcon }></FIcons>
+                  <Text style={ styles.font }>
+                    我的收款账户
+                  </Text>
                 </View>
               </TouchableOpacity>
-              <View style={styles.one}>
-                <FIcons name={'bitcoin'} style={styles.fontIcon}></FIcons>
-                <Text style={styles.font}>我的资产</Text>
+              <View style={ styles.one }>
+                <FIcons
+                        name={ 'bitcoin' }
+                        style={ styles.fontIcon }></FIcons>
+                <Text style={ styles.font }>
+                  我的资产
+                </Text>
               </View>
-              <View style={styles.one}>
-                <Ionicons name={'log-in'} style={styles.fontIcon}></Ionicons>
-                <Text style={styles.font}>转入与提现</Text>
+              <View style={ styles.one }>
+                <Ionicons
+                          name={ 'log-in' }
+                          style={ styles.fontIcon }></Ionicons>
+                <Text style={ styles.font }>
+                  转入与提现
+                </Text>
               </View>
             </View>
-            <View style={styles.listone}>
-              <TouchableOpacity style={styles.one}
-                onPress={() => this.onPress('modifyPwd')}>
-                <View style={{ flex: 1 }}>
-                  <Ionicons name={'lock'} style={styles.fontIcon}></Ionicons>
-                  <Text style={styles.font}>登录密码</Text>
+            <View style={ styles.listone }>
+              <TouchableOpacity
+                                style={ styles.one }
+                                onPress={ () => this.onPress('modifyPwd') }>
+                <View style={ { flex: 1 } }>
+                  <Ionicons
+                            name={ 'lock' }
+                            style={ styles.fontIcon }></Ionicons>
+                  <Text style={ styles.font }>
+                    登录密码
+                  </Text>
                 </View>
               </TouchableOpacity>
-              <TouchableOpacity style={styles.one}
-                onPress={() => this.onPress('modifyTPwd')}>
-                <View style={{ flex: 1 }}>
-                  <Ionicons name={'dollar-sign'} style={styles.fontIcon}></Ionicons>
-                  <Text style={styles.font}>支付密码</Text>
+              <TouchableOpacity
+                                style={ styles.one }
+                                onPress={ () => this.onPress('modifyTPwd') }>
+                <View style={ { flex: 1 } }>
+                  <Ionicons
+                            name={ 'dollar-sign' }
+                            style={ styles.fontIcon }></Ionicons>
+                  <Text style={ styles.font }>
+                    支付密码
+                  </Text>
                 </View>
               </TouchableOpacity>
-              <View style={styles.one}>
-                <MIcons name={'security'} style={styles.fontIcon}></MIcons>
-                <Text style={styles.font}>安全设置</Text>
+              <View style={ styles.one }>
+                <MIcons
+                        name={ 'security' }
+                        style={ styles.fontIcon }></MIcons>
+                <Text style={ styles.font }>
+                  安全设置
+                </Text>
               </View>
             </View>
-            <View style={styles.listone}>
-              <View style={styles.one}>
-                <Ionicons name={'rss'} style={styles.fontIcon}></Ionicons>
-                <Text style={styles.font}>公告</Text>
+            <View style={ styles.listone }>
+              <View style={ styles.one }>
+                <Ionicons
+                          name={ 'rss' }
+                          style={ styles.fontIcon }></Ionicons>
+                <Text style={ styles.font }>
+                  公告
+                </Text>
               </View>
-              <View style={styles.one}>
-                <Ionicons name={'bell'} style={styles.fontIcon}></Ionicons>
-                <Text style={styles.font}>个人消息</Text>
+              <View style={ styles.one }>
+                <Ionicons
+                          name={ 'bell' }
+                          style={ styles.fontIcon }></Ionicons>
+                <Text style={ styles.font }>
+                  个人消息
+                </Text>
               </View>
-              <View style={styles.one}>
-                <EIcons name={'shop'} style={styles.fontIcon}></EIcons>
-                <Text style={styles.font}>我的店铺</Text>
+              <View style={ styles.one }>
+                <EIcons
+                        name={ 'shop' }
+                        style={ styles.fontIcon }></EIcons>
+                <Text style={ styles.font }>
+                  我的店铺
+                </Text>
               </View>
             </View>
-            <View style={styles.listone}>
-              <TouchableOpacity style={styles.one}
-                onPress={() => this.onPress('tradeScreen')}>
-                <View style={{ flex: 1 }}>
-                  <MIcons name={'file-document-box-outline'} style={styles.fontIcon}></MIcons>
-                  <Text style={styles.font}>我的订单</Text>
+            <View style={ styles.listone }>
+              <TouchableOpacity
+                                style={ styles.one }
+                                onPress={ () => this.onPress('tradeScreen') }>
+                <View style={ { flex: 1 } }>
+                  <MIcons
+                          name={ 'file-document-box-outline' }
+                          style={ styles.fontIcon }></MIcons>
+                  <Text style={ styles.font }>
+                    我的订单
+                  </Text>
                 </View>
               </TouchableOpacity>
-              <View style={styles.one}>
-                <EIcons name={'location'} style={styles.fontIcon}></EIcons>
-                <Text style={styles.font}>地址管理</Text>
+              <View style={ styles.one }>
+                <EIcons
+                        name={ 'location' }
+                        style={ styles.fontIcon }></EIcons>
+                <Text style={ styles.font }>
+                  地址管理
+                </Text>
               </View>
-              <View style={styles.one}>
-                <EIcons name={'old-phone'} style={styles.fontIcon}></EIcons>
-                <Text style={styles.font}>投诉建议</Text>
-              </View>
-            </View>
-            <View style={styles.listone}>
-              <View style={styles.one}>
-                <EIcons name={'share'} style={styles.fontIcon}></EIcons>
-                <Text style={styles.font}>分享</Text>
-              </View>
-              <View style={styles.one}>
-                <FIcons name={'exclamation-circle'} style={styles.fontIcon}></FIcons>
-                <Text style={styles.font}>关于</Text>
+              <View style={ styles.one }>
+                <EIcons
+                        name={ 'old-phone' }
+                        style={ styles.fontIcon }></EIcons>
+                <Text style={ styles.font }>
+                  投诉建议
+                </Text>
               </View>
             </View>
-            <View style={styles.listone}>
-              <ImageBackground source={require('../../images/Button_bg.jpg')} style={styles.buttonstyle} >
+            <View style={ styles.listone }>
+              <View style={ styles.one }>
+                <EIcons
+                        name={ 'share' }
+                        style={ styles.fontIcon }></EIcons>
+                <Text style={ styles.font }>
+                  分享
+                </Text>
+              </View>
+              <View style={ styles.one }>
+                <FIcons
+                        name={ 'exclamation-circle' }
+                        style={ styles.fontIcon }></FIcons>
+                <Text style={ styles.font }>
+                  关于
+                </Text>
+              </View>
+            </View>
+            <View style={ styles.listone }>
+              <ImageBackground
+                               source={ require('../../images/Button_bg.jpg') }
+                               style={ styles.buttonstyle }>
                 <Button
-                  containerStyle={{ padding: 10, height: 45, overflow: 'hidden', borderRadius: 4 }}
-                  disabledContainerStyle={{ backgroundColor: '#441272' }}
-                  onPress={() => this.logout()}
-                  style={{ fontSize: 20, color: '#FFFFFF' }}>
+                        containerStyle={ { padding: 10, height: 45, overflow: 'hidden', borderRadius: 4 } }
+                        disabledContainerStyle={ { backgroundColor: '#441272' } }
+                        onPress={ () => this.logout() }
+                        style={ { fontSize: 18, color: '#FFFFFF' } }>
                   退出登录
                 </Button>
               </ImageBackground>
@@ -197,11 +276,11 @@ export default class userScreen extends Component {
           </ScrollView>
         </ImageBackground>
       </SafeAreaView>
-    );
+      );
   }
 }
 
-
+var navHeight = Platform.OS === 'android' ? StatusBar.currentHeight : 64;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -213,7 +292,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     height: 20,
-    backgroundColor: '#441272',
+    paddingTop: navHeight,
   },
   topInfo: {
     justifyContent: 'center',
@@ -245,9 +324,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold',
     textAlign: 'center',
-    color: '#FFFFFF',
+    color: 'rgb(152,152,152)',
+    marginTop: 6
   },
   buttonstyle: {
-    flex: 1, height: 45, width: '90%', margin: '5%'
+    flex: 1,
+    height: 45,
+    width: '90%',
+    margin: '5%'
   }
 });

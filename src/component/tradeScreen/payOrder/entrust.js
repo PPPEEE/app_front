@@ -21,7 +21,7 @@ export default class entrust extends Component {
       dataList: []
     };
   }
-  componentWillMount() {
+  componentDidMount() {
     storage.load({
       key: 'loginState'
     }).then((cache) => {
@@ -31,7 +31,7 @@ export default class entrust extends Component {
         headers: {
           "Accept": "application/json",
           "Content-Type": "application/json",
-          "token": token
+          "token": global.token
         },
         body: JSON.stringify({
           type: "0",
@@ -80,7 +80,7 @@ export default class entrust extends Component {
   }
 
   async getMoreList() {
-    if(this.state.pageTotal <= this.state.pageNo){
+    if (this.state.pageTotal <= this.state.pageNo) {
       return;
     }
     let res = await fetch(`${global.Config.FetchURL}/dks/dkByType`, {
@@ -92,7 +92,7 @@ export default class entrust extends Component {
       },
       body: JSON.stringify({
         type: "0",
-        pageNo: this.state.pageNo+1,
+        pageNo: this.state.pageNo + 1,
         pageSize: 10,
         status: "2"
       })
@@ -102,12 +102,12 @@ export default class entrust extends Component {
     dataList = dataList.concat(res.data.result);
     this.setState({
       dataList: dataList,
-      pageNo: this.state.pageNo+1
+      pageNo: this.state.pageNo + 1
     });
   }
 
   renderItem = (item, index) => {
-    var userPayInfo = item.item.user.userPayInfo;
+    var userPayInfo = item.item.user.userInfo;
     return (
       <ScrollView
                   style={ styles.listItem }
@@ -162,15 +162,25 @@ export default class entrust extends Component {
               </View>
             </View>
             <View style={ { alignItems: 'flex-end' } }>
-              <Text style={ [styles.primaryFont, { marginRight: 20 }] }>
-                { `交易: ` + item.item.dealNumber }
-              </Text>
-              <Text style={ [styles.lightFont, { margin: 20 }] }>
-                实付:
-                <Text style={ [styles.primaryFont, { fontSize: 36 }] }>
-                  { ' ' + item.item.money + ' ' }
+              <Text style={ [styles.lightFont, { marginRight: 0 }] }>
+                { "交易总量: " }
+                <Text style={ styles.primaryFont }>
+                  { ' '+Math.round(item.item.money * 1.25) + ' PE' }
                 </Text>
-                CNY
+              </Text>
+              <Text style={ [styles.lightFont, { marginTop: 20 }] }>
+                { `总金额: ` }
+                <Text style={ [styles.primaryFont, { fontSize: 36 }] }>
+                  { ' ' + item.item.money + ' CNY' }
+                </Text>
+              </Text>
+              <Text style={ [styles.lightFont, { marginTop: 20 }] }>
+                <Text style={ {} }>
+                  { `${item.item.type === 1 ? '已付' : '已收'}: ` }
+                </Text>
+                <Text style={ [styles.primaryFont, { fontSize: 36, color: item.item.type === 1 ? 'red' : 'green' }] }>
+                  { ' ' + Math.round(item.item.money - item.item.dealNumber * 0.8) + ' CNY' }
+                </Text>
               </Text>
             </View>
           </View>

@@ -54,7 +54,7 @@ export default class publish extends Component {
     }, 0);
   }
 
-  componentWillMount() {
+  componentDidMount() {
     storage.load({
       key: 'loginState'
     }).then((cache) => {
@@ -97,7 +97,7 @@ export default class publish extends Component {
   }
 
   async publishDK() {
-    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)^\S+[\s\S]{7,31}$/.test(this.state.payPwd)) {
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)^\S+[\s\S]{7,31}$/.test(this.state.payPwd) && this.state.current !== 'buy') {
       ToastAndroid.show("请输入8-32位大小写字母加数字支付密码", ToastAndroid.SHORT);
       return;
     }
@@ -110,24 +110,26 @@ export default class publish extends Component {
     }).filter((value) => {
       return value;
     }).join(',');
+    let res;
+    if (this.state.current !== 'buy') {
+      res = await fetch(`${global.Config.FetchURL}/user/userPayPwdIsOk`, {
+        method: 'post',
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "token": token
+        },
+        body: JSON.stringify({
+          payPwd: this.state.payPwd
+        })
+      });
 
-    let res = await fetch(`${global.Config.FetchURL}/user/userPayPwdIsOk`, {
-      method: 'post',
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-        "token": token
-      },
-      body: JSON.stringify({
-        payPwd: this.state.payPwd
-      })
-    });
+      res = await res.json();
 
-    res = await res.json();
-
-    if(!res.data){
-      ToastAndroid.show("支付密码错误", ToastAndroid.SHORT);
-      return;
+      if (!res.data) {
+        ToastAndroid.show("支付密码错误", ToastAndroid.SHORT);
+        return;
+      }
     }
 
     res = await fetch(`${global.Config.FetchURL}/dks/releaseDK`, {
@@ -155,6 +157,7 @@ export default class publish extends Component {
           PEBalance: Number(this.state.PEBalance) - Number(this.state.amount) + ''
         })
       }
+      this.props.navigation.goBack();
     } else {
       ToastAndroid.show(res.message, ToastAndroid.SHORT);
     }
@@ -321,8 +324,8 @@ export default class publish extends Component {
                                                      <View style={ [styles.formArea] }>
                                                        <TextInput
                                                                   placeholder="请输入您的支付密码"
-                                                                  style={ { fontSize: 40, padding: 0, margin: 0, flex: 1, color:'white' } }
-                                                                  secureTextEntry={true}
+                                                                  style={ { fontSize: 40, padding: 0, margin: 0, flex: 1, color: 'white' } }
+                                                                  secureTextEntry={ true }
                                                                   placeholderTextColor="rgb(219,219,219)"
                                                                   onChangeText={ (text) => {
                                                                                    this.setState({
@@ -403,8 +406,8 @@ const styles = StyleSheet.create({
   rowContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    paddingTop: 60,
-    paddingBottom: 60,
+    paddingTop: 40,
+    paddingBottom: 40,
     borderBottomWidth: 4,
     borderBottomColor: 'rgb(74,11,115)',
     width: 1000

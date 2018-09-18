@@ -18,6 +18,7 @@ export default class orderFlow extends Component {
   constructor(props) {
     super();
     this.state = {
+      order: {},
       buyColor: 'red',
       saleColor: 'white',
       PEBalance: '0',
@@ -47,7 +48,7 @@ export default class orderFlow extends Component {
     return title;
   }
 
-  componentWillUnmount(){
+  componentWillUnmount() {
     clearInterval(orderRefreshTimer);
   }
 
@@ -74,10 +75,10 @@ export default class orderFlow extends Component {
     } else {
       totalSeconds = order.times * 60;
     }
-    console.log(order);
+    
     this.setState({
       order: order,
-      payInfo: order.payUser.userPayInfo,
+      payInfo: order.type === 1 ? order.payUser.userPayInfo : order.user.userInfo,
       isBuyOrder: order.type === 1,
       dealNumber: order.dealNumber,
       buttonTitle: this.getBtnTitle(order.type, order.status),
@@ -168,13 +169,16 @@ export default class orderFlow extends Component {
   _paymentRender = (pay, index) => {
     let paymentColor = this.state.payment[index] ? 'rgb(13,126,190)' : 'white';
     let paymentArr = ['微信', '支付宝', '银行卡'];
-    let hasPaymentArr = this.state.payInfo.map((info) => info.payType);
+    let payInfo;
+    let hasPaymentArr = this.state.payInfo.map((info) => {
+      if (info.payType === index + 1) {
+        payInfo = info;
+      }
+      return info.payType;
+    });
     if (!hasPaymentArr.includes(index + 1)) {
       return null;
     }
-    let payInfo = this.state.payInfo.sort((x, y) => {
-      return x.payType - y.payType
-    });
     return (<View
                   style={ { marginTop: 40 } }
                   key={ index }>
@@ -188,12 +192,15 @@ export default class orderFlow extends Component {
                 </Text>
                 <TouchableOpacity onPress={ () => {
                                               if (index === 2) {
-                                                Clipboard.setString(payInfo[index].qrCode + '');
-                                                Alert.alert('提示', '已复制卡号到粘贴板');
+                                                Clipboard.setString(payInfo.qrCode + '');
+                                                Alert.alert('提示', '已复制银行卡号到粘贴板');
+                                                this.setState({
+                                                  openQrCode: true
+                                                });
                                                 return;
                                               }
                                               this.setState({
-                                                accountId: payInfo[index].accountId,
+                                                accountId: payInfo.accountId,
                                                 qrCodeVisible: true,
                                                 openQrCode: true
                                               })
@@ -214,10 +221,10 @@ export default class orderFlow extends Component {
                   { this.state.order && this.state.order.payUser && this.state.order.payUser.userName }
                 </Text>
                 <Text style={ { color: 'white', fontSize: 40, paddingLeft: 20 } }>
-                  { payInfo[index].qrCode }
+                  { payInfo.qrCode }
                 </Text>
                 <Text style={ { color: 'white', fontSize: 40, paddingLeft: 20 } }>
-                  { index === 2 ? payInfo[index].Bank : '' }
+                  { index === 2 ? payInfo.Bank : '' }
                 </Text>
               </View>
             </View>);
@@ -268,27 +275,27 @@ export default class orderFlow extends Component {
               { paymentsTitle.map(this._paymentRender) }
             </View>
             <View style={ { flexDirection: 'row', width: 900, justifyContent: 'flex-start', alignItems: 'center', margin: 40 } }>
-              { this.state.isBuyOrder
-                ? (<Text style={ { fontSize: 40, color: 'white' } }>
-                     待支付,请于
-                     <Text style={ { color: 'red' } }>
-                       { this.state.times }
-                     </Text>内向
-                     { user.userName }支付
-                     <Text style={ { color: 'rgb(46,132,255)' } }>
-                       { this.state.dealNumber && Math.round(Number(this.state.dealNumber) * 0.8) }CNY
-                     </Text>
-                   </Text>)
-                : <Text style={ { fontSize: 40, color: 'white' } }>
-                    等待对方支付,
-                    { user.userName }将于
-                    <Text style={ { color: 'red' } }>
-                      { this.state.times }
-                    </Text>内向您支付
-                    <Text style={ { color: 'rgb(46,132,255)' } }>
-                      { this.state.dealNumber && Math.round(Number(this.state.dealNumber) * 0.8) }CNY
-                    </Text>
-                  </Text> }
+              { this.state.order.status !== 3 && this.state.order.status !== 6 ? null : (this.state.isBuyOrder
+                  ? (<Text style={ { fontSize: 40, color: 'white' } }>
+                       待支付,请于
+                       <Text style={ { color: 'red' } }>
+                         { this.state.times }
+                       </Text>内向
+                       { user.userName }支付
+                       <Text style={ { color: 'rgb(46,132,255)' } }>
+                         { this.state.dealNumber && Math.round(Number(this.state.dealNumber) * 0.8) }CNY
+                       </Text>
+                     </Text>)
+                  : <Text style={ { fontSize: 40, color: 'white' } }>
+                      等待对方支付,
+                      { user.userName }将于
+                      <Text style={ { color: 'red' } }>
+                        { this.state.times }
+                      </Text>内向您支付
+                      <Text style={ { color: 'rgb(46,132,255)' } }>
+                        { this.state.dealNumber && Math.round(Number(this.state.dealNumber) * 0.8) }CNY
+                      </Text>
+                    </Text>) }
             </View>
           </View>
           <View style={ { flexDirection: 'row', height: 60, marginTop: 40, width: 1000, justifyContent: 'flex-start', alignItems: 'center' } }>
@@ -305,9 +312,7 @@ export default class orderFlow extends Component {
             </TouchableOpacity>
           </View>
           <View style={ { marginTop: 40 } }>
-            <TouchableOpacity
-                              onPress={ this.nextFlow }
-                              disabled={ !this.state.openQrCode }>
+            <TouchableOpacity onPress={ this.nextFlow }>
               <ImageBackground
                                style={ { borderRadius: 80, width: 1000, height: 150 } }
                                source={ require('../../../images/Button_bg.jpg') }

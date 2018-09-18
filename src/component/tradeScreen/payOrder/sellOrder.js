@@ -64,6 +64,14 @@ export default class sellOrder extends Component {
   }
 
   async payForOrder() {
+    if(Number(this.state.amount)%500 !== 0){
+      ToastAndroid.show("交易数量应为500的倍数", ToastAndroid.SHORT);
+      return;
+    }
+    if(this.state.amount > this.state.order.dealNumber){
+      ToastAndroid.show("交易数量超出委托单上限", ToastAndroid.SHORT);
+      return;
+    }
     if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)^\S+[\s\S]{7,31}$/.test(this.state.payPwd)) {
       ToastAndroid.show("请输入8-32位大小写字母加数字支付密码", ToastAndroid.SHORT);
       return;
@@ -101,7 +109,7 @@ export default class sellOrder extends Component {
     });
     res = await res.json();
     if (res.code === 200) {
-      this.props.navigation.push('orderFlow', {
+      this.props.navigation.replace('orderFlow', {
         id: res.data,
         dealNumber: this.state.amount,
         isNewOrder: true
@@ -173,7 +181,7 @@ export default class sellOrder extends Component {
           </View>
           <View style={ styles.rowContainer }>
             <Text style={ styles.label }>
-              买入数量
+              卖出数量
             </Text>
             <View style={ styles.formArea }>
               <TextInput
@@ -193,7 +201,7 @@ export default class sellOrder extends Component {
           </View>
           <View style={ [styles.rowContainer] }>
             <Text style={ styles.label }>
-              实付金额
+              实收金额
             </Text>
             <View style={ [styles.formArea, { flexDirection: 'row' }] }>
               <Text style={ styles.primaryFont }>

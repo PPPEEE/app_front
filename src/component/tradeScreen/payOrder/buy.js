@@ -77,7 +77,7 @@ export default class wantBuy extends Component {
     });
   }
   renderItem = (item, index) => {
-    var userPayInfo = item.item.user.userPayInfo;
+    var userPayInfo = item.item.user.userInfo;
     return (<TouchableOpacity
                               style={ styles.listItem }
                               showsHorizontalScrollIndicator={ false }

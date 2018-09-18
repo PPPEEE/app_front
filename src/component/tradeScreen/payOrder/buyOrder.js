@@ -62,6 +62,15 @@ export default class buyOrder extends Component {
   }
 
   async payForOrder() {
+    if(Number(this.state.amount)%500 !== 0){
+      ToastAndroid.show("交易数量应为500的倍数", ToastAndroid.SHORT);
+      return;
+    }
+    if(this.state.amount > this.state.order.dealNumber){
+      ToastAndroid.show("交易数量超出委托单上限", ToastAndroid.SHORT);
+      return;
+    }
+
     let res = await fetch(`${global.Config.FetchURL}/dks/dkPurchase`, {
       method: 'post',
       headers: {
@@ -76,12 +85,12 @@ export default class buyOrder extends Component {
     });
     res = await res.json();
     if (res.code === 200) {
-      this.props.navigation.push('orderFlow', {
+      this.props.navigation.replace('orderFlow', {
         id: res.data,
         dealNumber: this.state.amount,
         isNewOrder: true
       });
-    }else{
+    } else {
       Alert.alert('提示', '买入处理异常');
     }
 
