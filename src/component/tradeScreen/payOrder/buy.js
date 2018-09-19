@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   listItem: {
-    height: 307,
+    height: 300,
     borderBottomWidth: 4,
     borderBottomColor: 'rgb(208,192,227)',
     justifyContent: 'center'

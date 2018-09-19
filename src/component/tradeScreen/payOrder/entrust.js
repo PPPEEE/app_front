@@ -150,7 +150,7 @@ export default class entrust extends Component {
                 <View style={ { marginTop: 20, marginLeft: 4 } }>
                   <Text style={ styles.lightFont }>
                     限额
-                    { ' ' + item.item.minNumber ? item.item.minNumber : 0 }
+                    { ' ' + (item.item.minNumber ? item.item.minNumber : 0) }
                   </Text>
                 </View>
                 <View style={ { marginTop: 20, marginLeft: 4 } }>
@@ -162,19 +162,19 @@ export default class entrust extends Component {
               </View>
             </View>
             <View style={ { alignItems: 'flex-end' } }>
-              <Text style={ [styles.lightFont, { marginRight: 0 }] }>
+              <Text style={ [styles.lightFont, { marginRight: 20 }] }>
                 { "交易总量: " }
                 <Text style={ styles.primaryFont }>
                   { ' '+Math.round(item.item.money * 1.25) + ' PE' }
                 </Text>
               </Text>
-              <Text style={ [styles.lightFont, { marginTop: 20 }] }>
+              <Text style={ [styles.lightFont, { marginTop: 20, marginRight: 20 }] }>
                 { `总金额: ` }
                 <Text style={ [styles.primaryFont, { fontSize: 36 }] }>
                   { ' ' + item.item.money + ' CNY' }
                 </Text>
               </Text>
-              <Text style={ [styles.lightFont, { marginTop: 20 }] }>
+              <Text style={ [styles.lightFont, { marginTop: 20, marginRight: 20 }] }>
                 <Text style={ {} }>
                   { `${item.item.type === 1 ? '已付' : '已收'}: ` }
                 </Text>
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   listItem: {
-    height: 307,
+    height: 300,
     borderBottomWidth: 4,
     borderBottomColor: 'rgb(208,192,227)'
   },
