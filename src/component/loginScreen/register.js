@@ -87,7 +87,7 @@ export default class Register extends Component {
     }).then((res) => {
       return res.json();
     }).then((jsonData) => {
-      if (jsonData.code === '200') {
+      if (jsonData.code === 200) {
         ToastAndroid.show('注册成功', ToastAndroid.SHORT);
         this.props.navigation.replace('login');
       } else {

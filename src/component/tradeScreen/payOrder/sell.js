@@ -115,7 +115,7 @@ export default class wangSell extends Component {
                     <View style={ { marginTop: 20, marginLeft: 4 } }>
                       <Text style={ styles.lightFont }>
                         限额
-                        { ' ' + item.item.minNumber }
+                        { ' ' + (item.item.minNumber ? item.item.minNumber : 0) }
                       </Text>
                     </View>
                     <View style={ { marginTop: 20, marginLeft: 4 } }>

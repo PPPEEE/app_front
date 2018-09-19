@@ -8,6 +8,7 @@ import { SafeAreaView } from 'react-navigation';
 
 var ITEM_HEIGHT = 150;
 var status = ['已取消', '已完成', '未完成', '未付款', '已超时', '已冻结', '已付款', '已申诉'];
+var paymentIcons = [require('../../../images/WeChat.png'), require('../../../images/Alipay.png'), require('../../../images/BankCard.png')];
 type page = {};
 
 export default class buyList extends Component {
@@ -55,7 +56,8 @@ export default class buyList extends Component {
       dealNumber: item.dealNumber,
       orderNumber: item.orderNumber,
       status: item.status,
-      payUser: item.payUser
+      payUser: item.payUser,
+      type: item.type
     };
   }
 
@@ -109,12 +111,16 @@ export default class buyList extends Component {
             </Text>
             <View>
               <View style={ { flexDirection: 'row', justifyContent: 'flex-start' } }>
-                <Text style={ styles.text }>
+                <Text style={ [styles.text, {marginRight: 10}] }>
                   { (isBuyOrder ? '卖家' : '买家') + ': ' + (!item.item.payUser ? '无' : item.item.payUser.userName) }
                 </Text>
-                <Image
-                       style={ { width: 15, height: 15, borderRadius: 15, margin: 5 } }
-                       source={ require('../../../images/WeChat.png') } />
+                {item.item.payUser && item.item.payUser.userPayInfo.map((item, index)=>{
+                  return (<Image
+                       key={index}
+                       style={ { width: 14, height: 14, borderRadius: 7, margin: 5 } }
+                       resizeMode="contain"
+                       source={ paymentIcons[item.payType-1] } />);
+                }) }
               </View>
               <Text style={ styles.text }>
                 { (isBuyOrder ? '卖家' : '买家') + '手机: ' + (!item.item.payUser ? '无' : item.item.payUser.telephone) }
