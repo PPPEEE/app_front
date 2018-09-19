@@ -202,7 +202,7 @@ export default class entrust extends Component {
                    animating={ this.state.showLoading }
                    style={ { marginTop: -280 } }
                    size={ 180 } />
-          <View style={ { height: 1536 } }>
+          <View style={ { height: 1450 } }>
             <FlatList
                       data={ this.state.dataList }
                       initialNumToRender={ 5 }
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   listItem: {
-    height: 300,
+    height: 290,
     borderBottomWidth: 4,
     borderBottomColor: 'rgb(208,192,227)'
   },

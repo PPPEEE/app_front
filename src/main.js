@@ -95,7 +95,7 @@ const styles = StyleSheet.create({
   tabBarComponent: {
     borderTopWidth: 1,
     borderTopColor: '#A028EA',
-    height: 52
-    
+    height: 52,
+    position:'relative'
   }
 })

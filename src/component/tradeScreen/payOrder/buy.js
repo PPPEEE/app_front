@@ -146,7 +146,7 @@ export default class wantBuy extends Component {
     return (
       <Resolutions.FixFullView>
         <SafeAreaView style={ styles.container }>
-          <View style={ { height: 1536 } }>
+          <View style={ { height: 1483} }>
             <FlatList
                       data={ this.state.dataList }
                       onEndReached={ this.getMoreList }
@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   listItem: {
-    height: 300,
+    height: 290,
     borderBottomWidth: 4,
     borderBottomColor: 'rgb(208,192,227)',
     justifyContent: 'center'
