@@ -9,6 +9,8 @@ import Resolutions from '../../../utils/resolutions';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import ModalDropdown from 'react-native-modal-dropdown';
 
+const amoutArr = ['500', '1000', '1500', '2000'];
+const paymentsTitle = ['微信支付', '支付宝', '银行卡'];
 let paymentsArr = [null, null, null]; //微信,支付宝,银行
 let token = '';
 
@@ -169,11 +171,7 @@ export default class publish extends Component {
       amount: amount + ''
     });
   }
-
-  render() {
-    const amoutArr = ['500', '1000', '1500', '2000'];
-    const paymentsTitle = ['微信支付', '支付宝', '银行卡'];
-    const amoutsRender = (amount) => {
+  amoutsRender = (amount) => {
       let borderColor = amount === this.state.amount ? 'rgb(159,68,184)' : 'rgb(90,22,133)'
       return (<TouchableOpacity
                                 onPress={ () => {
@@ -188,7 +186,7 @@ export default class publish extends Component {
               </TouchableOpacity>);
     };
 
-    const paymentRender = (payment, index) => {
+  paymentRender = (payment, index) => {
       let paymentColor = this.state.payment[index] ? 'rgb(13,126,190)' : 'white';
       return (<TouchableOpacity
                                 onPress={ () => {
@@ -220,6 +218,10 @@ export default class publish extends Component {
                 </Text>
               </TouchableOpacity>);
     }
+
+  render() {
+    
+    
     return (
       <Resolutions.FixFullView>
         <StatusBar
@@ -279,7 +281,7 @@ export default class publish extends Component {
                                           })
                                         } } />
               <View style={ { flexDirection: 'row', marginTop: 40 } }>
-                { amoutArr.map(amoutsRender) }
+                { amoutArr.map(this.amoutsRender) }
               </View>
               <Text style={ { color: 'rgb(152,152,152)', fontSize: 36, marginTop: 40 } }>
                 交易数量只能为500的倍数
@@ -291,7 +293,7 @@ export default class publish extends Component {
               付款方式
             </Text>
             <View style={ [styles.formArea, { flexDirection: 'row' }] }>
-              { paymentsTitle.map(paymentRender) }
+              { paymentsTitle.map(this.paymentRender) }
             </View>
           </View>
           <View style={ styles.rowContainer }>
